@@ -1,6 +1,6 @@
 // main.dart (snippet mínimo)
 import 'package:flutter/material.dart';
-import 'package:cine_shelf/screens/home_screen.dart';
+import 'package:cine_shelf/screens/home.dart';
 
 void main() => runApp(const MyApp());
 
