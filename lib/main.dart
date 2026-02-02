@@ -1,6 +1,6 @@
 // main.dart (snippet mínimo)
+import 'package:cine_shelf/screens/login.dart';
 import 'package:flutter/material.dart';
-import 'package:cine_shelf/screens/home_screen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -9,9 +9,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
-    );
+    return const MaterialApp(debugShowCheckedModeBanner: false, home: Login());
   }
 }
