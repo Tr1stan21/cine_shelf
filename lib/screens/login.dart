@@ -1,6 +1,8 @@
 import 'package:cine_shelf/widgets/separator.dart';
 import 'package:cine_shelf/widgets/text_field.dart';
 import 'package:cine_shelf/widgets/background.dart';
+import 'package:cine_shelf/widgets/login_button.dart';
+import 'package:cine_shelf/screens/home.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -9,7 +11,7 @@ class Login extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Background(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: 24),
       child: Center(
         child: SingleChildScrollView(
           child: Column(
@@ -19,16 +21,19 @@ class Login extends StatelessWidget {
               const SizedBox(height: 30),
 
               CineTextField(isPassword: false),
-              const SizedBox(height: 16),
 
               const GlowSeparator(),
 
               CineTextField(isPassword: true),
               const SizedBox(height: 24),
 
-              ElevatedButton(
-                onPressed: () {},
-                child: const Text('Iniciar sesión'),
+              CinePrimaryGoldButton(
+                onPressed: () => {
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (_) => const Home()),
+                  ),
+                },
+                text: 'Login',
               ),
             ],
           ),

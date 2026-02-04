@@ -14,14 +14,10 @@ class Background extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
+        fit: StackFit.expand,
         children: [
           // Fondo global
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/background.png',
-              fit: BoxFit.cover,
-            ),
-          ),
+          Image.asset('assets/images/background.png', fit: BoxFit.cover),
 
           SafeArea(
             child: Padding(padding: padding, child: child),
