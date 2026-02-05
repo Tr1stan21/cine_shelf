@@ -1,70 +1,83 @@
 import 'package:flutter/material.dart';
 import 'package:cine_shelf/models/movie_item.dart';
+import 'package:cine_shelf/widgets/movie_list.dart';
 
 class MovieListSection extends StatelessWidget {
   final String title;
   final List<MovieItem> items;
 
-  MovieListSection({required this.title, required this.items});
+  const MovieListSection({super.key, required this.title, required this.items});
 
   @override
   Widget build(BuildContext context) {
+    const postersVisible = 3;
+    const itemSpacing = 12.0;
+    const posterAspectRatio = 2 / 3; // ancho/alto
+
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Título
+          // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 title,
-                style: TextStyle(
-                  color: Colors.amber, // Color dorado
+                style: const TextStyle(
+                  color: Colors.amber,
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.arrow_forward_ios, color: Colors.amber),
+                icon: const Icon(Icons.arrow_forward_ios, color: Colors.amber),
                 onPressed: () {
-                  // Acción para ver todo
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => MovieList(title: title, items: items),
+                    ),
+                  );
                 },
               ),
             ],
           ),
 
-          // Lista de Pósters
-          SizedBox(
-            height: 200, // Tamaño fijo de la lista horizontal
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                return Padding(
-                  padding: EdgeInsets.only(
-                    right: 12,
-                  ), // Espaciado entre imágenes
-                  child: GestureDetector(
-                    onTap: () {
-                      // Acción al tocar un póster
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(
-                        12,
-                      ), // Bordes redondeados
-                      child: Image.network(
-                        items[index].imageUrl,
-                        fit: BoxFit.cover, // Ajustar imagen al contenedor
-                        width: 120, // Ancho fijo para las imágenes
-                        height: 200, // Altura fija para las imágenes
+          // Lista (ancho calculado según el espacio REAL disponible)
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final availableW = constraints.maxWidth;
+              final totalSpacing = itemSpacing * (postersVisible - 1);
+              final posterW = (availableW - totalSpacing) / postersVisible;
+              final posterH = posterW / posterAspectRatio;
+
+              return SizedBox(
+                height: posterH,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) =>
+                      const SizedBox(width: itemSpacing),
+                  itemBuilder: (context, index) {
+                    return SizedBox(
+                      width: posterW,
+                      child: GestureDetector(
+                        onTap: () {},
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            items[index].imageUrl,
+                            fit: BoxFit.cover,
+                            filterQuality: FilterQuality.low,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                );
-              },
-            ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),

@@ -6,8 +6,4 @@ class MovieItem {
 
   // Constructor
   MovieItem({required this.title, required this.imageUrl, required this.id});
-
-  // Si necesitas métodos adicionales, añádelos aquí de forma sencilla
-  // Ejemplo: un método para obtener el nombre completo de la película
-  String get fullTitle => '$title (Detalles)';
 }
