@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cine_shelf/models/movie_item.dart';
-import 'package:cine_shelf/widgets/movie_list.dart';
+import 'package:cine_shelf/screens/movie_list.dart';
+import 'package:cine_shelf/screens/movie_details.dart';
 
 class MovieListSection extends StatelessWidget {
   final String title;
@@ -63,7 +64,11 @@ class MovieListSection extends StatelessWidget {
                     return SizedBox(
                       width: posterW,
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(builder: (_) => MovieDetails()),
+                          );
+                        },
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(12),
                           child: Image.network(

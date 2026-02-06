@@ -1,7 +1,7 @@
 import 'package:cine_shelf/widgets/separator.dart';
 import 'package:cine_shelf/widgets/text_field.dart';
 import 'package:cine_shelf/widgets/background.dart';
-import 'package:cine_shelf/widgets/login_button.dart';
+import 'package:cine_shelf/widgets/btn_login.dart';
 import 'package:cine_shelf/screens/home.dart';
 import 'package:flutter/material.dart';
 
