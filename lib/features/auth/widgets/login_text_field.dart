@@ -1,15 +1,24 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
-class TxtLogin extends StatefulWidget {
-  const TxtLogin({super.key, required this.isPassword});
+import 'package:cine_shelf/config/theme.dart';
+
+/// Campo de texto personalizado para el formulario de login
+///
+/// Soporta dos modos: email (por defecto) y contraseña.
+/// En modo contraseña, incluye un botón para mostrar/ocultar el texto.
+class LoginTextField extends StatefulWidget {
+  const LoginTextField({required this.isPassword, super.key});
 
   final bool isPassword;
 
+  static const String _emailHint = 'Email';
+  static const String _passwordHint = 'Password';
+
   @override
-  State<TxtLogin> createState() => _TxtLoginState();
+  State<LoginTextField> createState() => _LoginTextFieldState();
 }
 
-class _TxtLoginState extends State<TxtLogin> {
+class _LoginTextFieldState extends State<LoginTextField> {
   bool _obscureText = true;
 
   @override
@@ -19,13 +28,13 @@ class _TxtLoginState extends State<TxtLogin> {
     return Container(
       height: 56,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22),
+        borderRadius: BorderRadius.circular(CineRadius.xl),
         gradient: const LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
           colors: [Color(0xB8171212), Color(0xB80F0B0B)],
         ),
-        border: Border.all(color: Colors.white.withAlpha(36), width: 1),
+        border: Border.all(color: const Color(0x24FFFFFF), width: 1),
       ),
       child: TextField(
         obscureText: isPassword && _obscureText,
@@ -36,34 +45,33 @@ class _TxtLoginState extends State<TxtLogin> {
         ),
         cursorColor: const Color(0xFFFFA84B),
         decoration: InputDecoration(
-          hintText: isPassword ? 'Password' : 'Email',
+          hintText: isPassword
+              ? LoginTextField._passwordHint
+              : LoginTextField._emailHint,
           hintStyle: const TextStyle(
-            color: Color(0x73FFFFFF),
+            color: CineColors.textMuted,
             fontSize: 17,
             fontWeight: FontWeight.w500,
           ),
           prefixIcon: Icon(
             isPassword ? Icons.lock_outlined : Icons.email_outlined,
-            color: const Color(0xFFCAA35C),
-            size: 24,
+            color: CineColors.amber,
+            size: CineSizes.iconSize,
           ),
           suffixIcon: isPassword
               ? IconButton(
                   icon: Icon(
-                    _obscureText
-                        ? Icons.visibility_outlined
-                        : Icons.visibility_off_outlined,
-                    color: Colors.white.withAlpha(140),
-                    size: 24,
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                    color: CineColors.amber,
+                    size: CineSizes.iconSize,
                   ),
                   onPressed: () => setState(() => _obscureText = !_obscureText),
                 )
               : null,
           border: InputBorder.none,
-          isDense: true,
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 15,
+            horizontal: CineSpacing.xl,
+            vertical: CineSpacing.xl,
           ),
         ),
       ),

@@ -1,13 +1,23 @@
 import 'package:flutter/material.dart';
 
-class BtnMovieDetails extends StatelessWidget {
-  const BtnMovieDetails({
+import 'package:cine_shelf/config/theme.dart';
+
+/// Botón de acción para la pantalla de detalles de película
+///
+/// Soporta dos variantes:
+/// - Filled: con color de fondo sólido
+/// - Outlined: con borde y fondo semi-transparente
+///
+/// Puede incluir iconos leading y trailing opcionales.
+class MovieActionButton extends StatelessWidget {
+  const MovieActionButton({
     required this.label,
     required this.icon,
     this.backgroundColor,
-    this.foregroundColor = const Color(0xFFFFB000),
+    this.foregroundColor = CineColors.amber,
     this.outlined = false,
     this.trailingIcon,
+    super.key,
   });
 
   final String label;
@@ -17,13 +27,15 @@ class BtnMovieDetails extends StatelessWidget {
   final bool outlined;
   final IconData? trailingIcon;
 
+  static const Color _bgTransparent = Color(0xA60F0E0E);
+
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 44,
       decoration: BoxDecoration(
-        color: outlined ? const Color(0xA60F0E0E) : backgroundColor,
-        borderRadius: BorderRadius.circular(22),
+        color: outlined ? _bgTransparent : backgroundColor,
+        borderRadius: BorderRadius.circular(CineRadius.xl),
         border: outlined
             ? Border.all(
                 color: foregroundColor.withValues(alpha: 0.7),
@@ -34,21 +46,22 @@ class BtnMovieDetails extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 18, color: foregroundColor),
-          const SizedBox(width: 10),
+          Icon(icon, size: CineSizes.iconSizeSmall, color: foregroundColor),
+          const SizedBox(width: CineSpacing.sm),
           Text(
             label,
-            style: TextStyle(
-              color: foregroundColor,
+            style: const TextStyle(
               fontSize: 13.5,
               fontWeight: FontWeight.w600,
-            ),
+            ).copyWith(color: foregroundColor),
           ),
           if (trailingIcon != null) ...[
-            const SizedBox(width: 10),
+            const SizedBox(width: CineSpacing.sm),
             Icon(
               trailingIcon,
-              size: trailingIcon == Icons.chevron_right_rounded ? 20 : 18,
+              size: trailingIcon == Icons.chevron_right_rounded
+                  ? 20
+                  : CineSizes.iconSizeSmall,
               color: foregroundColor,
             ),
           ],

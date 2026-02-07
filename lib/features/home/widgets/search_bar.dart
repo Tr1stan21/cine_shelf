@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:cine_shelf/config/theme.dart';
+
+/// Barra de búsqueda personalizada con estilo CineShelf
+///
+/// Campo de entrada con gradiente oscuro, placeholder e ícono de búsqueda.
 class CineSearchBar extends StatelessWidget {
   const CineSearchBar({
     super.key,
@@ -12,13 +17,15 @@ class CineSearchBar extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
+  static const String _searchHint = 'Buscar películas...';
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
       child: Container(
         height: 50,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(22),
+          borderRadius: BorderRadius.circular(CineRadius.xl),
           gradient: const LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -31,16 +38,13 @@ class CineSearchBar extends StatelessWidget {
             onChanged: onChanged,
             onSubmitted: onSubmitted,
             textAlignVertical: TextAlignVertical.center,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-            decoration: InputDecoration(
-              hintText: 'Buscar películas...',
-              hintStyle: const TextStyle(
-                color: Color(0x99FFFFFF),
-                fontSize: 16,
-              ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 18),
+            style: CineTypography.bodyMedium,
+            decoration: const InputDecoration(
+              hintText: _searchHint,
+              hintStyle: TextStyle(color: CineColors.textHint, fontSize: 16),
+              contentPadding: EdgeInsets.symmetric(horizontal: CineSpacing.xl),
               border: InputBorder.none,
-              suffixIcon: Icon(Icons.search, color: Color(0xFFCAA35C)),
+              suffixIcon: Icon(Icons.search, color: CineColors.amber),
             ),
           ),
         ),

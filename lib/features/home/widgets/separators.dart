@@ -1,22 +1,33 @@
 import 'package:flutter/material.dart';
 
+/// Separador visual con efecto de brillo dorado/naranja
+///
+/// Componente decorativo que simula una línea luminosa con gradientes
+/// y efectos de glow. Usado para separar secciones de contenido.
 class GlowSeparator extends StatelessWidget {
   const GlowSeparator({super.key});
-
-  static const double _height = 72.0;
 
   @override
   Widget build(BuildContext context) {
     return const SizedBox(
-      height: _height,
+      height: 72,
       width: double.infinity,
       child: CustomPaint(painter: _GlowSeparatorPainter()),
     );
   }
 }
 
+/// Painter personalizado que dibuja el efecto de glow del separador
 class _GlowSeparatorPainter extends CustomPainter {
   const _GlowSeparatorPainter();
+
+  // Colores específicos del separador
+  static const Color _deep = Color(0xFF4A1E0C);
+  static const Color _edge = Color(0xFF7D3410);
+  static const Color _amberGlow = Color(0xFFC45A14);
+  static const Color _orange = Color(0xFFFF8A22);
+  static const Color _goldGlow = Color(0xFFFFC168);
+  static const Color _whiteHot = Color(0xFFFFF2D9);
 
   static const List<double> _wideStops = [
     0.0,
@@ -29,13 +40,6 @@ class _GlowSeparatorPainter extends CustomPainter {
   ];
 
   static const List<double> _coreStops = [0.0, 0.45, 0.5, 0.55, 1.0];
-
-  static const Color _deep = Color(0xFF4A1E0C);
-  static const Color _edge = Color(0xFF7D3410);
-  static const Color _amber = Color(0xFFC45A14);
-  static const Color _orange = Color(0xFFFF8A22);
-  static const Color _gold = Color(0xFFFFC168);
-  static const Color _whiteHot = Color(0xFFFFF2D9);
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -57,7 +61,7 @@ class _GlowSeparatorPainter extends CustomPainter {
         Colors.transparent,
         _deep,
         _edge,
-        _amber,
+        _amberGlow,
         _edge,
         _deep,
         Colors.transparent,
@@ -75,9 +79,9 @@ class _GlowSeparatorPainter extends CustomPainter {
       colors: const [
         Colors.transparent,
         _edge,
-        _amber,
+        _amberGlow,
         _orange,
-        _amber,
+        _amberGlow,
         _edge,
         Colors.transparent,
       ],
@@ -93,11 +97,11 @@ class _GlowSeparatorPainter extends CustomPainter {
       opacity: 0.52,
       colors: const [
         Colors.transparent,
-        _amber,
+        _amberGlow,
         _orange,
-        _gold,
+        _goldGlow,
         _orange,
-        _amber,
+        _amberGlow,
         Colors.transparent,
       ],
       stops: _wideStops,
@@ -129,9 +133,9 @@ class _GlowSeparatorPainter extends CustomPainter {
       colors: const [
         Colors.transparent,
         _orange,
-        _gold,
+        _goldGlow,
         _whiteHot,
-        _gold,
+        _goldGlow,
         _orange,
         Colors.transparent,
       ],
@@ -159,9 +163,9 @@ class _GlowSeparatorPainter extends CustomPainter {
       opacity: 0.78,
       colors: const [
         Colors.transparent,
-        _gold,
+        _goldGlow,
         _whiteHot,
-        _gold,
+        _goldGlow,
         Colors.transparent,
       ],
       stops: _coreStops,
@@ -236,7 +240,7 @@ class _GlowSeparatorPainter extends CustomPainter {
 
   List<Color> _withOpacity(List<Color> colors, double opacity) {
     return colors
-        .map((color) => color.withOpacity(_clamp01(color.opacity * opacity)))
+        .map((color) => color.withValues(alpha: _clamp01(color.a * opacity)))
         .toList(growable: false);
   }
 
