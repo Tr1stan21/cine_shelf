@@ -1,15 +1,15 @@
 ﻿import 'package:flutter/material.dart';
 
-class CineTextField extends StatefulWidget {
-  const CineTextField({super.key, required this.isPassword});
+class TxtLogin extends StatefulWidget {
+  const TxtLogin({super.key, required this.isPassword});
 
   final bool isPassword;
 
   @override
-  State<CineTextField> createState() => _CineTextFieldState();
+  State<TxtLogin> createState() => _TxtLoginState();
 }
 
-class _CineTextFieldState extends State<CineTextField> {
+class _TxtLoginState extends State<TxtLogin> {
   bool _obscureText = true;
 
   @override

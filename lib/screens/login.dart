@@ -1,5 +1,5 @@
 import 'package:cine_shelf/widgets/separator.dart';
-import 'package:cine_shelf/widgets/text_field.dart';
+import 'package:cine_shelf/widgets/txt_login.dart';
 import 'package:cine_shelf/widgets/background.dart';
 import 'package:cine_shelf/widgets/btn_login.dart';
 import 'package:cine_shelf/screens/home.dart';
@@ -20,11 +20,11 @@ class Login extends StatelessWidget {
               Image.asset('assets/logo/logo2.png'),
               const SizedBox(height: 30),
 
-              CineTextField(isPassword: false),
+              TxtLogin(isPassword: false),
 
               const GlowSeparator(),
 
-              CineTextField(isPassword: true),
+              TxtLogin(isPassword: true),
               const SizedBox(height: 24),
 
               CinePrimaryGoldButton(
