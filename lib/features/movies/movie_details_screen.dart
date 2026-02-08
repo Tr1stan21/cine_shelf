@@ -45,7 +45,7 @@ class MovieDetailsScreen extends StatelessWidget {
                     padding: const EdgeInsets.all(CineSpacing.xl),
                     decoration: const BoxDecoration(
                       image: DecorationImage(
-                        image: AssetImage(AppConstants.background),
+                        image: AssetImage(AppConstants.backgroundPath),
                         fit: BoxFit.cover,
                       ),
                     ),

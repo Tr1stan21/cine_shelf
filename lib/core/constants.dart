@@ -2,7 +2,7 @@
 abstract class AppConstants {
   // Assets paths
   static const String logoPath = 'assets/logo/logo_extracted.png';
-  static const String background = 'assets/images/background.png';
+  static const String backgroundPath = 'assets/images/background.png';
 
   // URLs placeholder (temporal hasta integrar API real)
   static const String urlPlaceholderPoster =

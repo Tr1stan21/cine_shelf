@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:cine_shelf/config/theme.dart';
 import 'package:cine_shelf/core/constants.dart';
-import 'package:cine_shelf/core/widgets/background.dart';
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
 import 'package:cine_shelf/features/home/widgets/search_bar.dart';
 import 'package:cine_shelf/features/home/widgets/separators.dart';
@@ -21,21 +19,18 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Background(
-      padding: const EdgeInsets.symmetric(horizontal: CineSpacing.md),
-      child: SingleChildScrollView(
-        child: Column(
-          children: [
-            Image.asset(AppConstants.logoPath, height: 100),
-            const SizedBox(height: 20),
-            CineSearchBar(onChanged: (v) {}, onSubmitted: (v) {}),
-            MovieListSection(title: _latestReleases, items: MovieData.m),
-            const GlowSeparator(),
-            MovieListSection(title: _topRated, items: MovieData.s),
-            const GlowSeparator(),
-            MovieListSection(title: _popular, items: MovieData.s),
-          ],
-        ),
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          Image.asset(AppConstants.logoPath, height: 100),
+          const SizedBox(height: 20),
+          CineSearchBar(onChanged: (v) {}, onSubmitted: (v) {}),
+          MovieListSection(title: _latestReleases, items: MovieData.m),
+          const GlowSeparator(),
+          MovieListSection(title: _topRated, items: MovieData.s),
+          const GlowSeparator(),
+          MovieListSection(title: _popular, items: MovieData.s),
+        ],
       ),
     );
   }

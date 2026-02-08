@@ -18,24 +18,26 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Background(
-      padding: const EdgeInsets.symmetric(horizontal: CineSpacing.xxl),
-      child: Center(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Image.asset('assets/logo/logo2.png'),
-              const SizedBox(height: CineSpacing.xxxl),
-              const LoginTextField(isPassword: false),
-              const GlowSeparator(),
-              const LoginTextField(isPassword: true),
-              const SizedBox(height: CineSpacing.xxl),
-              CinePrimaryGoldButton(
-                onPressed: () => context.go('/home'),
-                text: _loginButton,
-              ),
-            ],
+    return Scaffold(
+      body: Background(
+        padding: const EdgeInsets.symmetric(horizontal: CineSpacing.xxl),
+        child: Center(
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Image.asset('assets/logo/logo2.png'),
+                const SizedBox(height: CineSpacing.xxxl),
+                const LoginTextField(isPassword: false),
+                const GlowSeparator(),
+                const LoginTextField(isPassword: true),
+                const SizedBox(height: CineSpacing.xxl),
+                LoginButton(
+                  onPressed: () => context.go('/home'),
+                  text: _loginButton,
+                ),
+              ],
+            ),
           ),
         ),
       ),

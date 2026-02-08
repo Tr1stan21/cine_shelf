@@ -6,12 +6,8 @@ import 'package:cine_shelf/config/theme.dart';
 ///
 /// Botón elevado con gradiente dorado y efectos de sombra/glow.
 /// Se usa en acciones primarias como login.
-class CinePrimaryGoldButton extends StatelessWidget {
-  const CinePrimaryGoldButton({
-    required this.text,
-    required this.onPressed,
-    super.key,
-  });
+class LoginButton extends StatelessWidget {
+  const LoginButton({required this.text, required this.onPressed, super.key});
 
   final String text;
   final VoidCallback? onPressed;
