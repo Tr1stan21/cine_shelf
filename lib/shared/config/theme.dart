@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Paleta de colores global de CineShelf
+/// Global color palette for CineShelf
 abstract class CineColors {
   // Golds & Ambers
   static const Color amber = Color(0xFFFFB000);
@@ -19,7 +19,7 @@ abstract class CineColors {
   static const Color black = Color(0xFF000000);
 }
 
-/// Espaciado consistente
+/// Consistent spacing
 abstract class CineSpacing {
   static const double sm = 10.0;
   static const double md = 12.0;
@@ -29,7 +29,7 @@ abstract class CineSpacing {
   static const double xxxl = 30.0;
 }
 
-/// Radios de bordes
+/// Border radius
 abstract class CineRadius {
   static const double sm = 8.0;
   static const double md = 12.0;
@@ -37,14 +37,14 @@ abstract class CineRadius {
   static const double xl = 22.0;
 }
 
-/// Tamaños de componentes
+/// Component sizes
 abstract class CineSizes {
   static const double buttonHeight = 56.0;
   static const double iconSize = 24.0;
   static const double iconSizeSmall = 18.0;
 }
 
-/// Tipografía estandarizada
+/// Standardized typography
 abstract class CineTypography {
   static const TextStyle headline1 = TextStyle(
     fontSize: 28,
@@ -65,7 +65,7 @@ abstract class CineTypography {
   );
 }
 
-/// Theme principal de la app
+/// Main app theme
 ThemeData buildCineTheme() {
   return ThemeData(
     useMaterial3: true,

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-import 'package:cine_shelf/config/theme.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
 
-/// Botón de acción para la pantalla de detalles de película
+/// Action button for movie details screen
 ///
-/// Soporta dos variantes:
-/// - Filled: con color de fondo sólido
-/// - Outlined: con borde y fondo semi-transparente
+/// Supports two variants:
+/// - Filled: with solid background color
+/// - Outlined: with border and semi-transparent background
 ///
-/// Puede incluir iconos leading y trailing opcionales.
+/// Can include optional leading and trailing icons.
 class MovieActionButton extends StatelessWidget {
   const MovieActionButton({
     required this.label,

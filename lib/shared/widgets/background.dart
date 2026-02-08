@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:cine_shelf/core/constants.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
 
 class Background extends StatelessWidget {
   const Background({

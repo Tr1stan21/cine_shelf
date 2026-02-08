@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/config/theme.dart';
-import 'package:cine_shelf/core/constants.dart';
-import 'package:cine_shelf/models/movie_item.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/router/app_router.dart';
 
-/// Widget que muestra una sección horizontal de películas con título y botón de navegación
+/// Widget displaying a horizontal section of movies with title and navigation button
 ///
-/// Presenta un carrusel horizontal de posters de películas con:
-/// - Título de la sección
-/// - Botón de navegación para ver la lista completa
-/// - Lista horizontal scrolleable de posters
+/// Presents a horizontal carousel of movie posters with:
+/// - Section title
+/// - Navigation button to view the full list
+/// - Horizontal scrollable list of posters
 class MovieListSection extends StatelessWidget {
   const MovieListSection({required this.title, required this.items, super.key});
 
   final String title;
-  final List<MovieItem> items;
+  final List<Movie> items;
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +25,7 @@ class MovieListSection extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header con título y botón de navegación
+          // Header with title and navigation button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -43,7 +43,7 @@ class MovieListSection extends StatelessWidget {
             ],
           ),
 
-          // Lista horizontal de películas
+          // Horizontal list of movies
           LayoutBuilder(
             builder: (context, constraints) {
               final availableW = constraints.maxWidth;

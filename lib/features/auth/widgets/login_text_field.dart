@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:cine_shelf/config/theme.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
 
-/// Campo de texto personalizado para el formulario de login
+/// Custom text field for login form
 ///
-/// Soporta dos modos: email (por defecto) y contraseña.
-/// En modo contraseña, incluye un botón para mostrar/ocultar el texto.
+/// Supports two modes: email (default) and password.
+/// In password mode, includes a button to show/hide the text.
 class LoginTextField extends StatefulWidget {
   const LoginTextField({required this.isPassword, super.key});
 

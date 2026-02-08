@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/config/theme.dart';
-import 'package:cine_shelf/core/constants.dart';
-import 'package:cine_shelf/core/widgets/background.dart';
-import 'package:cine_shelf/models/movie_item.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/shared/widgets/background.dart';
+import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/router/app_router.dart';
 
-/// Pantalla que muestra una lista completa de películas en formato de grilla
+/// Screen displaying a complete movie list in grid format
 ///
-/// Organiza las películas en una cuadrícula de 3 columnas y permite
-/// navegar a los detalles al tocar cualquier película.
+/// Organizes movies in a 3-column grid and allows
+/// navigation to details when tapping any movie.
 class MovieListScreen extends StatelessWidget {
   const MovieListScreen({required this.title, required this.items, super.key});
 
   final String title;
-  final List<MovieItem> items;
+  final List<Movie> items;
 
   @override
   Widget build(BuildContext context) {

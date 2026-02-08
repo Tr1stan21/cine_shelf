@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import 'package:cine_shelf/config/theme.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
 
-/// Barra de búsqueda personalizada con estilo CineShelf
+/// Custom search bar with CineShelf style
 ///
-/// Campo de entrada con gradiente oscuro, placeholder e ícono de búsqueda.
+/// Input field with dark gradient, placeholder, and search icon.
 class CineSearchBar extends StatelessWidget {
   const CineSearchBar({
     super.key,
@@ -17,7 +17,7 @@ class CineSearchBar extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
 
-  static const String _searchHint = 'Buscar películas...';
+  static const String _searchHint = 'Search movies...';
 
   @override
   Widget build(BuildContext context) {

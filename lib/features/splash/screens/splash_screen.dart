@@ -3,13 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/core/constants.dart';
-import 'package:cine_shelf/core/widgets/background.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/shared/widgets/background.dart';
 
-/// Pantalla de bienvenida inicial de la aplicación
+/// Initial welcome screen of the application
 ///
-/// Muestra el logo de CineShelf durante [_splashDuration]
-/// y luego navega automáticamente a la pantalla de login.
+/// Displays the CineShelf logo for [_splashDuration]
+/// and then automatically navigates to the login screen.
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 

@@ -1,27 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/features/account/account_screen.dart';
-import 'package:cine_shelf/features/lists/my_lists_screen.dart';
-import 'package:cine_shelf/features/auth/login_screen.dart';
-import 'package:cine_shelf/features/home/home_screen.dart';
-import 'package:cine_shelf/features/movies/movie_details_screen.dart';
-import 'package:cine_shelf/features/movies/movie_list_screen.dart';
-import 'package:cine_shelf/features/splash/splash_screen.dart';
-import 'package:cine_shelf/models/movie_item.dart';
+import 'package:cine_shelf/features/account/screens/account_screen.dart';
+import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
+import 'package:cine_shelf/features/auth/screens/login_screen.dart';
+import 'package:cine_shelf/features/home/screens/home_screen.dart';
+import 'package:cine_shelf/features/movies/screens/movie_details_screen.dart';
+import 'package:cine_shelf/features/movies/screens/movie_list_screen.dart';
+import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
+import 'package:cine_shelf/features/movies/models/movie.dart';
+import 'package:cine_shelf/shared/widgets/nav_shell.dart';
 
-// Importa tu ShellScaffold que monta BackgroundBody + BottomNav
-import 'package:cine_shelf/core/widgets/nav_shell.dart';
-
-/// Argumentos para MovieListScreen
+/// Arguments for MovieListScreen
 class MovieListArgs {
   const MovieListArgs({required this.title, required this.items});
 
   final String title;
-  final List<MovieItem> items;
+  final List<Movie> items;
 }
 
-/// Argumentos para MovieDetailsScreen
+/// Arguments for MovieDetailsScreen
 class MovieDetailsArgs {
   const MovieDetailsArgs({this.movieId});
 
@@ -49,7 +47,7 @@ class AppRouter {
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
 
-      // -------- Tabs con estado persistente (BottomNav fija) --------
+      // -------- Tabs with persistent state (Fixed BottomNav) --------
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return NavShell(navigationShell: navigationShell);
@@ -71,7 +69,7 @@ class AppRouter {
               GoRoute(
                 path: '/mylists',
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: MyLists()),
+                    const NoTransitionPage(child: MyListsScreen()),
               ),
             ],
           ),
@@ -81,22 +79,22 @@ class AppRouter {
               GoRoute(
                 path: '/account',
                 pageBuilder: (context, state) =>
-                    const NoTransitionPage(child: Account()),
+                    const NoTransitionPage(child: AccountScreen()),
               ),
             ],
           ),
         ],
       ),
 
-      // -------- Pantallas fuera del shell (sin BottomNav) --------
+      // -------- Screens outside the shell (without BottomNav) --------
       GoRoute(
         parentNavigatorKey: _rootKey,
         path: '/movies',
         builder: (context, state) {
           final args = state.extra as MovieListArgs?;
           return MovieListScreen(
-            title: args?.title ?? 'Películas',
-            items: args?.items ?? const <MovieItem>[],
+            title: args?.title ?? 'Movies',
+            items: args?.items ?? const <Movie>[],
           );
         },
       ),

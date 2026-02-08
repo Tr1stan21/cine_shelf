@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'package:cine_shelf/config/theme.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/router/app_router.dart';
 
-/// Punto de entrada principal de la aplicación CineShelf
+/// Main entry point of the CineShelf application
 ///
-/// Configura el MaterialApp con theme, router y configuraciones globales.
+/// Configures the MaterialApp with theme, router, and global settings.
 class App extends StatelessWidget {
   const App({super.key});
 

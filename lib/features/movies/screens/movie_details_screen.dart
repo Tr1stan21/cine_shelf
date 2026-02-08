@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/config/theme.dart';
-import 'package:cine_shelf/core/constants.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 
-/// Pantalla de detalles de una pelÃ­cula
+/// Movie detail screen
 ///
-/// Muestra informaciÃ³n detallada incluyendo poster, tÃ­tulo, aÃ±o,
-/// gÃ©neros, sinopsis, calificaciÃ³n y botones de acciÃ³n
-/// (favorito, watchlist, visto, listas).
+/// Displays detailed information including poster, title, year,
+/// genres, synopsis, rating, and action buttons
+/// (favorite, watchlist, watched, lists).
 class MovieDetailsScreen extends StatelessWidget {
   const MovieDetailsScreen({super.key, this.movieId});
 
@@ -17,10 +17,10 @@ class MovieDetailsScreen extends StatelessWidget {
 
   static const _topImageUrl = AppConstants.urlPlaceholderPoster;
   static const int _maxStars = 5;
-  static const String _favoriteLabel = 'Favorito';
+  static const String _favoriteLabel = 'Favorite';
   static const String _watchlistLabel = 'Watchlist';
-  static const String _seenLabel = 'Visto';
-  static const String _listLabel = 'Lista...';
+  static const String _seenLabel = 'Watched';
+  static const String _listLabel = 'List...';
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
@@ -70,7 +70,7 @@ class MovieDetailsScreen extends StatelessWidget {
                                 ),
                               ),
                               TextSpan(
-                                text: '  |  Ciencia ficción, Drama, Misterio',
+                                text: '  |  Science Fiction, Drama, Mystery',
                                 style: TextStyle(
                                   color: CineColors.textSecondary,
                                   fontSize: 14,
@@ -82,18 +82,13 @@ class MovieDetailsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: CineSpacing.lg),
                         const Text(
-                          'Un nuevo blade runner, el oficial K de la policí­a de\n'
-                          'Los Ãngeles, descubre un secreto largamente oculto\n'
-                          'que tiene el potencial de sumir lo que queda de la\n'
-                          'sociedad en el caos.'
-                          'Un nuevo blade runner, el oficial K de la policí­a de\n'
-                          'Los Ãngeles, descubre un secreto largamente oculto\n'
-                          'que tiene el potencial de sumir lo que queda de la\n'
-                          'sociedad en el caos.'
-                          'Un nuevo blade runner, el oficial K de la policí­a de\n'
-                          'Los Ãngeles, descubre un secreto largamente oculto\n'
-                          'que tiene el potencial de sumir lo que queda de la\n'
-                          'sociedad en el caos.',
+                          'A new blade runner, Officer K of the Los Angeles Police Department, '
+                          'uncovers a long-hidden secret that has the potential to plunge what remains '
+                          'of society into chaos. A new blade runner, Officer K of the Los Angeles Police '
+                          'Department, uncovers a long-hidden secret that has the potential to plunge what '
+                          'remains of society into chaos. A new blade runner, Officer K of the Los Angeles '
+                          'Police Department, uncovers a long-hidden secret that has the potential to plunge '
+                          'what remains of society into chaos.',
                           style: TextStyle(
                             fontSize: 14,
                             height: 1.35,

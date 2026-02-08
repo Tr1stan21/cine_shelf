@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/config/theme.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
 
-class BottomNav extends StatelessWidget {
-  const BottomNav({required this.navigationShell, super.key});
+class BottomNavBar extends StatelessWidget {
+  const BottomNavBar({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
   void _onTap(int newIndex) {
     navigationShell.goBranch(
       newIndex,
-      // Si pulsas el tab activo: vuelve a la raíz del tab.
+      // If you tap the active tab: return to the root of the tab.
       initialLocation: newIndex == navigationShell.currentIndex,
     );
   }
@@ -26,22 +26,22 @@ class BottomNav extends StatelessWidget {
         height: 72,
         child: Row(
           children: [
-            _Item(
+            _BottomNavItem(
               selected: index == 0,
               icon: Icons.home_rounded,
-              label: 'Inicio',
+              label: 'Home',
               onTap: () => _onTap(0),
             ),
-            _Item(
+            _BottomNavItem(
               selected: index == 1,
               icon: Icons.view_list_rounded,
-              label: 'Mis listas',
+              label: 'My Lists',
               onTap: () => _onTap(1),
             ),
-            _Item(
+            _BottomNavItem(
               selected: index == 2,
               icon: Icons.person_rounded,
-              label: 'Cuenta',
+              label: 'Account',
               onTap: () => _onTap(2),
             ),
           ],
@@ -51,8 +51,8 @@ class BottomNav extends StatelessWidget {
   }
 }
 
-class _Item extends StatelessWidget {
-  const _Item({
+class _BottomNavItem extends StatelessWidget {
+  const _BottomNavItem({
     required this.selected,
     required this.icon,
     required this.label,

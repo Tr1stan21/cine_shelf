@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-import 'package:cine_shelf/config/theme.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
 
-/// Botón principal dorado de CineShelf
+/// CineShelf main golden button
 ///
-/// Botón elevado con gradiente dorado y efectos de sombra/glow.
-/// Se usa en acciones primarias como login.
+/// Elevated button with golden gradient and shadow/glow effects.
+/// Used for primary actions such as login.
 class LoginButton extends StatelessWidget {
   const LoginButton({required this.text, required this.onPressed, super.key});
 
   final String text;
   final VoidCallback? onPressed;
 
-  // Colores específicos del botón
+  // Specific button colors
   static const Color _gold = Color(0xFFD4AF6A);
   static const Color _goldDark = Color(0xFFB8893D);
   static const Color _goldHighlight = Color(0xFFC89A4A);
