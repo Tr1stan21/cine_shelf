@@ -29,11 +29,9 @@ class HomeScreen extends StatelessWidget {
           Image.asset(AppConstants.logoPath, height: 100),
           const SizedBox(height: 20),
           CineSearchBar(onChanged: (v) {}, onSubmitted: (v) {}),
-
           // 1) Impacto + frescura
           MovieListSection(title: _trendingToday, items: MovieData.medium),
           const GlowSeparator(),
-
           // 2) Novedades “tipo Netflix”
           MovieListSection(title: _latestReleases, items: MovieData.medium),
           const GlowSeparator(),

@@ -4,7 +4,7 @@ class GlowSeparator extends StatelessWidget {
   const GlowSeparator({
     super.key,
     this.width = double.infinity,
-    this.height = 4.0,
+    this.height = 3.0,
   });
 
   final double width;

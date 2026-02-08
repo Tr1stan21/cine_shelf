@@ -1,3 +1,4 @@
+import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,7 +13,10 @@ class NavShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Background(child: navigationShell),
+      body: Background(
+        padding: EdgeInsets.all(CineSpacing.md),
+        child: navigationShell,
+      ),
       bottomNavigationBar: BottomNavBar(navigationShell: navigationShell),
     );
   }

@@ -1,7 +1,7 @@
 /// Global constants for CineShelf app
 abstract class AppConstants {
   // Assets paths
-  static const String logoPath = 'assets/logo/logo_extracted.png';
+  static const String logoPath = 'assets/logo/logo_close_up.png';
   static const String backgroundPath = 'assets/images/background.png';
 
   // Placeholder URLs (temporary until real API integration)

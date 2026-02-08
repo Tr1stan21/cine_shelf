@@ -40,7 +40,10 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Background(
-      child: Center(child: Image.asset(AppConstants.logoPath, height: 300)),
+      child: Align(
+        alignment: const Alignment(0, -0.3),
+        child: Image.asset(AppConstants.logoPath, height: 100),
+      ),
     );
   }
 }

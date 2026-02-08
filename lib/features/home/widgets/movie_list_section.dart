@@ -21,28 +21,25 @@ class MovieListSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: CineSpacing.md),
+      padding: const EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Header with title and navigation button
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(title, style: CineTypography.headline2),
-              IconButton(
-                icon: const Icon(
-                  Icons.arrow_forward_ios,
-                  color: CineColors.amber,
-                ),
-                onPressed: () => context.push(
-                  '/movies',
-                  extra: MovieListArgs(title: title, items: items),
-                ),
-              ),
-            ],
+          InkWell(
+            onTap: () => context.push(
+              '/movies',
+              extra: MovieListArgs(title: title, items: items),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(title, style: CineTypography.headline2),
+                const Icon(Icons.arrow_forward_ios, color: CineColors.amber),
+              ],
+            ),
           ),
-
+          const SizedBox(height: 5),
           // Horizontal list of movies
           LayoutBuilder(
             builder: (context, constraints) {
