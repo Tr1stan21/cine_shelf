@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:cine_shelf/shared/config/theme.dart';
+
 class GlowSeparator extends StatelessWidget {
   const GlowSeparator({
     super.key,
@@ -97,5 +99,14 @@ class GlowSeparator extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ThinDivider extends StatelessWidget {
+  const ThinDivider({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(height: 1, color: CineColors.white.withOpacity(0.08));
   }
 }
