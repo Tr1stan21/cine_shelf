@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "441290716212",
+    "project_id": "cine-shelf",
+    "storage_bucket": "cine-shelf.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:441290716212:android:c0bb9ea49e0041227e0661",
+        "android_client_info": {
+          "package_name": "com.example.cine_shelf"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCW6tcEm-jNJiMrhgqRmbDMsc_vq1u4xhQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
