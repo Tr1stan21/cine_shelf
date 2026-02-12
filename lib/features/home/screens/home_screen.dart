@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
 import 'package:cine_shelf/features/home/widgets/search_bar.dart';
-import 'package:cine_shelf/features/home/widgets/separators.dart';
+import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/shared/mock/movie_data.dart';
 
 /// Home screen of the application
