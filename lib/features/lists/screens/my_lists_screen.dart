@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 
-class MyListsContent extends StatelessWidget {
-  const MyListsContent({
+class MyListsScreen extends StatelessWidget {
+  const MyListsScreen({
     super.key,
     this.watchedCount = 0,
     this.watchlistCount = 0,
@@ -56,46 +56,46 @@ class MyListsContent extends StatelessWidget {
             ),
             const SizedBox(height: CineSpacing.lg),
 
-            CineListRow(
-              icon: Icons.visibility_outlined,
-              label: 'Watched',
-              numMovies: watchedCount,
-              onTap: onWatchedTap,
-            ),
-            const SizedBox(height: CineSpacing.md),
-            CineListRow(
-              icon: Icons.bookmark_border,
-              label: 'Watchlist',
-              numMovies: watchlistCount,
-              onTap: onWatchlistTap,
-            ),
-            const SizedBox(height: CineSpacing.md),
-            CineListRow(
-              icon: Icons.favorite_border,
-              label: 'Favorites',
-              numMovies: favoritesCount,
-              onTap: onFavoritesTap,
-            ),
+            // CineListRow(
+            //   icon: Icons.visibility_outlined,
+            //   label: 'Watched',
+            //   numMovies: watchedCount,
+            //   onTap: onWatchedTap,
+            // ),
+            // const SizedBox(height: CineSpacing.md),
+            // CineListRow(
+            //   icon: Icons.bookmark_border,
+            //   label: 'Watchlist',
+            //   numMovies: watchlistCount,
+            //   onTap: onWatchlistTap,
+            // ),
+            // const SizedBox(height: CineSpacing.md),
+            // CineListRow(
+            //   icon: Icons.favorite_border,
+            //   label: 'Favorites',
+            //   numMovies: favoritesCount,
+            //   onTap: onFavoritesTap,
+            // ),
 
-            const SizedBox(height: CineSpacing.xl),
-            const GlowSeparator(),
-            const SizedBox(height: CineSpacing.xl),
+            // const SizedBox(height: CineSpacing.xl),
+            // const GlowSeparator(),
+            // const SizedBox(height: CineSpacing.xl),
 
-            Text(
-              'My Lists',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: cs.primary,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: CineSpacing.md),
+            // Text(
+            //   'My Lists',
+            //   style: theme.textTheme.titleLarge?.copyWith(
+            //     color: cs.primary,
+            //     fontWeight: FontWeight.w700,
+            //   ),
+            // ),
+            // const SizedBox(height: CineSpacing.md),
 
-            Text(
-              'Your custom lists will appear here.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: cs.onSurface.withOpacity(0.7),
-              ),
-            ),
+            // Text(
+            //   'Your custom lists will appear here.',
+            //   style: theme.textTheme.bodyMedium?.copyWith(
+            //     color: cs.onSurface.withOpacity(0.7),
+            //   ),
+            // ),
           ],
         ),
       ),

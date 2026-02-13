@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'dart:async';
 
 import 'package:cine_shelf/features/account/screens/account_screen.dart';
 import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
@@ -26,6 +28,20 @@ class MovieDetailsArgs {
   final String? movieId;
 }
 
+class _GoRouterRefreshStream extends ChangeNotifier {
+  _GoRouterRefreshStream(Stream<dynamic> stream) {
+    _sub = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _sub;
+
+  @override
+  void dispose() {
+    _sub.cancel();
+    super.dispose();
+  }
+}
+
 class AppRouter {
   AppRouter._();
 
@@ -43,6 +59,29 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootKey,
     initialLocation: '/',
+    refreshListenable: _GoRouterRefreshStream(
+      FirebaseAuth.instance.authStateChanges(),
+    ),
+    redirect: (context, state) {
+      final user = FirebaseAuth.instance.currentUser;
+      final loggedIn = user != null;
+
+      final loc = state.matchedLocation;
+      final inLogin = loc == '/login';
+      final inSplash = loc == '/';
+
+      // No logueado: solo puede estar en /login (o /)
+      if (!loggedIn) {
+        return (inLogin || inSplash) ? null : '/login';
+      }
+
+      // Logueado: no debería estar en /login o splash
+      if (loggedIn && (inLogin || inSplash)) {
+        return '/home';
+      }
+
+      return null;
+    },
     routes: <RouteBase>[
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
