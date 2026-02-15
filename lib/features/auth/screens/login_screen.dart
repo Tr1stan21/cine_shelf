@@ -9,8 +9,8 @@ import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_button.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_text_field.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
-
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
+import 'package:cine_shelf/features/auth/utils/validators.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -25,14 +25,35 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   String _email = '';
   String _password = '';
   bool _isLoading = false;
+  String? _emailError;
+
+  bool get _isFormValid {
+    return _email.trim().isNotEmpty &&
+        _password.isNotEmpty &&
+        isValidEmail(_email.trim()) &&
+        _emailError == null;
+  }
+
+  void _onEmailChanged(String value) {
+    setState(() {
+      _email = value;
+      if (value.trim().isEmpty) {
+        _emailError = null;
+      } else if (!isValidEmail(value.trim())) {
+        _emailError = 'Invalid email address.';
+      } else {
+        _emailError = null;
+      }
+    });
+  }
 
   Future<void> _onLoginPressed(BuildContext context) async {
     final email = _email.trim();
     final password = _password;
 
-    if (email.isEmpty || password.isEmpty) {
+    if (!_isFormValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Introduce email y contraseña.')),
+        const SnackBar(content: Text('Please fill all fields correctly.')),
       );
       return;
     }
@@ -40,18 +61,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await ref.read(authControllerProvider).signIn(email, password);
-
-      // Ideal: que tu router redirija por authStateChanges().
-      // Si aún NO tienes redirect, puedes navegar manualmente:
-      // if (mounted) context.go('/home');
+      if (!mounted) return;
+      context.go('/');
     } catch (e, st) {
       debugPrint('LOGIN ERROR TYPE: ${e.runtimeType}');
       debugPrint('LOGIN ERROR: $e');
       debugPrint('STACK: $st');
 
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -83,10 +104,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: CineSpacing.md),
-                AuthTextField(
-                  isPassword: false,
-                  onChanged: (v) => _email = v, // <-- cableado
-                ),
+                AuthTextField(isPassword: false, onChanged: _onEmailChanged),
+                if (_emailError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: CineSpacing.sm),
+                    child: Text(
+                      _emailError!,
+                      style: const TextStyle(
+                        color: Color(0xFFEF5350),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
 
                 const SizedBox(height: CineSpacing.lg),
 
@@ -102,13 +131,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 const SizedBox(height: CineSpacing.md),
                 AuthTextField(
                   isPassword: true,
-                  onChanged: (v) => _password = v, // <-- cableado
+                  onChanged: (v) => setState(() => _password = v),
                 ),
 
                 const SizedBox(height: CineSpacing.xxxl),
 
                 AuthButton(
-                  onPressed: _isLoading ? null : () => _onLoginPressed(context),
+                  onPressed: (_isLoading || !_isFormValid)
+                      ? null
+                      : () => _onLoginPressed(context),
                   text: LoginScreen._loginButton,
                 ),
 

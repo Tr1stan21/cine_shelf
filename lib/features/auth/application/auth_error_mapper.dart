@@ -1,24 +1,30 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
-/// Minimum auth error mapping to readable messages.
+/// Maps Firebase authentication exceptions to user-friendly error messages.
 String mapAuthError(Object error) {
   if (error is FirebaseAuthException) {
     switch (error.code) {
       case 'invalid-email':
-        return 'Email inválido.';
+        return 'Invalid email address.';
       case 'user-not-found':
+        return 'User not found.';
       case 'wrong-password':
+        return 'Incorrect password.';
       case 'invalid-credential':
-        return 'Credenciales incorrectas.';
+        return 'Invalid credentials.';
       case 'email-already-in-use':
-        return 'Ese email ya está registrado.';
+        return 'Email already registered.';
       case 'weak-password':
-        return 'La contraseña es demasiado débil.';
+        return 'Password too weak (min. 6 characters).';
       case 'too-many-requests':
-        return 'Demasiados intentos. Prueba más tarde.';
+        return 'Too many attempts. Try again later.';
+      case 'operation-not-allowed':
+        return 'Operation not allowed.';
+      case 'account-exists-with-different-credential':
+        return 'Account exists with different credential.';
       default:
-        return 'Error de autenticación: ${error.code}.';
+        return 'Authentication error: ${error.code}.';
     }
   }
-  return 'Error inesperado. Inténtalo de nuevo.';
+  return 'Operation failed. Please try again.';
 }

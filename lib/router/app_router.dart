@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'dart:async';
 
 import 'package:cine_shelf/features/account/screens/account_screen.dart';
 import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
@@ -29,20 +28,6 @@ class MovieDetailsArgs {
   final String? movieId;
 }
 
-class _GoRouterRefreshStream extends ChangeNotifier {
-  _GoRouterRefreshStream(Stream<dynamic> stream) {
-    _sub = stream.listen((_) => notifyListeners());
-  }
-
-  late final StreamSubscription<dynamic> _sub;
-
-  @override
-  void dispose() {
-    _sub.cancel();
-    super.dispose();
-  }
-}
-
 class AppRouter {
   AppRouter._();
 
@@ -60,39 +45,19 @@ class AppRouter {
   static final GoRouter router = GoRouter(
     navigatorKey: _rootKey,
     initialLocation: '/',
-    refreshListenable: _GoRouterRefreshStream(
-      FirebaseAuth.instance.authStateChanges(),
-    ),
-    redirect: (context, state) {
-      final user = FirebaseAuth.instance.currentUser;
-      final loggedIn = user != null;
-
-      final loc = state.matchedLocation;
-      final inLogin = loc == '/login';
-      final inSplash = loc == '/';
-      final inSignUp = loc == '/sign-up';
-
-      // No logueado: solo puede estar en /login, / o /sign-up
-      if (!loggedIn) {
-        return (inLogin || inSplash || inSignUp) ? null : '/login';
-      }
-
-      // Logueado: no debería estar en /login, splash o /sign-up
-      if (loggedIn && (inLogin || inSplash || inSignUp)) {
-        return '/home';
-      }
-
-      return null;
-    },
+    redirect: _handleRedirect,
     routes: <RouteBase>[
+      /// Entry point - SplashScreen handles auth-based navigation
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+
+      /// Auth screens - only accessible when not authenticated
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(
         path: '/sign-up',
         builder: (context, state) => const SignUpScreen(),
       ),
 
-      // -------- Tabs with persistent state (Fixed BottomNav) --------
+      /// App shell with bottom navigation tabs
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return NavShell(navigationShell: navigationShell);
@@ -131,7 +96,7 @@ class AppRouter {
         ],
       ),
 
-      // -------- Screens outside the shell (without BottomNav) --------
+      /// Movie screens - only accessible when authenticated
       GoRoute(
         parentNavigatorKey: _rootKey,
         path: '/movies',
@@ -153,4 +118,37 @@ class AppRouter {
       ),
     ],
   );
+
+  /// Redirect logic for route protection.
+  /// - SplashScreen (/) handles initial auth-based navigation
+  /// - Protects app routes when not authenticated
+  /// - Prevents access to auth screens when authenticated
+  static String? _handleRedirect(BuildContext context, GoRouterState state) {
+    final location = state.matchedLocation;
+    final isLoggedIn = FirebaseAuth.instance.currentUser != null;
+
+    // Allow splash to load and handle initial navigation
+    if (location == '/') {
+      return null;
+    }
+
+    // Protect app routes - redirect unauthenticated users to login
+    final isProtectedRoute =
+        location.startsWith('/home') ||
+        location.startsWith('/mylists') ||
+        location.startsWith('/account') ||
+        location.startsWith('/movies');
+
+    if (isProtectedRoute && !isLoggedIn) {
+      return '/login';
+    }
+
+    // Block auth screens for authenticated users
+    if (isLoggedIn && (location == '/login' || location == '/sign-up')) {
+      return '/home';
+    }
+
+    // Allow all other navigation
+    return null;
+  }
 }

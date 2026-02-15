@@ -8,9 +8,9 @@ import 'package:cine_shelf/shared/widgets/wordmark.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_button.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_text_field.dart';
-
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
+import 'package:cine_shelf/features/auth/utils/validators.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
@@ -26,37 +26,105 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   String _email = '';
   String _password = '';
   bool _isLoading = false;
+  String? _emailError;
+
+  bool get _isFormValid {
+    return isValidUsername(_username) &&
+        _email.trim().isNotEmpty &&
+        isValidEmail(_email.trim()) &&
+        isValidPassword(_password) &&
+        _emailError == null;
+  }
+
+  void _onEmailChanged(String value) {
+    setState(() {
+      _email = value;
+      if (value.trim().isEmpty) {
+        _emailError = null;
+      } else if (!isValidEmail(value.trim())) {
+        _emailError = 'Invalid email address.';
+      } else {
+        _emailError = null;
+      }
+    });
+  }
+
+  Future<void> _showCompletionDialog() {
+    // Capture router before entering dialog context
+    final router = GoRouter.of(context);
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF1A1A1A),
+          title: const Text(
+            'Account Created',
+            style: TextStyle(color: Color(0xFFD4AF6A)),
+          ),
+          content: const Text(
+            'Your account has been created successfully. Please sign in with your credentials.',
+            style: TextStyle(color: Color(0xFFFFFFFF)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                router.go('/login');
+              },
+              child: const Text(
+                'Go to Login',
+                style: TextStyle(color: Color(0xFFD4AF6A)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> _onSignUpPressed(BuildContext context) async {
     final String username = _username.trim();
     final String email = _email.trim().toLowerCase();
     final String password = _password;
 
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    if (!_isFormValid) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Introduce username, email y contrasena.'),
-        ),
+        const SnackBar(content: Text('Please fill all fields correctly.')),
       );
       return;
     }
 
     setState(() => _isLoading = true);
+    // Capture scaffoldMessenger before async operations
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
     try {
+      // Create user account and Firestore document
       await ref.read(authControllerProvider).signUp(username, email, password);
+
       if (!mounted) return;
-      await ref.read(authControllerProvider).signOut();
+
+      // Sign out immediately after signup (required by flow)
+      try {
+        await ref.read(authControllerProvider).signOut();
+      } catch (e) {
+        debugPrint('Signout after signup error: $e');
+        // Continue anyway - show dialog
+      }
+
       if (!mounted) return;
-      // TODO: navegar tras signup si no hay redirect basado en authStateChanges.
+
+      // Show success dialog and navigate to login
+      await _showCompletionDialog();
     } catch (e, st) {
       debugPrint('SIGNUP ERROR TYPE: ${e.runtimeType}');
       debugPrint('SIGNUP ERROR: $e');
       debugPrint('STACK: $st');
 
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+      scaffoldMessenger.showSnackBar(SnackBar(content: Text(mapAuthError(e))));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -90,7 +158,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 const SizedBox(height: CineSpacing.md),
                 AuthTextField(
                   isPassword: false,
-                  onChanged: (v) => _username = v,
+                  onChanged: (v) => setState(() => _username = v),
                 ),
 
                 const SizedBox(height: CineSpacing.lg),
@@ -105,7 +173,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                   ),
                 ),
                 const SizedBox(height: CineSpacing.md),
-                AuthTextField(isPassword: false, onChanged: (v) => _email = v),
+                AuthTextField(isPassword: false, onChanged: _onEmailChanged),
+                if (_emailError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: CineSpacing.sm),
+                    child: Text(
+                      _emailError!,
+                      style: const TextStyle(
+                        color: Color(0xFFEF5350),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
 
                 const SizedBox(height: CineSpacing.lg),
 
@@ -121,13 +200,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 const SizedBox(height: CineSpacing.md),
                 AuthTextField(
                   isPassword: true,
-                  onChanged: (v) => _password = v,
+                  onChanged: (v) => setState(() => _password = v),
                 ),
 
                 const SizedBox(height: CineSpacing.xxxl),
 
                 AuthButton(
-                  onPressed: _isLoading
+                  onPressed: (_isLoading || !_isFormValid)
                       ? null
                       : () => _onSignUpPressed(context),
                   text: SignUpScreen._signUpButton,
