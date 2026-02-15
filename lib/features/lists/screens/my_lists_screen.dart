@@ -5,6 +5,18 @@ import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 
+/// User's personal movie lists screen.
+///
+/// Displays two sections:
+/// 1. Base Lists - System-provided lists:
+///    - Watched: Movies the user has marked as watched
+///    - Watchlist: Movies saved to watch later
+///    - Favorites: Movies marked as favorites
+///
+/// 2. My Lists - User-created custom lists (currently placeholder)
+///
+/// Each list row shows the list name, icon, and current movie count.
+/// Tapping a list navigates to the detailed list view.
 class MyListsScreen extends StatelessWidget {
   const MyListsScreen({
     super.key,

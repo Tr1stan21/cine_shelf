@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 
+/// Statistics display widget showing user's movie collection counts.
+///
+/// Presents three key metrics in a single pill-shaped container:
+/// - Watched movies count
+/// - Watchlist count
+/// - Favorites count
+///
+/// Each stat includes an icon, numeric value, and label.
+/// Metrics are separated by vertical dividers.
 class StatsPill extends StatelessWidget {
-  const StatsPill({super.key});
+  const StatsPill({
+    required this.watchedValue,
+    required this.watchlistValue,
+    required this.favoriteValue,
+    super.key,
+  });
 
-  static const _watched = StatItem(
-    icon: Icons.remove_red_eye_outlined,
-    value: '152',
-    label: 'Watched',
-  );
-  static const _watchList = StatItem(
-    icon: Icons.bookmark_outline,
-    value: '40',
-    label: 'Watchlist',
-  );
-  static const _favorites = StatItem(
-    icon: Icons.favorite_border,
-    value: '23',
-    label: 'Favorites',
-  );
+  final int watchedValue;
+  final int watchlistValue;
+  final int favoriteValue;
 
   @override
   Widget build(BuildContext context) {
@@ -32,19 +34,44 @@ class StatsPill extends StatelessWidget {
         border: Border.all(color: CineColors.amber.withValues(alpha: 0.55)),
         color: CineColors.black.withValues(alpha: 0.14),
       ),
-      child: const Row(
+      child: Row(
         children: [
-          Expanded(child: Center(child: _watched)),
-          _Divider(),
-          Expanded(child: Center(child: _watchList)),
-          _Divider(),
-          Expanded(child: Center(child: _favorites)),
+          Expanded(
+            child: Center(
+              child: StatItem(
+                icon: Icons.remove_red_eye_outlined,
+                value: watchedValue,
+                label: 'Watched',
+              ),
+            ),
+          ),
+          const _Divider(),
+          Expanded(
+            child: Center(
+              child: StatItem(
+                icon: Icons.bookmark_outline,
+                value: watchlistValue,
+                label: 'Watchlist',
+              ),
+            ),
+          ),
+          const _Divider(),
+          Expanded(
+            child: Center(
+              child: StatItem(
+                icon: Icons.favorite_border,
+                value: favoriteValue,
+                label: 'Favorites',
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
+/// Internal vertical divider between stat items.
 class _Divider extends StatelessWidget {
   const _Divider();
 
@@ -59,6 +86,9 @@ class _Divider extends StatelessWidget {
   }
 }
 
+/// Individual statistic item within the stats pill.
+///
+/// Displays an icon, numeric value, and label in a compact column layout.
 class StatItem extends StatelessWidget {
   const StatItem({
     required this.icon,
@@ -68,7 +98,7 @@ class StatItem extends StatelessWidget {
   });
 
   final IconData icon;
-  final String value;
+  final int value;
   final String label;
 
   @override
@@ -87,7 +117,7 @@ class StatItem extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              value,
+              value.toString(),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(

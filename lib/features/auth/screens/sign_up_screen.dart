@@ -12,6 +12,17 @@ import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/utils/validators.dart';
 
+/// Registration screen for new users.
+///
+/// Features:
+/// - Username, email, and password input with validation
+/// - Real-time email format validation
+/// - Password requirements (min 6 characters)
+/// - Username requirements (min 2 characters)
+/// - Form validation (button disabled until all fields valid)
+/// - Loading state during account creation
+/// - Atomic user creation (auth + Firestore profile)
+/// - Error handling with user-friendly messages
 class SignUpScreen extends ConsumerStatefulWidget {
   const SignUpScreen({super.key});
 
@@ -28,6 +39,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   bool _isLoading = false;
   String? _emailError;
 
+  /// Returns true when all form fields are valid and ready for submission.
   bool get _isFormValid {
     return isValidUsername(_username) &&
         _email.trim().isNotEmpty &&
@@ -36,6 +48,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         _emailError == null;
   }
 
+  /// Validates email in real-time as user types.
+  ///
+  /// Shows error only when email is non-empty and invalid.
   void _onEmailChanged(String value) {
     setState(() {
       _email = value;
@@ -49,6 +64,17 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     });
   }
 
+  /// Handles sign-up button press with atomic user creation.
+  ///
+  /// Process:
+  /// 1. Validates all form fields
+  /// 2. Creates Firebase Auth account
+  /// 3. Creates Firestore profile document (with Cloud Function enrichment)
+  /// 4. Rollback auth account if profile creation fails
+  /// 5. Navigates to splash (which redirects to home) on success
+  ///
+  /// Captures ScaffoldMessenger and GoRouter before async operations
+  /// to avoid BuildContext issues across async gaps.
   Future<void> _onSignUpPressed(BuildContext context) async {
     final String username = _username.trim();
     final String email = _email.trim().toLowerCase();

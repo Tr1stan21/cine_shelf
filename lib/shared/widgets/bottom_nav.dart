@@ -3,11 +3,24 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 
+/// Custom bottom navigation bar for main app tabs.
+///
+/// Displays three navigation items:
+/// - Home: Browse and discover movies
+/// - My Lists: Access user's collections
+/// - Account: Profile and settings
+///
+/// Integrates with GoRouter's StatefulNavigationShell for
+/// persistent tab state and independent navigation stacks.
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
+  /// Handles tab selection.
+  ///
+  /// If tapping the currently active tab, resets to root of that tab's stack.
+  /// Otherwise, switches to the selected tab.
   void _onTap(int newIndex) {
     navigationShell.goBranch(
       newIndex,
@@ -51,6 +64,9 @@ class BottomNavBar extends StatelessWidget {
   }
 }
 
+/// Individual navigation item within the bottom bar.
+///
+/// Displays icon and label with selected/unselected visual states.
 class _BottomNavItem extends StatelessWidget {
   const _BottomNavItem({
     required this.selected,

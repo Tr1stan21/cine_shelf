@@ -1,4 +1,11 @@
-/// Global constants for CineShelf app
+/// Application-wide constants for CineShelf.
+///
+/// Centralized location for:
+/// - Asset paths
+/// - Placeholder URLs
+/// - Layout dimensions and proportions
+///
+/// Ensures consistency across the application.
 abstract class AppConstants {
   // Assets paths
   static const String logoPath = 'assets/logo/logo_close_up.png';

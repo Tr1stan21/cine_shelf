@@ -7,10 +7,15 @@ import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/router/app_router.dart';
 
-/// Screen displaying a complete movie list in grid format
+/// Full-screen movie list displaying movies in a responsive grid layout.
 ///
-/// Organizes movies in a 3-column grid and allows
-/// navigation to details when tapping any movie.
+/// Presents a collection of movies organized in a multi-column grid where:
+/// - Column count is determined by [AppConstants.moviesPerRow]
+/// - Each movie poster maintains consistent aspect ratio
+/// - Tapping any poster navigates to movie details screen
+/// - Grid automatically handles varying list lengths with proper spacing
+///
+/// Typically navigated to from MovieListSection when user taps "see all".
 class MovieListScreen extends StatelessWidget {
   const MovieListScreen({required this.title, required this.items, super.key});
 

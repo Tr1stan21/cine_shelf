@@ -8,14 +8,32 @@ import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/lists/application/list_providers.dart';
 
+/// User profile and account management screen.
+///
+/// Displays:
+/// - Profile avatar (placeholder with icon)
+/// - Username and email from Firestore
+/// - Statistics pill showing watched, watchlist, and favorites counts
+/// - Account management options: Edit Profile, Credits, Sign Out
+///
+/// Data is loaded from Firestore via Riverpod providers with loading/error states.
+/// Sign out invalidates cached user data and triggers auth state change.
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
+  /// Handles sign out with proper state cleanup.
+  ///
+  /// Invalidates currentUserProvider before signing out to ensure
+  /// cached user data is cleared from memory, preventing stale data
+  /// if a different user signs in later.
   Future<void> _onSignOut(BuildContext context, WidgetRef ref) async {
     try {
+      // Limpia el perfil cacheado en memoria (Riverpod)
+      ref.invalidate(currentUserProvider);
+
       await ref.read(authControllerProvider).signOut();
-      // Router redirect handles navigation automatically when auth state changes
     } catch (e) {
       debugPrint('SIGNOUT ERROR: $e');
       if (context.mounted) {
@@ -29,6 +47,9 @@ class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userDocument = ref.watch(currentUserProvider);
+    final watchedCount = ref.watch(watchedCountProvider);
+    final watchlistCount = ref.watch(watchlistCountProvider);
+    final favoritesCount = ref.watch(favoritesCountProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
@@ -133,7 +154,11 @@ class AccountScreen extends ConsumerWidget {
           const SizedBox(height: CineSpacing.xxl),
 
           // Stats (1 pill, 4 items)
-          const StatsPill(),
+          StatsPill(
+            watchedValue: watchedCount.value ?? 0,
+            favoriteValue: favoritesCount.value ?? 0,
+            watchlistValue: watchlistCount.value ?? 0,
+          ),
 
           const SizedBox(height: CineSpacing.xxl),
           const GlowSeparator(),

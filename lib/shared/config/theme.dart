@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// Global color palette for CineShelf
+/// Global color palette for CineShelf application.
+///
+/// Defines a consistent dark theme with golden/amber accents
+/// emphasizing a cinematic, premium aesthetic.
 abstract class CineColors {
   // Golds & Ambers
   static const Color amber = Color(0xFFFFB000);
@@ -19,7 +22,9 @@ abstract class CineColors {
   static const Color black = Color(0xFF000000);
 }
 
-/// Consistent spacing
+/// Consistent spacing scale used throughout the application.
+///
+/// Provides a harmonic spacing system for layout consistency.
 abstract class CineSpacing {
   static const double sm = 10.0;
   static const double md = 12.0;
@@ -29,7 +34,7 @@ abstract class CineSpacing {
   static const double xxxl = 30.0;
 }
 
-/// Border radius
+/// Border radius constants for consistent rounded corners.
 abstract class CineRadius {
   static const double sm = 8.0;
   static const double md = 12.0;
@@ -37,14 +42,16 @@ abstract class CineRadius {
   static const double xl = 22.0;
 }
 
-/// Component sizes
+/// Standardized component dimensions.
 abstract class CineSizes {
   static const double buttonHeight = 56.0;
   static const double iconSize = 24.0;
   static const double iconSizeSmall = 18.0;
 }
 
-/// Standardized typography
+/// Predefined typography styles for consistent text rendering.
+///
+/// Aligns with Material Design principles while maintaining brand identity.
 abstract class CineTypography {
   static const TextStyle headline1 = TextStyle(
     fontSize: 28,
@@ -65,7 +72,15 @@ abstract class CineTypography {
   );
 }
 
-/// Main app theme
+/// Builds the application's Material theme configuration.
+///
+/// Configures:
+/// - Material 3 design system
+/// - Dark mode with custom background
+/// - Typography using CineTypography styles
+/// - Icon theme with amber accent
+///
+/// Returns ThemeData configured for MaterialApp.
 ThemeData buildCineTheme() {
   return ThemeData(
     useMaterial3: true,

@@ -1,6 +1,14 @@
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:flutter/material.dart';
 
+/// Interactive row representing a single movie list.
+///
+/// Displays:
+/// - Icon representing the list type
+/// - List name and movie count
+/// - Chevron indicating it's tappable
+///
+/// Styled with amber border and responsive to taps.
 class ListRow extends StatelessWidget {
   const ListRow({
     required this.icon,

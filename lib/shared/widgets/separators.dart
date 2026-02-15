@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 
+/// Decorative separator with gradient glow effect.
+///
+/// Creates a cinematic horizontal divider with:
+/// - Multi-color gradient from red-orange through amber to white center
+/// - Symmetric fade from center to edges
+/// - Soft opacity transitions for smooth visual effect
+///
+/// Used between major content sections to create visual hierarchy
+/// while maintaining the app's premium aesthetic.
 class GlowSeparator extends StatelessWidget {
   const GlowSeparator({
     super.key,
@@ -102,6 +111,10 @@ class GlowSeparator extends StatelessWidget {
   }
 }
 
+/// Simple thin horizontal divider with subtle transparency.
+///
+/// Used for lightweight separation within grouped content,
+/// such as between account menu items.
 class ThinDivider extends StatelessWidget {
   const ThinDivider({super.key});
 

@@ -1,10 +1,15 @@
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/features/movies/models/movie.dart';
 
-/// Class that provides mock movie data for development
+/// Provides mock movie data for development and testing.
 ///
-/// Generates test movie lists in different categories.
-/// For temporary use until real API integration.
+/// Generates placeholder movie lists with varying sizes:
+/// - `medium`: 25 items (for featured sections)
+/// - `small`: 10 items (for compact carousels)
+/// - `large`: 50 items (for extensive browsing)
+///
+/// Uses placeholder images until real API integration.
+/// TODO: Replace with actual movie API calls.
 class MovieData {
   MovieData._();
 

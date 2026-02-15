@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
-/// Wordmark de marca: "CineShelf" coherente con el logo (oro/ámbar, acabado metálico).
+/// CineShelf brand wordmark widget.
+///
+/// Renders the "CineShelf" text with consistent brand styling:
+/// - Golden/amber color matching logo
+/// - Bold weight for prominence
+/// - Tight letter spacing for premium feel
+///
+/// Used in auth screens and other branding contexts.
 class CineShelfWordmark extends StatelessWidget {
   const CineShelfWordmark({
     required this.fontSize,

@@ -12,6 +12,16 @@ import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/utils/validators.dart';
 
+/// Login screen for existing users.
+///
+/// Features:
+/// - Email and password input with real-time validation
+/// - Email format validation with error display
+/// - Password visibility toggle
+/// - Form validation (button disabled until valid)
+/// - Loading state during authentication
+/// - Navigation to sign-up screen
+/// - Firebase authentication error handling with user-friendly messages
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
@@ -27,6 +37,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
   String? _emailError;
 
+  /// Returns true when form is valid and ready for submission.
   bool get _isFormValid {
     return _email.trim().isNotEmpty &&
         _password.isNotEmpty &&
@@ -34,6 +45,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         _emailError == null;
   }
 
+  /// Validates email in real-time as user types.
+  ///
+  /// Shows error message only when email is non-empty and invalid,
+  /// clearing error when field is empty or email becomes valid.
   void _onEmailChanged(String value) {
     setState(() {
       _email = value;
@@ -47,6 +62,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     });
   }
 
+  /// Handles login button press.
+  ///
+  /// Flow:
+  /// 1. Validates form completeness
+  /// 2. Triggers authentication via AuthController
+  /// 3. Navigates to splash (which redirects to home) on success
+  /// 4. Displays user-friendly error message on failure
+  ///
+  /// Loading state prevents multiple concurrent submissions.
   Future<void> _onLoginPressed(BuildContext context) async {
     final email = _email.trim();
     final password = _password;

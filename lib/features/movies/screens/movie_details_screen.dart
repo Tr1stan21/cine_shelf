@@ -5,11 +5,19 @@ import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 
-/// Movie detail screen
+/// Detailed view of a single movie.
 ///
-/// Displays detailed information including poster, title, year,
-/// genres, synopsis, rating, and action buttons
-/// (favorite, watchlist, watched, lists).
+/// Layout structure:
+/// - Full-width hero poster image at top
+/// - Scrollable content panel overlapping poster with rounded top corners
+/// - Movie metadata: title, year, genres
+/// - Synopsis text
+/// - Star rating display
+/// - Action buttons: Favorite, Watchlist, Watched, Add to List
+/// - Back button overlay in top-left corner
+///
+/// Currently displays static placeholder data.
+/// TODO: Integrate with movie API using [movieId] parameter.
 class MovieDetailsScreen extends StatelessWidget {
   const MovieDetailsScreen({super.key, this.movieId});
 

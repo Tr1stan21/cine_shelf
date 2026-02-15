@@ -5,6 +5,14 @@ import 'package:go_router/go_router.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/shared/widgets/bottom_nav.dart';
 
+/// Navigation shell wrapper for tab-based navigation.
+///
+/// Wraps the StatefulNavigationShell provided by GoRouter to add:
+/// - Branded background
+/// - Consistent padding
+/// - Bottom navigation bar
+///
+/// Used as the builder for StatefulShellRoute in AppRouter.
 class NavShell extends StatelessWidget {
   const NavShell({required this.navigationShell, super.key});
 

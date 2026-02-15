@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 
+/// Full-screen background wrapper with branded image.
+///
+/// Provides consistent background across all screens using
+/// the application's background asset with SafeArea insets.
+///
+/// Parameters:
+/// - [child]: Content to display over the background
+/// - [padding]: Optional padding around the child (defaults to no padding)
 class Background extends StatelessWidget {
   const Background({
     required this.child,

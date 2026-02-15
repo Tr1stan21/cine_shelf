@@ -1,6 +1,10 @@
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:flutter/material.dart';
 
+/// Interactive row for account screen menu options.
+///
+/// Displays an icon, label text, and chevron indicator.
+/// Used for navigation to sub-screens or triggering actions like sign out.
 class AccountRow extends StatelessWidget {
   const AccountRow({
     required this.icon,

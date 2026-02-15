@@ -1,5 +1,14 @@
-/// Email validation using a simple regex pattern
-/// Validates basic email format without being overly strict
+/// Validates email address format.
+///
+/// Uses a simple regex pattern that checks for:
+/// - Local part with alphanumeric and common special characters
+/// - @ symbol
+/// - Domain with at least one dot
+/// - TLD with minimum 2 characters
+///
+/// Not overly strict to avoid rejecting valid international email formats.
+///
+/// Returns true if email format is valid, false otherwise.
 bool isValidEmail(String email) {
   final emailRegex = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
@@ -7,12 +16,21 @@ bool isValidEmail(String email) {
   return emailRegex.hasMatch(email);
 }
 
-/// Password validation: minimum 6 characters
+/// Validates password meets minimum requirements.
+///
+/// Firebase Auth requires minimum 6 characters.
+/// Returns true if password has at least 6 characters.
 bool isValidPassword(String password) {
   return password.length >= 6;
 }
 
-/// Username validation: non-empty, at least 2 characters
+/// Validates username meets minimum requirements.
+///
+/// Requires:
+/// - Non-empty after trimming whitespace
+/// - At least 2 characters in length
+///
+/// Returns true if username is valid.
 bool isValidUsername(String username) {
   return username.trim().length >= 2;
 }

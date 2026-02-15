@@ -14,6 +14,8 @@ import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/shared/widgets/nav_shell.dart';
 
 /// Arguments for MovieListScreen
+///
+/// Encapsulates data needed to display a filtered or categorized list of movies.
 class MovieListArgs {
   const MovieListArgs({required this.title, required this.items});
 
@@ -22,12 +24,27 @@ class MovieListArgs {
 }
 
 /// Arguments for MovieDetailsScreen
+///
+/// Carries movie identifier for detail screen navigation.
 class MovieDetailsArgs {
   const MovieDetailsArgs({this.movieId});
 
   final String? movieId;
 }
 
+/// Central routing configuration for the CineShelf application.
+///
+/// Manages all navigation routes using GoRouter with:
+/// - Authentication-based route protection and redirection
+/// - StatefulShellRoute for persistent bottom navigation tabs
+/// - Separate navigator keys for proper navigation stack management
+/// - Integration with Riverpod auth state for reactive navigation
+///
+/// Route structure:
+/// - `/` - Splash screen (initial route, handles auth-based navigation)
+/// - `/login`, `/sign-up` - Authentication screens (blocked when authenticated)
+/// - `/home`, `/mylists`, `/account` - Tab-based protected routes
+/// - `/movies`, `/movies/details` - Full-screen protected routes
 class AppRouter {
   AppRouter._();
 
@@ -42,11 +59,21 @@ class AppRouter {
   static final GlobalKey<NavigatorState> _accountTabKey =
       GlobalKey<NavigatorState>(debugLabel: 'accountTab');
 
-  /// Store auth notifier for use in redirect callback
+  /// Cached reference to auth state notifier for redirect callback access.
+  ///
+  /// Stored statically because GoRouter redirect callbacks cannot directly reference
+  /// Riverpod providers. Updated each time createRouter is called.
   static AuthStateNotifier? _authNotifier;
 
   /// Creates GoRouter instance configured with auth-based redirect logic.
-  /// Router reacts to auth state changes via refreshListenable.
+  ///
+  /// The router reacts to auth state changes via [refreshListenable],
+  /// triggering redirect logic whenever authentication status changes.
+  ///
+  /// Parameters:
+  /// - [authNotifier]: Listenable that notifies when auth state changes
+  ///
+  /// Returns configured GoRouter instance ready for MaterialApp.router
   static GoRouter createRouter(AuthStateNotifier authNotifier) {
     _authNotifier = authNotifier;
 
@@ -132,11 +159,16 @@ class AppRouter {
     );
   }
 
-  /// Redirect logic for route protection.
-  /// Uses Riverpod auth state provider instead of direct FirebaseAuth access.
-  /// - SplashScreen (/) handles its own navigation with appropriate loading delay
-  /// - Protects app routes when not authenticated
-  /// - Prevents access to auth screens when authenticated
+  /// Implements authentication-based route protection and redirection.
+  ///
+  /// Redirect logic:
+  /// 1. Splash screen (`/`) always allowed - handles its own navigation timing and loading
+  /// 2. If auth not initialized, redirects all routes to splash for proper initialization
+  /// 3. Protected app routes require authentication - redirects to `/login` if not authenticated
+  /// 4. Auth screens (`/login`, `/sign-up`) redirect to `/home` if already authenticated
+  /// 5. All other routes proceed without redirection
+  ///
+  /// Returns the route to redirect to, or `null` to allow navigation to proceed.
   static String? _handleRedirect(BuildContext context, GoRouterState state) {
     final location = state.matchedLocation;
     final authNotifier = _authNotifier;
