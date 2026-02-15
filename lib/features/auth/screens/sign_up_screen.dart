@@ -49,41 +49,6 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     });
   }
 
-  Future<void> _showCompletionDialog() {
-    // Capture router before entering dialog context
-    final router = GoRouter.of(context);
-
-    return showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext dialogContext) {
-        return AlertDialog(
-          backgroundColor: const Color(0xFF1A1A1A),
-          title: const Text(
-            'Account Created',
-            style: TextStyle(color: Color(0xFFD4AF6A)),
-          ),
-          content: const Text(
-            'Your account has been created successfully. Please sign in with your credentials.',
-            style: TextStyle(color: Color(0xFFFFFFFF)),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(dialogContext).pop();
-                router.go('/login');
-              },
-              child: const Text(
-                'Go to Login',
-                style: TextStyle(color: Color(0xFFD4AF6A)),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   Future<void> _onSignUpPressed(BuildContext context) async {
     final String username = _username.trim();
     final String email = _email.trim().toLowerCase();
@@ -97,8 +62,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     }
 
     setState(() => _isLoading = true);
-    // Capture scaffoldMessenger before async operations
+    // Capture scaffoldMessenger and router before async operations
     final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
 
     try {
       // Create user account and Firestore document
@@ -106,18 +72,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
       if (!mounted) return;
 
-      // Sign out immediately after signup (required by flow)
-      try {
-        await ref.read(authControllerProvider).signOut();
-      } catch (e) {
-        debugPrint('Signout after signup error: $e');
-        // Continue anyway - show dialog
-      }
-
-      if (!mounted) return;
-
-      // Show success dialog and navigate to login
-      await _showCompletionDialog();
+      // Navigate to splash - router will redirect to home automatically
+      router.go('/');
     } catch (e, st) {
       debugPrint('SIGNUP ERROR TYPE: ${e.runtimeType}');
       debugPrint('SIGNUP ERROR: $e');

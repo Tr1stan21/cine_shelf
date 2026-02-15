@@ -8,7 +8,6 @@ import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:go_router/go_router.dart';
 
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
@@ -16,10 +15,7 @@ class AccountScreen extends ConsumerWidget {
   Future<void> _onSignOut(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(authControllerProvider).signOut();
-      ref.invalidate(currentUserDocumentProvider);
-      if (context.mounted) {
-        context.go('/login');
-      }
+      // Router redirect handles navigation automatically when auth state changes
     } catch (e) {
       debugPrint('SIGNOUT ERROR: $e');
       if (context.mounted) {
@@ -32,7 +28,7 @@ class AccountScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userDocument = ref.watch(currentUserDocumentProvider);
+    final userDocument = ref.watch(currentUserProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),

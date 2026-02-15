@@ -6,12 +6,10 @@ import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 
-/// Splash screen - Entry point that determines navigation based on auth state.
+/// Splash screen - Loading screen shown during app initialization and after login.
 ///
-/// Uses ref.watch() within build() to listen to auth state changes.
-/// Navigates to either:
-/// - /login if not authenticated
-/// - /home if authenticated
+/// Displays logo and loading indicator for minimum duration (UX),
+/// then navigates based on auth state once determined.
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
@@ -21,35 +19,44 @@ class SplashScreen extends ConsumerStatefulWidget {
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
   bool _hasNavigated = false;
+  bool _minDelayComplete = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Minimum display time for splash (better UX)
+    Future.delayed(const Duration(milliseconds: 800), () {
+      if (mounted) {
+        setState(() => _minDelayComplete = true);
+        _attemptNavigation();
+      }
+    });
+  }
+
+  void _attemptNavigation() {
+    if (_hasNavigated || !_minDelayComplete) return;
+
+    final authState = ref.read(authStateProvider);
+
+    authState.whenData((user) {
+      if (_hasNavigated || !mounted) return;
+      _hasNavigated = true;
+
+      final isLoggedIn = user != null;
+      if (isLoggedIn) {
+        context.go('/home');
+      } else {
+        context.go('/login');
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Store router reference to use outside async context
-    final router = GoRouter.of(context);
-
-    // Watch auth state - this triggers rebuild on changes
-    // ref.listen() must be called within build()
-    ref.listen<AsyncValue<Object?>>(authStateProvider, (previous, next) {
-      // Only handle data state
-      next.whenData((user) {
-        // Prevent multiple navigation attempts
-        if (_hasNavigated) return;
-        _hasNavigated = true;
-
-        // Small delay for better UX (show splash briefly)
-        Future.delayed(const Duration(milliseconds: 500), () {
-          if (!mounted) return;
-
-          final isLoggedIn = user != null;
-          if (isLoggedIn) {
-            router.go('/home');
-          } else {
-            router.go('/login');
-          }
-        });
-      });
+    // Listen to auth state changes to trigger navigation
+    ref.listen<AsyncValue<Object?>>(authStateProvider, (_, __) {
+      _attemptNavigation();
     });
-
     return Background(
       child: Align(
         alignment: const Alignment(0, -0.3),
