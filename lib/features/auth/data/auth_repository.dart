@@ -15,14 +15,21 @@ class AuthRepository {
     await _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
-  Future<void> signUpWithEmailPassword({
+  Future<UserCredential> signUpWithEmailPassword({
     required String email,
     required String password,
   }) async {
-    await _auth.createUserWithEmailAndPassword(
+    return _auth.createUserWithEmailAndPassword(
       email: email,
       password: password,
     );
+  }
+
+  Future<void> deleteCurrentUser() async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      await user.delete();
+    }
   }
 
   Future<void> signOut() => _auth.signOut();

@@ -1,0 +1,8 @@
+{
+  "projects": {
+    "cine_shelf": "cine-shelf",
+    "default": "cine-shelf"
+  },
+  "targets": {},
+  "etags": {}
+}

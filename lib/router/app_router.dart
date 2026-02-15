@@ -6,6 +6,7 @@ import 'dart:async';
 import 'package:cine_shelf/features/account/screens/account_screen.dart';
 import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
 import 'package:cine_shelf/features/auth/screens/login_screen.dart';
+import 'package:cine_shelf/features/auth/screens/sign_up_screen.dart';
 import 'package:cine_shelf/features/home/screens/home_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_details_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_list_screen.dart';
@@ -69,14 +70,15 @@ class AppRouter {
       final loc = state.matchedLocation;
       final inLogin = loc == '/login';
       final inSplash = loc == '/';
+      final inSignUp = loc == '/sign-up';
 
-      // No logueado: solo puede estar en /login (o /)
+      // No logueado: solo puede estar en /login, / o /sign-up
       if (!loggedIn) {
-        return (inLogin || inSplash) ? null : '/login';
+        return (inLogin || inSplash || inSignUp) ? null : '/login';
       }
 
-      // Logueado: no debería estar en /login o splash
-      if (loggedIn && (inLogin || inSplash)) {
+      // Logueado: no debería estar en /login, splash o /sign-up
+      if (loggedIn && (inLogin || inSplash || inSignUp)) {
         return '/home';
       }
 
@@ -85,6 +87,10 @@ class AppRouter {
     routes: <RouteBase>[
       GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+      GoRoute(
+        path: '/sign-up',
+        builder: (context, state) => const SignUpScreen(),
+      ),
 
       // -------- Tabs with persistent state (Fixed BottomNav) --------
       StatefulShellRoute.indexedStack(

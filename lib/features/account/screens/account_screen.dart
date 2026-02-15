@@ -1,15 +1,31 @@
 import 'package:cine_shelf/features/account/widgets/account_row.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
+import 'package:cine_shelf/features/auth/application/auth_controller.dart';
+import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 
-class AccountScreen extends StatelessWidget {
+class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
+  Future<void> _onSignOut(BuildContext context, WidgetRef ref) async {
+    try {
+      await ref.read(authControllerProvider).signOut();
+    } catch (e) {
+      debugPrint('SIGNOUT ERROR: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+      }
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
       child: Column(
@@ -66,10 +82,10 @@ class AccountScreen extends StatelessWidget {
             onTap: null,
           ),
           const ThinDivider(),
-          const AccountRow(
+          AccountRow(
             icon: Icons.power_settings_new,
             label: 'Sign Out',
-            onTap: null,
+            onTap: () => _onSignOut(context, ref),
           ),
         ],
       ),

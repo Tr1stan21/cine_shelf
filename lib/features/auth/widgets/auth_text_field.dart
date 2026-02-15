@@ -6,8 +6,8 @@ import 'package:cine_shelf/shared/config/theme.dart';
 ///
 /// Supports two modes: email (default) and password.
 /// In password mode, includes a button to show/hide the text.
-class LoginTextField extends StatefulWidget {
-  const LoginTextField({required this.isPassword, this.onChanged, super.key});
+class AuthTextField extends StatefulWidget {
+  const AuthTextField({required this.isPassword, this.onChanged, super.key});
 
   final bool isPassword;
   final ValueChanged<String>? onChanged; // <-- NUEVO
@@ -16,10 +16,10 @@ class LoginTextField extends StatefulWidget {
   static const String _passwordHint = 'Password';
 
   @override
-  State<LoginTextField> createState() => _LoginTextFieldState();
+  State<AuthTextField> createState() => _AuthTextFieldState();
 }
 
-class _LoginTextFieldState extends State<LoginTextField> {
+class _AuthTextFieldState extends State<AuthTextField> {
   bool _obscureText = true;
 
   @override
@@ -54,8 +54,8 @@ class _LoginTextFieldState extends State<LoginTextField> {
           cursorColor: const Color(0xFFFFA84B),
           decoration: InputDecoration(
             hintText: isPassword
-                ? LoginTextField._passwordHint
-                : LoginTextField._emailHint,
+                ? AuthTextField._passwordHint
+                : AuthTextField._emailHint,
             hintStyle: const TextStyle(
               color: CineColors.textMuted,
               fontSize: 17,

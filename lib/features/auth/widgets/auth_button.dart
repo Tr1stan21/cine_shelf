@@ -6,8 +6,8 @@ import 'package:cine_shelf/shared/config/theme.dart';
 ///
 /// Elevated button with golden gradient and shadow/glow effects.
 /// Used for primary actions such as login.
-class LoginButton extends StatelessWidget {
-  const LoginButton({required this.text, required this.onPressed, super.key});
+class AuthButton extends StatelessWidget {
+  const AuthButton({required this.text, required this.onPressed, super.key});
 
   final String text;
   final VoidCallback? onPressed;
