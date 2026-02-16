@@ -33,24 +33,18 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
     });
   }
 
-  void _attemptNavigation() async {
+  void _attemptNavigation() {
     if (_hasNavigated || !_minDelayComplete) return;
 
     final authState = ref.read(authStateProvider);
 
-    authState.whenData((user) async {
+    authState.whenData((user) {
       if (_hasNavigated || !mounted) return;
       _hasNavigated = true;
 
       final isLoggedIn = user != null;
       if (isLoggedIn) {
-        // Precarga del perfil de usuario antes de navegar al Home
-        try {
-          await ref.read(currentUserProvider.future);
-        } catch (e) {
-          debugPrint('Error precargando usuario: $e');
-        }
-        if (mounted) context.go('/home');
+        context.go('/home');
       } else {
         context.go('/login');
       }
@@ -59,6 +53,11 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Listen to auth state changes to trigger navigation
+    ref.listen<AsyncValue<Object?>>(authStateProvider, (_, __) {
+      _attemptNavigation();
+    });
+
     return Background(
       child: Align(
         alignment: const Alignment(0, -0.3),
