@@ -7,7 +7,6 @@ import 'package:cine_shelf/router/app_router.dart';
 import 'package:cine_shelf/router/auth_state_notifier.dart';
 import 'package:cine_shelf/router/splash_gate_notifier.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/auth/utils/preload_user_data.dart';
 
 /// Main entry point of the CineShelf application
 ///
@@ -39,23 +38,13 @@ class _AppState extends ConsumerState<App> {
 
     if (!_hasInitializedAuth) {
       _hasInitializedAuth = true;
-      splashGate.runGate(
-        minDelay: _splashMinDelay,
-        onPreload: () {
-          if (isAuthenticated) {
-            preloadUserData(ref);
-          }
-        },
-      );
+      splashGate.runGate(minDelay: _splashMinDelay);
       _wasAuthenticated = isAuthenticated;
       return;
     }
 
     if (!_wasAuthenticated && isAuthenticated) {
-      splashGate.runGate(
-        minDelay: _splashMinDelay,
-        onPreload: () => preloadUserData(ref),
-      );
+      splashGate.runGate(minDelay: _splashMinDelay);
     }
 
     _wasAuthenticated = isAuthenticated;

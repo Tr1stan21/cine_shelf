@@ -58,7 +58,9 @@ final currentUserDocumentProvider = FutureProvider.autoDispose
 final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) async {
   // Watch auth state to get current user's uid
   final authState = ref.watch(authStateProvider);
-  final uid = authState.whenData((user) => user?.uid).value;
+  final user =
+      authState.asData?.value ?? ref.watch(authRepositoryProvider).currentUser;
+  final uid = user?.uid;
 
   // Watch the family provider with the extracted uid
   final result = ref
