@@ -36,7 +36,7 @@ final watchedCountProvider = StreamProvider<int>((ref) {
           .watchListCount(uid: user.uid, listId: _watchedListId);
     },
     loading: () => Stream<int>.value(0),
-    error: (_, __) => Stream<int>.value(0),
+    error: (_, _) => Stream<int>.value(0),
   );
 });
 
@@ -63,7 +63,7 @@ final watchlistCountProvider = StreamProvider<int>((ref) {
           .watchListCount(uid: user.uid, listId: _watchlistListId);
     },
     loading: () => Stream<int>.value(0),
-    error: (_, __) => Stream<int>.value(0),
+    error: (_, _) => Stream<int>.value(0),
   );
 });
 
@@ -90,6 +90,6 @@ final favoritesCountProvider = StreamProvider<int>((ref) {
           .watchListCount(uid: user.uid, listId: _favoritesListId);
     },
     loading: () => Stream<int>.value(0),
-    error: (_, __) => Stream<int>.value(0),
+    error: (_, _) => Stream<int>.value(0),
   );
 });

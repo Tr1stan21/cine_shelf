@@ -73,7 +73,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// 4. Displays user-friendly error message on failure
   ///
   /// Loading state prevents multiple concurrent submissions.
-  Future<void> _onLoginPressed(BuildContext context) async {
+  Future<void> _onLoginPressed() async {
     final email = _email.trim();
     final password = _password;
 
@@ -174,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 AuthButton(
                   onPressed: (_isLoading || !_isFormValid)
                       ? null
-                      : () => _onLoginPressed(context),
+                      : _onLoginPressed,
                   text: LoginScreen._loginButton,
                 ),
 

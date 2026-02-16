@@ -22,7 +22,7 @@ class NavShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Background(
-        padding: EdgeInsets.all(CineSpacing.md),
+        padding: const EdgeInsets.all(CineSpacing.md),
         child: navigationShell,
       ),
       bottomNavigationBar: BottomNavBar(navigationShell: navigationShell),

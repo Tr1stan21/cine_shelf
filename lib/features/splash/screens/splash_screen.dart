@@ -64,7 +64,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     // Listen to auth state changes to trigger navigation
-    ref.listen<AsyncValue<Object?>>(authStateProvider, (_, __) {
+    ref.listen<AsyncValue<Object?>>(authStateProvider, (_, _) {
       _attemptNavigation();
     });
 
