@@ -24,15 +24,8 @@ class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
   /// Handles sign out with proper state cleanup.
-  ///
-  /// Invalidates currentUserProvider before signing out to ensure
-  /// cached user data is cleared from memory, preventing stale data
-  /// if a different user signs in later.
   Future<void> _onSignOut(BuildContext context, WidgetRef ref) async {
     try {
-      // Limpia el perfil cacheado en memoria (Riverpod)
-      ref.invalidate(currentUserProvider);
-
       await ref.read(authControllerProvider).signOut();
     } catch (e) {
       debugPrint('SIGNOUT ERROR: $e');

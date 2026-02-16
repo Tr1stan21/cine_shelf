@@ -22,6 +22,9 @@ final authControllerProvider = Provider.autoDispose<AuthController>((ref) {
 class AuthController {
   final Ref ref;
 
+  static const int _userDocMaxAttempts = 6;
+  static const Duration _userDocPollDelay = Duration(milliseconds: 250);
+
   AuthController(this.ref);
 
   /// Authenticates user with email and password.
@@ -38,7 +41,8 @@ class AuthController {
   /// Atomicity guarantee:
   /// 1. Creates Firebase Auth user
   /// 2. Creates Firestore profile document
-  /// 3. If step 2 fails, deletes Auth user (best-effort rollback)
+  /// 3. Waits for profile document to be readable
+  /// 4. If steps 2-3 fail, deletes Auth user (best-effort rollback)
   ///
   /// This prevents orphaned auth accounts without profile data.
   ///
@@ -68,6 +72,8 @@ class AuthController {
         username: username,
         email: email,
       );
+
+      await _waitForUserDocument(user.uid);
     } catch (error) {
       // Compensation to avoid auth users without a profile document.
       try {
@@ -82,13 +88,23 @@ class AuthController {
     }
   }
 
-  /// Signs out current user and clears cached user data.
-  ///
-  /// Invalidates currentUserProvider to ensure stale data is not retained
-  /// after logout.
+  /// Signs out current user.
   Future<void> signOut() async {
     await ref.read(authRepositoryProvider).signOut();
-    // Invalidates the provider to clear user data from memory
-    ref.invalidate(currentUserProvider);
+  }
+
+  Future<void> _waitForUserDocument(String uid) async {
+    final userRepository = ref.read(userRepositoryProvider);
+
+    for (var attempt = 0; attempt < _userDocMaxAttempts; attempt++) {
+      final userDoc = await userRepository.getUserDocument(uid);
+      if (userDoc != null) {
+        return;
+      }
+
+      await Future.delayed(_userDocPollDelay);
+    }
+
+    throw Exception('User profile not available after signup.');
   }
 }

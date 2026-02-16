@@ -36,29 +36,26 @@ final authStateProvider = StreamProvider<User?>((ref) {
 
 /// Family provider that fetches user document from Firestore by uid.
 /// - Keyed by uid to enable proper caching per user
-/// - Uses keepAlive to persist cache across rebuilds while user is authenticated
+/// - Auto-disposes when no longer observed to prevent cross-session leakage
 /// - Returns null if uid is null (not authenticated)
-final currentUserDocumentProvider = FutureProvider.family<UserModel?, String?>((
-  ref,
-  uid,
-) async {
-  if (uid == null) {
-    return null;
-  }
+final currentUserDocumentProvider = FutureProvider.autoDispose
+    .family<UserModel?, String?>((ref, uid) async {
+      if (uid == null) {
+        return null;
+      }
 
-  // Fetch user document from Firestore
-  final userDoc = await ref.watch(userRepositoryProvider).getUserDocument(uid);
+      // Fetch user document from Firestore
+      final userDoc = await ref
+          .watch(userRepositoryProvider)
+          .getUserDocument(uid);
 
-  // Keep provider alive to avoid refetching on every rebuild
-  ref.keepAlive();
-
-  return userDoc;
-});
+      return userDoc;
+    });
 
 /// Convenience provider that automatically extracts uid from auth state.
 /// Use this provider in UI screens instead of manually extracting uid.
-/// NOT autoDispose - keeps user data in memory during entire session.
-final currentUserProvider = FutureProvider<UserModel?>((ref) async {
+/// Auto-disposes when no longer observed to prevent cross-session leakage.
+final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) async {
   // Watch auth state to get current user's uid
   final authState = ref.watch(authStateProvider);
   final uid = authState.whenData((user) => user?.uid).value;
@@ -71,9 +68,6 @@ final currentUserProvider = FutureProvider<UserModel?>((ref) async {
         loading: () => throw const AsyncLoading<UserModel?>(),
         error: (error, stack) => throw AsyncError<UserModel?>(error, stack),
       );
-
-  // Keep provider alive to maintain user data in memory throughout session
-  ref.keepAlive();
 
   return result;
 });

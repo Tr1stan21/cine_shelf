@@ -18,12 +18,8 @@ final listRepositoryProvider = Provider<ListRepository>((ref) {
 /// Returns:
 /// - Real-time count from Firestore when user is authenticated
 /// - Zero when user is not authenticated or during auth loading/error
-///
-/// Provider is kept alive to maintain subscription across widget rebuilds.
-final watchedCountProvider = StreamProvider<int>((ref) {
+final watchedCountProvider = StreamProvider.autoDispose<int>((ref) {
   final authState = ref.watch(authStateProvider);
-
-  ref.keepAlive();
 
   return authState.when(
     data: (user) {
@@ -45,12 +41,8 @@ final watchedCountProvider = StreamProvider<int>((ref) {
 /// Returns:
 /// - Real-time count from Firestore when user is authenticated
 /// - Zero when user is not authenticated or during auth loading/error
-///
-/// Provider is kept alive to maintain subscription across widget rebuilds.
-final watchlistCountProvider = StreamProvider<int>((ref) {
+final watchlistCountProvider = StreamProvider.autoDispose<int>((ref) {
   final authState = ref.watch(authStateProvider);
-
-  ref.keepAlive();
 
   return authState.when(
     data: (user) {
@@ -72,12 +64,8 @@ final watchlistCountProvider = StreamProvider<int>((ref) {
 /// Returns:
 /// - Real-time count from Firestore when user is authenticated
 /// - Zero when user is not authenticated or during auth loading/error
-///
-/// Provider is kept alive to maintain subscription across widget rebuilds.
-final favoritesCountProvider = StreamProvider<int>((ref) {
+final favoritesCountProvider = StreamProvider.autoDispose<int>((ref) {
   final authState = ref.watch(authStateProvider);
-
-  ref.keepAlive();
 
   return authState.when(
     data: (user) {

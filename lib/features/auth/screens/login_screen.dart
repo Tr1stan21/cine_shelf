@@ -11,8 +11,6 @@ import 'package:cine_shelf/features/auth/widgets/auth_text_field.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/utils/validators.dart';
-import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/lists/application/list_providers.dart';
 
 /// Login screen for existing users.
 ///
@@ -87,7 +85,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await ref.read(authControllerProvider).signIn(email, password);
-      _preloadUserData();
 
       if (!mounted) return;
       context.go('/');
@@ -104,13 +101,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
-  }
-
-  void _preloadUserData() {
-    ref.read(currentUserProvider.future).ignore();
-    ref.read(watchedCountProvider.future).ignore();
-    ref.read(watchlistCountProvider.future).ignore();
-    ref.read(favoritesCountProvider.future).ignore();
   }
 
   @override
