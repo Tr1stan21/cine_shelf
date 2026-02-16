@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/lists/application/list_providers.dart';
 
 /// Splash screen - Loading screen shown during app initialization and after login.
 ///
@@ -42,13 +43,22 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       if (_hasNavigated || !mounted) return;
       _hasNavigated = true;
 
-      final isLoggedIn = user != null;
-      if (isLoggedIn) {
+      if (user != null) {
+        // PRECARGA: Dispara carga de datos sin bloquear navegación
+        _preloadUserData();
         context.go('/home');
       } else {
         context.go('/login');
       }
     });
+  }
+
+  void _preloadUserData() {
+    // Lectura imperativa (no reactiva) que inicia carga en background
+    ref.read(currentUserProvider.future).ignore();
+    ref.read(watchedCountProvider.future).ignore();
+    ref.read(watchlistCountProvider.future).ignore();
+    ref.read(favoritesCountProvider.future).ignore();
   }
 
   @override
