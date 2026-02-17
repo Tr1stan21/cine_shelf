@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/router/auth_state_notifier.dart';
+import 'package:cine_shelf/router/splash_gate_notifier.dart';
 import 'package:cine_shelf/features/account/screens/account_screen.dart';
 import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
 import 'package:cine_shelf/features/auth/screens/login_screen.dart';
@@ -41,7 +42,7 @@ class MovieDetailsArgs {
 /// - Integration with Riverpod auth state for reactive navigation
 ///
 /// Route structure:
-/// - `/` - Splash screen (initial route, handles auth-based navigation)
+/// - `/` - Splash screen (initial route, router decides redirect)
 /// - `/login`, `/sign-up` - Authentication screens (blocked when authenticated)
 /// - `/home`, `/mylists`, `/account` - Tab-based protected routes
 /// - `/movies`, `/movies/details` - Full-screen protected routes
@@ -64,6 +65,7 @@ class AppRouter {
   /// Stored statically because GoRouter redirect callbacks cannot directly reference
   /// Riverpod providers. Updated each time createRouter is called.
   static AuthStateNotifier? _authNotifier;
+  static SplashGateNotifier? _splashGate;
 
   /// Creates GoRouter instance configured with auth-based redirect logic.
   ///
@@ -72,18 +74,23 @@ class AppRouter {
   ///
   /// Parameters:
   /// - [authNotifier]: Listenable that notifies when auth state changes
+  /// - [splashGate]: Listenable that controls splash gating
   ///
   /// Returns configured GoRouter instance ready for MaterialApp.router
-  static GoRouter createRouter(AuthStateNotifier authNotifier) {
+  static GoRouter createRouter(
+    AuthStateNotifier authNotifier,
+    SplashGateNotifier splashGate,
+  ) {
     _authNotifier = authNotifier;
+    _splashGate = splashGate;
 
     return GoRouter(
       navigatorKey: _rootKey,
       initialLocation: '/',
-      refreshListenable: authNotifier,
+      refreshListenable: Listenable.merge([authNotifier, splashGate]),
       redirect: _handleRedirect,
       routes: <RouteBase>[
-        /// Entry point - SplashScreen handles auth-based navigation
+        /// Entry point - SplashScreen is visual-only
         GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
 
         /// Auth screens - only accessible when not authenticated
@@ -162,8 +169,8 @@ class AppRouter {
   /// Implements authentication-based route protection and redirection.
   ///
   /// Redirect logic:
-  /// 1. Splash screen (`/`) always allowed - handles its own navigation timing and loading
-  /// 2. If auth not initialized, redirects all routes to splash for proper initialization
+  /// 1. If auth not initialized, redirects all routes to splash for proper initialization
+  /// 2. When initialized, `/` redirects to `/home` or `/login` when splash gate opens
   /// 3. Protected app routes require authentication - redirects to `/login` if not authenticated
   /// 4. Auth screens (`/login`, `/sign-up`) redirect to `/home` if already authenticated
   /// 5. All other routes proceed without redirection
@@ -172,18 +179,22 @@ class AppRouter {
   static String? _handleRedirect(BuildContext context, GoRouterState state) {
     final location = state.matchedLocation;
     final authNotifier = _authNotifier;
-
-    // Allow splash to display and handle its own navigation timing
-    if (location == '/') {
-      return null;
-    }
+    final splashGate = _splashGate;
 
     // If auth not initialized yet, force to splash for loading
     if (authNotifier == null || !authNotifier.isInitialized) {
-      return '/';
+      return location == '/' ? null : '/';
     }
 
     final isLoggedIn = authNotifier.isAuthenticated;
+
+    if (location == '/') {
+      if (splashGate == null || !splashGate.isReady) {
+        return null;
+      }
+
+      return isLoggedIn ? '/home' : '/login';
+    }
 
     // Protect app routes - redirect unauthenticated users to login
     final isProtectedRoute =

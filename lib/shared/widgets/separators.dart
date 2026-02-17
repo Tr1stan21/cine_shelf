@@ -45,15 +45,15 @@ class GlowSeparator extends StatelessWidget {
             begin: Alignment.centerLeft,
             end: Alignment.centerRight,
             colors: [
-              _redOrange.withOpacity(0.00),
-              _redOrange.withOpacity(0.18),
+              _redOrange.withValues(alpha: 0.00),
+              _redOrange.withValues(alpha: 0.18),
 
-              _hotOrange.withOpacity(0.35),
-              _hotOrange.withOpacity(0.55),
-              _orange.withOpacity(0.75),
-              _orange.withOpacity(0.90),
+              _hotOrange.withValues(alpha: 0.35),
+              _hotOrange.withValues(alpha: 0.55),
+              _orange.withValues(alpha: 0.75),
+              _orange.withValues(alpha: 0.90),
 
-              _amber.withOpacity(0.92),
+              _amber.withValues(alpha: 0.92),
 
               // Transición más suave al blanco
               _amberLight1,
@@ -64,15 +64,15 @@ class GlowSeparator extends StatelessWidget {
               _amberLight2,
               _amberLight1,
 
-              _amber.withOpacity(0.92),
+              _amber.withValues(alpha: 0.92),
 
-              _orange.withOpacity(0.90),
-              _orange.withOpacity(0.75),
-              _hotOrange.withOpacity(0.55),
-              _hotOrange.withOpacity(0.35),
+              _orange.withValues(alpha: 0.90),
+              _orange.withValues(alpha: 0.75),
+              _hotOrange.withValues(alpha: 0.55),
+              _hotOrange.withValues(alpha: 0.35),
 
-              _redOrange.withOpacity(0.18),
-              _redOrange.withOpacity(0.00),
+              _redOrange.withValues(alpha: 0.18),
+              _redOrange.withValues(alpha: 0.00),
             ],
             stops: const [
               0.00,
@@ -120,6 +120,9 @@ class ThinDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(height: 1, color: CineColors.white.withOpacity(0.08));
+    return Container(
+      height: 1,
+      color: CineColors.white.withValues(alpha: 0.08),
+    );
   }
 }
