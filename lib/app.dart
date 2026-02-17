@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/router/app_router.dart';
-import 'package:cine_shelf/router/auth_state_notifier.dart';
 import 'package:cine_shelf/router/splash_gate_notifier.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 
@@ -55,10 +54,7 @@ class _AppState extends ConsumerState<App> {
     ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
       _handleAuthChange(next);
     });
-
-    final authNotifier = ref.watch(authStateNotifierProvider);
-    final splashGate = ref.watch(splashGateNotifierProvider);
-    final router = AppRouter.createRouter(authNotifier, splashGate);
+    final router = ref.read(goRouterProvider);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,

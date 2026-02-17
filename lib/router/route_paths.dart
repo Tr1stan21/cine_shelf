@@ -1,0 +1,21 @@
+class RoutePaths {
+  RoutePaths._();
+
+  static const String splash = '/';
+  static const String login = '/login';
+  static const String signUp = '/sign-up';
+  static const String home = '/home';
+  static const String myLists = '/mylists';
+  static const String account = '/account';
+  static const String movies = '/movies';
+  static const String movieDetails = '/movies/details';
+
+  static const List<String> protectedPrefixes = <String>[
+    home,
+    myLists,
+    account,
+    movies,
+  ];
+
+  static const Set<String> authRoutes = <String>{login, signUp};
+}

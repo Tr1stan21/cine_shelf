@@ -11,6 +11,7 @@ import 'package:cine_shelf/features/auth/widgets/auth_text_field.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/utils/validators.dart';
+import 'package:cine_shelf/router/route_paths.dart';
 
 /// Login screen for existing users.
 ///
@@ -87,7 +88,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authControllerProvider).signIn(email, password);
 
       if (!mounted) return;
-      context.go('/');
+      context.go(RoutePaths.splash);
     } catch (e, st) {
       debugPrint('LOGIN ERROR TYPE: ${e.runtimeType}');
       debugPrint('LOGIN ERROR: $e');
@@ -173,7 +174,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 // Sign up link
                 Center(
                   child: GestureDetector(
-                    onTap: () => context.push('/sign-up'),
+                    onTap: () => context.push(RoutePaths.signUp),
                     child: const Text(
                       'Don\'t have an account? Sign up',
                       style: TextStyle(

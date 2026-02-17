@@ -34,42 +34,17 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authRepositoryProvider).authStateChanges();
 });
 
-/// Family provider that fetches user document from Firestore by uid.
-/// - Keyed by uid to enable proper caching per user
-/// - Auto-disposes when no longer observed to prevent cross-session leakage
-/// - Returns null if uid is null (not authenticated)
-final currentUserDocumentProvider = FutureProvider.autoDispose
-    .family<UserModel?, String?>((ref, uid) async {
-      if (uid == null) {
-        return null;
-      }
-
-      // Fetch user document from Firestore
-      final userDoc = await ref
-          .watch(userRepositoryProvider)
-          .getUserDocument(uid);
-
-      return userDoc;
-    });
-
 /// Convenience provider that automatically extracts uid from auth state.
 /// Use this provider in UI screens instead of manually extracting uid.
-/// Auto-disposes when no longer observed to prevent cross-session leakage.
-final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) async {
-  // Watch auth state to get current user's uid
-  final authState = ref.watch(authStateProvider);
-  final user =
-      authState.asData?.value ?? ref.watch(authRepositoryProvider).currentUser;
-  final uid = user?.uid;
+final currentUserProvider = FutureProvider<UserModel?>((ref) async {
+  final auth = ref.watch(authStateProvider);
 
-  // Watch the family provider with the extracted uid
-  final result = ref
-      .watch(currentUserDocumentProvider(uid))
-      .when(
-        data: (user) => user,
-        loading: () => throw const AsyncLoading<UserModel?>(),
-        error: (error, stack) => throw AsyncError<UserModel?>(error, stack),
-      );
+  final user = await auth.when(
+    data: (u) async => u,
+    loading: () => ref.watch(authStateProvider.future),
+    error: (e, st) => Future.error(e, st),
+  );
 
-  return result;
+  if (user == null) return null;
+  return ref.read(userRepositoryProvider).getUserDocument(user.uid);
 });

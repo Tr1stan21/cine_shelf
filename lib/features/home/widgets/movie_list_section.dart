@@ -5,6 +5,7 @@ import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/router/app_router.dart';
+import 'package:cine_shelf/router/route_paths.dart';
 
 /// Widget displaying a horizontal section of movies with title and navigation button
 ///
@@ -28,7 +29,7 @@ class MovieListSection extends StatelessWidget {
           // Header with title and navigation button
           InkWell(
             onTap: () => context.push(
-              '/movies',
+              RoutePaths.movies,
               extra: MovieListArgs(title: title, items: items),
             ),
             child: Row(
@@ -62,7 +63,7 @@ class MovieListSection extends StatelessWidget {
                       width: posterW,
                       child: GestureDetector(
                         onTap: () => context.push(
-                          '/movies/details',
+                          RoutePaths.movieDetails,
                           extra: MovieDetailsArgs(movieId: items[index].id),
                         ),
                         child: ClipRRect(

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/router/auth_state_notifier.dart';
 import 'package:cine_shelf/router/splash_gate_notifier.dart';
+import 'package:cine_shelf/router/route_paths.dart';
 import 'package:cine_shelf/features/account/screens/account_screen.dart';
 import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
 import 'package:cine_shelf/features/auth/screens/login_screen.dart';
@@ -60,13 +62,6 @@ class AppRouter {
   static final GlobalKey<NavigatorState> _accountTabKey =
       GlobalKey<NavigatorState>(debugLabel: 'accountTab');
 
-  /// Cached reference to auth state notifier for redirect callback access.
-  ///
-  /// Stored statically because GoRouter redirect callbacks cannot directly reference
-  /// Riverpod providers. Updated each time createRouter is called.
-  static AuthStateNotifier? _authNotifier;
-  static SplashGateNotifier? _splashGate;
-
   /// Creates GoRouter instance configured with auth-based redirect logic.
   ///
   /// The router reacts to auth state changes via [refreshListenable],
@@ -77,29 +72,31 @@ class AppRouter {
   /// - [splashGate]: Listenable that controls splash gating
   ///
   /// Returns configured GoRouter instance ready for MaterialApp.router
-  static GoRouter createRouter(
-    AuthStateNotifier authNotifier,
-    SplashGateNotifier splashGate,
-  ) {
-    _authNotifier = authNotifier;
-    _splashGate = splashGate;
-
+  static GoRouter createRouter({
+    required AuthStateNotifier authNotifier,
+    required SplashGateNotifier splashGate,
+    required Listenable refreshListenable,
+  }) {
     return GoRouter(
       navigatorKey: _rootKey,
-      initialLocation: '/',
-      refreshListenable: Listenable.merge([authNotifier, splashGate]),
-      redirect: _handleRedirect,
+      initialLocation: RoutePaths.splash,
+      refreshListenable: refreshListenable,
+      redirect: (context, state) =>
+          _handleRedirect(state, authNotifier, splashGate),
       routes: <RouteBase>[
         /// Entry point - SplashScreen is visual-only
-        GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
+        GoRoute(
+          path: RoutePaths.splash,
+          builder: (context, state) => const SplashScreen(),
+        ),
 
         /// Auth screens - only accessible when not authenticated
         GoRoute(
-          path: '/login',
+          path: RoutePaths.login,
           builder: (context, state) => const LoginScreen(),
         ),
         GoRoute(
-          path: '/sign-up',
+          path: RoutePaths.signUp,
           builder: (context, state) => const SignUpScreen(),
         ),
 
@@ -113,7 +110,7 @@ class AppRouter {
               navigatorKey: _homeTabKey,
               routes: <RouteBase>[
                 GoRoute(
-                  path: '/home',
+                  path: RoutePaths.home,
                   pageBuilder: (context, state) =>
                       const NoTransitionPage(child: HomeScreen()),
                 ),
@@ -123,7 +120,7 @@ class AppRouter {
               navigatorKey: _myListsTabKey,
               routes: <RouteBase>[
                 GoRoute(
-                  path: '/mylists',
+                  path: RoutePaths.myLists,
                   pageBuilder: (context, state) =>
                       const NoTransitionPage(child: MyListsScreen()),
                 ),
@@ -133,7 +130,7 @@ class AppRouter {
               navigatorKey: _accountTabKey,
               routes: <RouteBase>[
                 GoRoute(
-                  path: '/account',
+                  path: RoutePaths.account,
                   pageBuilder: (context, state) =>
                       const NoTransitionPage(child: AccountScreen()),
                 ),
@@ -145,7 +142,7 @@ class AppRouter {
         /// Movie screens - only accessible when authenticated
         GoRoute(
           parentNavigatorKey: _rootKey,
-          path: '/movies',
+          path: RoutePaths.movies,
           builder: (context, state) {
             final args = state.extra as MovieListArgs?;
             return MovieListScreen(
@@ -156,7 +153,7 @@ class AppRouter {
         ),
         GoRoute(
           parentNavigatorKey: _rootKey,
-          path: '/movies/details',
+          path: RoutePaths.movieDetails,
           builder: (context, state) {
             final args = state.extra as MovieDetailsArgs?;
             return MovieDetailsScreen(movieId: args?.movieId);
@@ -176,43 +173,110 @@ class AppRouter {
   /// 5. All other routes proceed without redirection
   ///
   /// Returns the route to redirect to, or `null` to allow navigation to proceed.
-  static String? _handleRedirect(BuildContext context, GoRouterState state) {
+  static String? _handleRedirect(
+    GoRouterState state,
+    AuthStateNotifier authNotifier,
+    SplashGateNotifier splashGate,
+  ) {
     final location = state.matchedLocation;
-    final authNotifier = _authNotifier;
-    final splashGate = _splashGate;
+    String? destination;
 
-    // If auth not initialized yet, force to splash for loading
-    if (authNotifier == null || !authNotifier.isInitialized) {
-      return location == '/' ? null : '/';
-    }
-
-    final isLoggedIn = authNotifier.isAuthenticated;
-
-    if (location == '/') {
-      if (splashGate == null || !splashGate.isReady) {
+    // If auth not initialized yet, force to splash for loading.
+    if (!authNotifier.isInitialized) {
+      destination = RoutePaths.splash;
+    } else if (location == RoutePaths.splash) {
+      if (!splashGate.isReady) {
         return null;
       }
 
-      return isLoggedIn ? '/home' : '/login';
+      destination = authNotifier.isAuthenticated
+          ? RoutePaths.home
+          : RoutePaths.login;
+    } else {
+      final isProtectedRoute = RoutePaths.protectedPrefixes.any(
+        (prefix) => location.startsWith(prefix),
+      );
+
+      if (isProtectedRoute && !authNotifier.isAuthenticated) {
+        destination = RoutePaths.login;
+      }
+
+      if (authNotifier.isAuthenticated &&
+          RoutePaths.authRoutes.contains(location)) {
+        destination = RoutePaths.home;
+      }
     }
 
-    // Protect app routes - redirect unauthenticated users to login
-    final isProtectedRoute =
-        location.startsWith('/home') ||
-        location.startsWith('/mylists') ||
-        location.startsWith('/account') ||
-        location.startsWith('/movies');
-
-    if (isProtectedRoute && !isLoggedIn) {
-      return '/login';
+    if (destination == null || destination == location) {
+      return null;
     }
 
-    // Block auth screens for authenticated users
-    if (isLoggedIn && (location == '/login' || location == '/sign-up')) {
-      return '/home';
-    }
-
-    // Allow all other navigation
-    return null;
+    return destination;
   }
 }
+
+class _RedirectState {
+  const _RedirectState({
+    required this.isAuthenticated,
+    required this.isGateOpen,
+    required this.isInitialized,
+  });
+
+  final bool isAuthenticated;
+  final bool isGateOpen;
+  final bool isInitialized;
+
+  factory _RedirectState.from(
+    AuthStateNotifier authNotifier,
+    SplashGateNotifier splashGate,
+  ) {
+    return _RedirectState(
+      isAuthenticated: authNotifier.isAuthenticated,
+      isGateOpen: splashGate.isReady,
+      isInitialized: authNotifier.isInitialized,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is _RedirectState &&
+        other.isAuthenticated == isAuthenticated &&
+        other.isGateOpen == isGateOpen &&
+        other.isInitialized == isInitialized;
+  }
+
+  @override
+  int get hashCode => Object.hash(isAuthenticated, isGateOpen, isInitialized);
+}
+
+final goRouterProvider = Provider<GoRouter>((ref) {
+  final authNotifier = ref.read(authStateNotifierProvider);
+  final splashGate = ref.read(splashGateNotifierProvider);
+  final refreshNotifier = ValueNotifier<int>(0);
+  var lastState = _RedirectState.from(authNotifier, splashGate);
+
+  void bumpIfNeeded() {
+    final nextState = _RedirectState.from(authNotifier, splashGate);
+    if (nextState == lastState) {
+      return;
+    }
+
+    lastState = nextState;
+    refreshNotifier.value++;
+  }
+
+  authNotifier.addListener(bumpIfNeeded);
+  splashGate.addListener(bumpIfNeeded);
+
+  ref.onDispose(() {
+    authNotifier.removeListener(bumpIfNeeded);
+    splashGate.removeListener(bumpIfNeeded);
+    refreshNotifier.dispose();
+  });
+
+  return AppRouter.createRouter(
+    authNotifier: authNotifier,
+    splashGate: splashGate,
+    refreshListenable: refreshNotifier,
+  );
+});

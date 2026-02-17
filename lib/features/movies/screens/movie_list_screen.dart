@@ -6,6 +6,7 @@ import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/router/app_router.dart';
+import 'package:cine_shelf/router/route_paths.dart';
 
 /// Full-screen movie list displaying movies in a responsive grid layout.
 ///
@@ -57,7 +58,7 @@ class MovieListScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 4),
                           child: GestureDetector(
                             onTap: () => context.push(
-                              '/movies/details',
+                              RoutePaths.movieDetails,
                               extra: MovieDetailsArgs(movieId: item.id),
                             ),
                             child: AspectRatio(
