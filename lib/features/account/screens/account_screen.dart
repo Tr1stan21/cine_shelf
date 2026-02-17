@@ -50,7 +50,6 @@ class AccountScreen extends ConsumerWidget {
         children: [
           const SizedBox(height: CineSpacing.xxxl),
 
-          // Avatar (simple)
           Container(
             width: 110,
             height: 110,
