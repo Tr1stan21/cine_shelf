@@ -51,9 +51,31 @@ class _AppState extends ConsumerState<App> {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ CORRECT PATTERN: ref.listen() in build for managing side effects
+    //
+    // Why this is safe and correct:
+    // - Riverpod automatically deduplicates listeners: the callback is registered only once
+    //   even if build() is called multiple times (e.g., during hot reload or parent rebuilds)
+    // - Listeners are automatically cleaned up when the widget is disposed
+    // - This is the idiomatic Riverpod pattern for reacting to state changes
+    //
+    // When build() runs multiple times:
+    // 1. First time: listener is registered
+    // 2. Subsequent times: Riverpod detects the same listener, no duplicate is added
+    // 3. Disposal: cleaned up automatically by Framework's lifecycle
+    //
+    // Alternative patterns and their trade-offs:
+    // - .select(): Used when you only care about specific fields, not the entire AsyncValue
+    //   Not needed here since we handle the entire auth state flow
+    // - useEffect() (from flutter_hooks): Would require ConsumerHookWidget wrapper
+    //   Unnecessary complexity for this simple side effect
+    // - Navigator callback: Similar to ref.listen(), but less declarative
+    //
+    // Reference: https://riverpod.dev/docs/essentials/side_effects/
     ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
       _handleAuthChange(next);
     });
+
     final router = ref.read(goRouterProvider);
 
     return MaterialApp.router(

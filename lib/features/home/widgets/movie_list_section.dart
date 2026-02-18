@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
@@ -68,10 +69,17 @@ class MovieListSection extends StatelessWidget {
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(CineRadius.md),
-                          child: Image.network(
-                            items[index].imageUrl,
+                          child: CachedNetworkImage(
+                            imageUrl: items[index].imageUrl,
                             fit: BoxFit.cover,
                             filterQuality: FilterQuality.low,
+                            placeholder: (context, url) => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                            errorWidget: (context, url, error) => const Icon(
+                              Icons.error_outline,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
                       ),

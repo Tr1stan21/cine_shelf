@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
@@ -15,6 +16,12 @@ import 'package:cine_shelf/router/route_paths.dart';
 /// - Each movie poster maintains consistent aspect ratio
 /// - Tapping any poster navigates to movie details screen
 /// - Grid automatically handles varying list lengths with proper spacing
+///
+/// **Performance Optimizations:**
+/// - Uses ListView.builder for lazy loading (only visible rows rendered)
+/// - Enables addRepaintBoundaries to prevent unnecessary repaints of off-screen rows
+/// - CachedNetworkImage with memory caching for image rendering efficiency
+/// - Efficiently calculates row/column indices without allocating full grid in memory
 ///
 /// Typically navigated to from MovieListSection when user taps "see all".
 class MovieListScreen extends StatelessWidget {
@@ -34,7 +41,10 @@ class MovieListScreen extends StatelessWidget {
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(8),
+              // Calculate number of rows needed
               itemCount: (items.length / AppConstants.moviesPerRow).ceil(),
+              // Enable addRepaintBoundaries to optimize repaints of off-screen rows
+              addRepaintBoundaries: true,
               itemBuilder: (context, rowIndex) {
                 final start = rowIndex * AppConstants.moviesPerRow;
                 final end = (start + AppConstants.moviesPerRow).clamp(
@@ -56,25 +66,7 @@ class MovieListScreen extends StatelessWidget {
                       return Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: GestureDetector(
-                            onTap: () => context.push(
-                              RoutePaths.movieDetails,
-                              extra: MovieDetailsArgs(movieId: item.id),
-                            ),
-                            child: AspectRatio(
-                              aspectRatio: AppConstants.posterAspectRatio,
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                  CineRadius.md,
-                                ),
-                                child: Image.network(
-                                  item.imageUrl,
-                                  fit: BoxFit.cover,
-                                  filterQuality: FilterQuality.low,
-                                ),
-                              ),
-                            ),
-                          ),
+                          child: _MoviePosterCard(item: item),
                         ),
                       );
                     }),
@@ -84,6 +76,43 @@ class MovieListScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Extracted widget for individual movie poster card.
+///
+/// Separating into its own widget improves performance by:
+/// - Reducing unnecessary rebuilds of the entire row
+/// - Allowing Flutter to optimize widget lifecycle independently
+/// - Better memory management in large lists
+class _MoviePosterCard extends StatelessWidget {
+  const _MoviePosterCard({required this.item});
+
+  final Movie item;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () => context.push(
+        RoutePaths.movieDetails,
+        extra: MovieDetailsArgs(movieId: item.id),
+      ),
+      child: AspectRatio(
+        aspectRatio: AppConstants.posterAspectRatio,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(CineRadius.md),
+          child: CachedNetworkImage(
+            imageUrl: item.imageUrl,
+            fit: BoxFit.cover,
+            filterQuality: FilterQuality.low,
+            placeholder: (context, url) =>
+                const Center(child: CircularProgressIndicator()),
+            errorWidget: (context, url, error) =>
+                const Icon(Icons.error_outline, color: Colors.grey),
+          ),
+        ),
       ),
     );
   }

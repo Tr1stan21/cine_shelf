@@ -82,6 +82,12 @@ class AuthController {
 
   /// Signs out current user.
   Future<void> signOut() async {
-    await ref.read(authRepositoryProvider).signOut();
+    final signOutFlag = ref.read(signOutInProgressProvider.notifier);
+    signOutFlag.setInProgress(true);
+    try {
+      await ref.read(authRepositoryProvider).signOut();
+    } finally {
+      signOutFlag.setInProgress(false);
+    }
   }
 }

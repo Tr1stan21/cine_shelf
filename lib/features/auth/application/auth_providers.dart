@@ -34,17 +34,44 @@ final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authRepositoryProvider).authStateChanges();
 });
 
-/// Convenience provider that automatically extracts uid from auth state.
-/// Use this provider in UI screens instead of manually extracting uid.
-final currentUserProvider = FutureProvider<UserModel?>((ref) async {
-  final auth = ref.watch(authStateProvider);
+/// Tracks whether a sign-out operation is in progress.
+///
+/// Used to trigger immediate navigation to auth routes before auth stream updates.
+final signOutInProgressProvider = NotifierProvider<SignOutFlagNotifier, bool>(
+  SignOutFlagNotifier.new,
+);
 
-  final user = await auth.when(
-    data: (u) async => u,
-    loading: () => ref.watch(authStateProvider.future),
-    error: (e, st) => Future.error(e, st),
-  );
+class SignOutFlagNotifier extends Notifier<bool> {
+  @override
+  bool build() => false;
 
+  void setInProgress(bool value) {
+    state = value;
+  }
+}
+
+/// Future provider that fetches the full UserModel for the authenticated user.
+///
+/// Flow:
+/// 1. Waits for authentication state to be determined via [authStateProvider.future]
+/// 2. If no user is authenticated, returns null
+/// 3. If authenticated, fetches the user's profile document from Firestore
+///
+/// Uses .autoDispose to automatically clean up resources when no longer watched,
+/// reducing memory usage and preventing stale cached data.
+///
+/// Typical usage:
+/// ```dart
+/// final userModel = await ref.read(currentUserProvider.future);
+/// final userAsyncValue = ref.watch(currentUserProvider);
+/// ```
+final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) async {
+  // Wait for auth state to be determined (converts StreamProvider to Future)
+  final user = await ref.watch(authStateProvider.future);
+
+  // If no user authenticated, return null early
   if (user == null) return null;
+
+  // Fetch user's profile document from Firestore
   return ref.read(userRepositoryProvider).getUserDocument(user.uid);
 });

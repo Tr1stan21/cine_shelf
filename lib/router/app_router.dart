@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:cine_shelf/router/auth_state_notifier.dart';
 import 'package:cine_shelf/router/splash_gate_notifier.dart';
 import 'package:cine_shelf/router/route_paths.dart';
+import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/account/screens/account_screen.dart';
 import 'package:cine_shelf/features/lists/screens/my_lists_screen.dart';
 import 'package:cine_shelf/features/auth/screens/login_screen.dart';
@@ -265,11 +267,22 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshNotifier.value++;
   }
 
-  authNotifier.addListener(bumpIfNeeded);
+  // Listen to auth state changes directly from authStateProvider (single source of truth).
+  // This ensures the router reacts to authentication updates consistently with the rest of the app.
+  // authStateNotifier self-synchronizes with this same stream, so its getters reflect current state.
+  ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
+    bumpIfNeeded();
+  });
+
+  // Listen to sign-out flag to redirect immediately before auth stream updates.
+  ref.listen<bool>(signOutInProgressProvider, (previous, next) {
+    bumpIfNeeded();
+  });
+
+  // Also listen to splashGate completion changes
   splashGate.addListener(bumpIfNeeded);
 
   ref.onDispose(() {
-    authNotifier.removeListener(bumpIfNeeded);
     splashGate.removeListener(bumpIfNeeded);
     refreshNotifier.dispose();
   });

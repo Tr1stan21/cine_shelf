@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
@@ -45,7 +46,14 @@ class MovieDetailsScreen extends StatelessWidget {
                 SizedBox(
                   height: size.height - panelHeight + overlap,
                   width: double.infinity,
-                  child: Image.network(_topImageUrl, fit: BoxFit.cover),
+                  child: CachedNetworkImage(
+                    imageUrl: _topImageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) =>
+                        const Center(child: CircularProgressIndicator()),
+                    errorWidget: (context, url, error) =>
+                        const Icon(Icons.error_outline, color: Colors.grey),
+                  ),
                 ),
                 SafeArea(
                   top: false,

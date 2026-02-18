@@ -45,7 +45,30 @@ class UserModel {
 /// - Fetching user profile data
 ///
 /// User documents are stored in the `/user/{uid}` collection.
+///
+/// **Dependency Injection for Testability:**
+///
+/// The [FirebaseFirestore] instance is injected via constructor, allowing:
+/// - Easy mocking in unit tests without Firebase initialization
+/// - Alternative Firestore implementations or adapters
+/// - Decoupling from Firebase SDK specifics
+///
+/// Example for production:
+/// ```dart
+/// final userRepository = UserRepository(FirebaseFirestore.instance);
+/// ```
+///
+/// Example for testing (with mock):
+/// ```dart
+/// final mockFirestore = MockFirebaseFirestore();
+/// final userRepository = UserRepository(mockFirestore);
+/// ```
 class UserRepository {
+  /// Creates a UserRepository with the provided FirebaseFirestore instance.
+  ///
+  /// Parameters:
+  /// - [firestore]: FirebaseFirestore instance to use for operations.
+  ///   Injected for testability and flexibility.
   UserRepository(this._firestore);
 
   final FirebaseFirestore _firestore;
@@ -58,6 +81,11 @@ class UserRepository {
   ///    with `createdAt` timestamp and any other server-side data
   ///
   /// This ensures consistent server timestamps and allows backend validation.
+  ///
+  /// Parameters:
+  /// - [uid]: User ID from Firebase Authentication
+  /// - [username]: Display name for the user
+  /// - [email]: User's email address
   ///
   /// Throws exception if Firestore write fails.
   Future<void> createUserDocument({
@@ -84,6 +112,10 @@ class UserRepository {
   /// - `null` if document doesn't exist or error occurs
   ///
   /// Errors are logged but not rethrown to avoid breaking app flow.
+  /// If Firestore is unavailable, returns null gracefully.
+  ///
+  /// Parameters:
+  /// - [uid]: User ID to fetch profile for
   Future<UserModel?> getUserDocument(String uid) async {
     try {
       final doc = await _firestore.collection('user').doc(uid).get();
