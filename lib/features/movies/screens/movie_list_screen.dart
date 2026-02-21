@@ -1,3 +1,4 @@
+import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -6,7 +7,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
-import 'package:cine_shelf/router/app_router.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 
 /// Full-screen movie list displaying movies in a responsive grid layout.

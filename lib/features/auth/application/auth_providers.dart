@@ -1,10 +1,9 @@
+import 'package:cine_shelf/features/auth/models/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/auth_repository.dart';
 import '../data/user_repository.dart';
-
-export '../data/user_repository.dart' show UserModel;
 
 /// Provides singleton FirebaseAuth instance.
 final firebaseAuthProvider = Provider<FirebaseAuth>(

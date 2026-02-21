@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/auth/utils/preload_user_data.dart';
+import 'package:cine_shelf/router/preload_user_data.dart';
 
 /// Controls when the splash screen is allowed to redirect.
 ///

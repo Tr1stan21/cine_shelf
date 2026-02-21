@@ -7,7 +7,7 @@ import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
 import 'package:cine_shelf/features/home/widgets/search_bar.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 
-import 'package:cine_shelf/features/movies/presentation/providers/popular_movies_provider.dart';
+import 'package:cine_shelf/features/movies/application/popular_movies_provider.dart';
 
 /// Home screen of the application
 ///

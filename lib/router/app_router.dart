@@ -1,3 +1,5 @@
+import 'package:cine_shelf/features/movies/models/movie_list_args.dart';
+import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,26 +18,7 @@ import 'package:cine_shelf/features/movies/screens/movie_details_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_list_screen.dart';
 import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
-import 'package:cine_shelf/shared/widgets/nav_shell.dart';
-
-/// Arguments for MovieListScreen
-///
-/// Encapsulates data needed to display a filtered or categorized list of movies.
-class MovieListArgs {
-  const MovieListArgs({required this.title, required this.items});
-
-  final String title;
-  final List<MoviePoster> items;
-}
-
-/// Arguments for MovieDetailsScreen
-///
-/// Carries movie identifier for detail screen navigation.
-class MovieDetailsArgs {
-  const MovieDetailsArgs({required this.movie});
-
-  final MoviePoster movie;
-}
+import 'package:cine_shelf/router/shell.dart';
 
 /// Central routing configuration for the CineShelf application.
 ///

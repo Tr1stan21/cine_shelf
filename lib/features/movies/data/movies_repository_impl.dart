@@ -1,4 +1,4 @@
-import '../domain/movies_repository.dart';
+import 'movies_repository.dart';
 import '../models/movie_poster.dart';
 import '../mappers/movie_mapper.dart';
 import 'tmdb_remote_data_source.dart';
