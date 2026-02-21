@@ -15,7 +15,7 @@ import 'package:cine_shelf/features/home/screens/home_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_details_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_list_screen.dart';
 import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
-import 'package:cine_shelf/features/movies/models/movie.dart';
+import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/shared/widgets/nav_shell.dart';
 
 /// Arguments for MovieListScreen
@@ -25,16 +25,16 @@ class MovieListArgs {
   const MovieListArgs({required this.title, required this.items});
 
   final String title;
-  final List<Movie> items;
+  final List<MoviePoster> items;
 }
 
 /// Arguments for MovieDetailsScreen
 ///
 /// Carries movie identifier for detail screen navigation.
 class MovieDetailsArgs {
-  const MovieDetailsArgs({this.movieId});
+  const MovieDetailsArgs({required this.movie});
 
-  final String? movieId;
+  final MoviePoster movie;
 }
 
 /// Central routing configuration for the CineShelf application.
@@ -149,7 +149,7 @@ class AppRouter {
             final args = state.extra as MovieListArgs?;
             return MovieListScreen(
               title: args?.title ?? 'Movies',
-              items: args?.items ?? const <Movie>[],
+              items: args?.items ?? const <MoviePoster>[],
             );
           },
         ),
@@ -158,7 +158,7 @@ class AppRouter {
           path: RoutePaths.movieDetails,
           builder: (context, state) {
             final args = state.extra as MovieDetailsArgs?;
-            return MovieDetailsScreen(movieId: args?.movieId);
+            return MovieDetailsScreen(movie: args!.movie);
           },
         ),
       ],

@@ -1,3 +1,4 @@
+import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -5,7 +6,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
-import 'package:cine_shelf/features/movies/models/movie.dart';
 import 'package:cine_shelf/router/app_router.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 
@@ -28,7 +28,7 @@ class MovieListScreen extends StatelessWidget {
   const MovieListScreen({required this.title, required this.items, super.key});
 
   final String title;
-  final List<Movie> items;
+  final List<MoviePoster> items;
 
   @override
   Widget build(BuildContext context) {
@@ -90,21 +90,21 @@ class MovieListScreen extends StatelessWidget {
 class _MoviePosterCard extends StatelessWidget {
   const _MoviePosterCard({required this.item});
 
-  final Movie item;
+  final MoviePoster item;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => context.push(
         RoutePaths.movieDetails,
-        extra: MovieDetailsArgs(movieId: item.id),
+        extra: MovieDetailsArgs(movie: item),
       ),
       child: AspectRatio(
         aspectRatio: AppConstants.posterAspectRatio,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(CineRadius.md),
           child: CachedNetworkImage(
-            imageUrl: item.imageUrl,
+            imageUrl: item.posterPath,
             fit: BoxFit.cover,
             filterQuality: FilterQuality.low,
             placeholder: (context, url) =>

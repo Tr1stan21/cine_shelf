@@ -1,3 +1,4 @@
+import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -20,11 +21,10 @@ import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 /// Currently displays static placeholder data.
 /// TODO: Integrate with movie API using [movieId] parameter.
 class MovieDetailsScreen extends StatelessWidget {
-  const MovieDetailsScreen({super.key, this.movieId});
+  const MovieDetailsScreen({required this.movie, super.key});
 
-  final String? movieId;
+  final MoviePoster movie;
 
-  static const _topImageUrl = AppConstants.urlPlaceholderPoster;
   static const int _maxStars = 5;
   static const String _favoriteLabel = 'Favorite';
   static const String _watchlistLabel = 'Watchlist';
@@ -47,7 +47,7 @@ class MovieDetailsScreen extends StatelessWidget {
                   height: size.height - panelHeight + overlap,
                   width: double.infinity,
                   child: CachedNetworkImage(
-                    imageUrl: _topImageUrl,
+                    imageUrl: movie.posterPath,
                     fit: BoxFit.cover,
                     placeholder: (context, url) =>
                         const Center(child: CircularProgressIndicator()),

@@ -35,6 +35,5 @@ Future<void> main() async {
   // - Validates cache on each request (smart cache invalidation)
   // - Provides in-memory LRU cache as well
   // No additional initialization needed; caching is automatic.
-
   runApp(const ProviderScope(child: App()));
 }

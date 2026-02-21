@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
-import 'package:cine_shelf/features/movies/models/movie.dart';
+import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/router/app_router.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 
@@ -18,7 +18,7 @@ class MovieListSection extends StatelessWidget {
   const MovieListSection({required this.title, required this.items, super.key});
 
   final String title;
-  final List<Movie> items;
+  final List<MoviePoster> items;
 
   @override
   Widget build(BuildContext context) {
@@ -60,17 +60,22 @@ class MovieListSection extends StatelessWidget {
                   separatorBuilder: (_, index) =>
                       const SizedBox(width: AppConstants.itemSpacing),
                   itemBuilder: (context, index) {
+                    final movie = items[index];
+                    final imageUrl = AppConstants.tmdbPosterUrl(
+                      movie.posterPath,
+                    );
+
                     return SizedBox(
                       width: posterW,
                       child: GestureDetector(
                         onTap: () => context.push(
                           RoutePaths.movieDetails,
-                          extra: MovieDetailsArgs(movieId: items[index].id),
+                          extra: MovieDetailsArgs(movie: movie),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(CineRadius.md),
                           child: CachedNetworkImage(
-                            imageUrl: items[index].imageUrl,
+                            imageUrl: imageUrl,
                             fit: BoxFit.cover,
                             filterQuality: FilterQuality.low,
                             placeholder: (context, url) => const Center(

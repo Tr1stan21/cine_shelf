@@ -9,7 +9,14 @@
 abstract class AppConstants {
   // Assets paths
   static const String logoPath = 'assets/logo/logo_close_up.png';
+
   static const String backgroundPath = 'assets/images/background.png';
+  static const String tmdbImageBaseUrlW500 = 'https://image.tmdb.org/t/p/w500';
+
+  static String tmdbPosterUrl(String? posterPath) {
+    if (posterPath == null || posterPath.isEmpty) return urlPlaceholderPoster;
+    return '$tmdbImageBaseUrlW500$posterPath';
+  }
 
   // Placeholder URLs (temporary until real API integration)
   static const String urlPlaceholderPoster =
