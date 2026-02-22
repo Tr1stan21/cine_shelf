@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import '../models/tmdb/popular_movies_dto.dart';
+import '../models/tmdb/category_movies_dto.dart';
 import '../models/tmdb/list_category.dart';
 import '../models/tmdb/movie_detail_dto.dart';
 
@@ -8,7 +8,7 @@ class TmdbRemoteDataSource {
 
   TmdbRemoteDataSource(this._dio);
 
-  Future<PopularMoviesDto> getMovies(
+  Future<CategoryMoviesDto> getMovies(
     ListCategory category, {
     int page = 1,
   }) async {
@@ -16,7 +16,7 @@ class TmdbRemoteDataSource {
       '/movie/${category.path}',
       queryParameters: {'page': page},
     );
-    return PopularMoviesDto.fromJson(response.data as Map<String, dynamic>);
+    return CategoryMoviesDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   /// Obtiene el detalle de una película por su id TMDB.
