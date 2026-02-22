@@ -5,6 +5,7 @@ import '../mappers/movie_detail_dto_mapper.dart';
 import 'tmdb_remote_data_source.dart';
 import '../models/tmdb/list_category.dart';
 import '../models/movie_detail.dart';
+import '../models/paginated_movies.dart';
 
 class MoviesRepositoryImpl implements MoviesRepository {
   final TmdbRemoteDataSource _remote;
@@ -18,6 +19,19 @@ class MoviesRepositoryImpl implements MoviesRepository {
   }) async {
     final dto = await _remote.getMovies(category, page: page);
     return dto.results.map((e) => e.toAppModel()).toList();
+  }
+
+  @override
+  Future<PaginatedMoviesPage> getMoviesPage(
+    ListCategory category, {
+    int page = 1,
+  }) async {
+    final dto = await _remote.getMovies(category, page: page);
+    return PaginatedMoviesPage(
+      page: dto.page,
+      totalPages: dto.totalPages,
+      movies: dto.results.map((e) => e.toAppModel()).toList(),
+    );
   }
 
   @override

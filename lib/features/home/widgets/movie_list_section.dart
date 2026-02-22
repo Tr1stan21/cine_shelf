@@ -1,5 +1,6 @@
 import 'package:cine_shelf/features/movies/models/movie_list_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
+import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -9,17 +10,30 @@ import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 
-/// Widget displaying a horizontal section of movies with title and navigation button
+/// Widget displaying a horizontal section of movies with title and navigation button.
 ///
 /// Presents a horizontal carousel of movie posters with:
 /// - Section title
-/// - Navigation button to view the full list
+/// - Navigation button to view the full list (with infinite scroll)
 /// - Horizontal scrollable list of posters
+///
+/// [category] is forwarded to [MovieListArgs] so [MovieListScreen] can load
+/// additional pages when the user scrolls to the bottom of the full list.
 class MovieListSection extends StatelessWidget {
-  const MovieListSection({required this.title, required this.items, super.key});
+  const MovieListSection({
+    required this.title,
+    required this.items,
+    required this.totalPages,
+    required this.category,
+    super.key,
+  });
 
   final String title;
   final List<MoviePoster> items;
+  final int totalPages;
+
+  /// TMDB category — passed through to MovieListScreen to enable infinite scroll.
+  final ListCategory category;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +46,12 @@ class MovieListSection extends StatelessWidget {
           InkWell(
             onTap: () => context.push(
               RoutePaths.movies,
-              extra: MovieListArgs(title: title, items: items),
+              extra: MovieListArgs(
+                title: title,
+                items: items,
+                totalPages: totalPages,
+                category: category,
+              ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

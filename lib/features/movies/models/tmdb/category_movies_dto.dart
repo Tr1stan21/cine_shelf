@@ -1,13 +1,19 @@
 class CategoryMoviesDto {
   final int page;
+  final int totalPages;
   final List<MoviePosterDto> results;
 
-  CategoryMoviesDto({required this.page, required this.results});
+  CategoryMoviesDto({
+    required this.page,
+    required this.totalPages,
+    required this.results,
+  });
 
   factory CategoryMoviesDto.fromJson(Map<String, dynamic> json) {
     final resultsJson = (json['results'] as List<dynamic>? ?? const []);
     return CategoryMoviesDto(
       page: (json['page'] as num?)?.toInt() ?? 1,
+      totalPages: (json['total_pages'] as num?)?.toInt() ?? 1,
       results: resultsJson
           .map((e) => MoviePosterDto.fromJson(e as Map<String, dynamic>))
           .toList(),

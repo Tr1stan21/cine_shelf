@@ -1,6 +1,9 @@
 import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
+import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
+import 'package:cine_shelf/features/movies/application/paginated_movies_notifier.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -11,41 +14,172 @@ import 'package:cine_shelf/router/route_paths.dart';
 
 /// Full-screen movie list displaying movies in a responsive grid layout.
 ///
-/// Presents a collection of movies organized in a multi-column grid where:
-/// - Column count is determined by [AppConstants.moviesPerRow]
-/// - Each movie poster maintains consistent aspect ratio
-/// - Tapping any poster navigates to movie details screen
-/// - Grid automatically handles varying list lengths with proper spacing
+/// When [category] is provided the screen supports infinite scroll:
+/// - [initialItems] (page 1) are shown immediately without a network call.
+/// - Scrolling to ~85 % of the list triggers [PaginatedMoviesNotifier.loadMore].
+/// - A loading indicator row is appended while the next page is fetching.
+/// - On error, an inline retry button lets the user try again without losing
+///   the items already displayed.
 ///
-/// **Performance Optimizations:**
-/// - Uses ListView.builder for lazy loading (only visible rows rendered)
-/// - Enables addRepaintBoundaries to prevent unnecessary repaints of off-screen rows
-/// - CachedNetworkImage with memory caching for image rendering efficiency
-/// - Efficiently calculates row/column indices without allocating full grid in memory
+/// When [category] is null the list is static — identical to the original
+/// behaviour so existing call-sites that do not pass a category are unaffected.
 ///
-/// Typically navigated to from MovieListSection when user taps "see all".
-class MovieListScreen extends StatelessWidget {
-  const MovieListScreen({required this.title, required this.items, super.key});
+/// Performance optimisations carried over from the original:
+/// - ListView.builder for lazy row rendering.
+/// - addRepaintBoundaries to isolate off-screen row repaints.
+/// - CachedNetworkImage with low filter quality for smooth scrolling.
+class MovieListScreen extends ConsumerStatefulWidget {
+  const MovieListScreen({
+    required this.title,
+    required this.initialItems,
+    required this.totalPages,
+    this.category,
+    super.key,
+  });
 
   final String title;
-  final List<MoviePoster> items;
+  final List<MoviePoster> initialItems;
+  final int totalPages;
+
+  /// When non-null, enables infinite scroll for this category.
+  final ListCategory? category;
+
+  @override
+  ConsumerState<MovieListScreen> createState() => _MovieListScreenState();
+}
+
+class _MovieListScreenState extends ConsumerState<MovieListScreen> {
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_onScroll);
+
+    // Seed the paginated provider with the items already loaded by HomeScreen
+    // so the list appears instantly without an extra network round-trip.
+    if (widget.category != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final notifier = ref.read(
+          paginatedMoviesProvider(widget.category!).notifier,
+        );
+        if (widget.initialItems.isNotEmpty) {
+          notifier.seed(
+            initialItems: widget.initialItems,
+            totalPages: widget.totalPages,
+          );
+        } else {
+          notifier.loadInitialIfNeeded();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  /// Triggers loadMore when the user reaches 85 % of the current scroll extent.
+  void _onScroll() {
+    if (widget.category == null) return;
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent * 0.85) {
+      ref.read(paginatedMoviesProvider(widget.category!).notifier).loadMore();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Resolve items and pagination state.
+    final List<MoviePoster> items;
+    final bool isLoadingMore;
+    final String? error;
+
+    if (widget.category != null) {
+      final s = ref.watch(paginatedMoviesProvider(widget.category!));
+      // Fall back to initialItems while the seed hasn't been applied yet
+      // (i.e. currentPage == 0 on the very first frame).
+      items = s.items.isNotEmpty ? s.items : widget.initialItems;
+      isLoadingMore = s.isLoadingMore;
+      error = s.error;
+    } else {
+      items = widget.initialItems;
+      isLoadingMore = false;
+      error = null;
+    }
+
+    // Number of grid rows needed for the current item list.
+    final int gridRows = (items.length / AppConstants.moviesPerRow).ceil();
+
+    // Extra rows at the bottom: loading indicator and/or error message.
+    final int extraRows = (isLoadingMore ? 1 : 0) + (error != null ? 1 : 0);
+    final int totalRows = gridRows + extraRows;
+
     return Background(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.md),
       child: Column(
         children: [
-          Text(title, style: CineTypography.headline2),
+          Text(widget.title, style: CineTypography.headline2),
           const SizedBox(height: CineSpacing.md),
           Expanded(
             child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.all(8),
-              // Calculate number of rows needed
-              itemCount: (items.length / AppConstants.moviesPerRow).ceil(),
-              // Enable addRepaintBoundaries to optimize repaints of off-screen rows
+              itemCount: totalRows,
               addRepaintBoundaries: true,
               itemBuilder: (context, rowIndex) {
+                // ── Loading indicator row ─────────────────────────────────
+                if (rowIndex == gridRows && isLoadingMore) {
+                  return const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          CineColors.amber,
+                        ),
+                      ),
+                    ),
+                  );
+                }
+
+                // ── Error row ─────────────────────────────────────────────
+                final isErrorRow =
+                    error != null &&
+                    rowIndex == gridRows + (isLoadingMore ? 1 : 0);
+                if (isErrorRow) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Column(
+                      children: [
+                        Text(
+                          'Failed to load more movies.',
+                          style: const TextStyle(
+                            color: Color(0xFFEF5350),
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () => ref
+                              .read(
+                                paginatedMoviesProvider(
+                                  widget.category!,
+                                ).notifier,
+                              )
+                              .loadMore(),
+                          child: const Text(
+                            'Retry',
+                            style: TextStyle(color: CineColors.amber),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+
+                // ── Movie grid row ────────────────────────────────────────
                 final start = rowIndex * AppConstants.moviesPerRow;
                 final end = (start + AppConstants.moviesPerRow).clamp(
                   0,
@@ -60,13 +194,10 @@ class MovieListScreen extends StatelessWidget {
                       if (i >= rowItems.length) {
                         return const Expanded(child: SizedBox());
                       }
-
-                      final item = rowItems[i];
-
                       return Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: _MoviePosterCard(item: item),
+                          child: _MoviePosterCard(item: rowItems[i]),
                         ),
                       );
                     }),
@@ -81,12 +212,10 @@ class MovieListScreen extends StatelessWidget {
   }
 }
 
-/// Extracted widget for individual movie poster card.
+/// Extracted widget for an individual movie poster card.
 ///
-/// Separating into its own widget improves performance by:
-/// - Reducing unnecessary rebuilds of the entire row
-/// - Allowing Flutter to optimize widget lifecycle independently
-/// - Better memory management in large lists
+/// Isolated into its own widget to reduce unnecessary rebuilds of the full row
+/// and to allow Flutter to manage its lifecycle independently.
 class _MoviePosterCard extends StatelessWidget {
   const _MoviePosterCard({required this.item});
 

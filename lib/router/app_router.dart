@@ -48,15 +48,6 @@ class AppRouter {
       GlobalKey<NavigatorState>(debugLabel: 'accountTab');
 
   /// Creates GoRouter instance configured with auth-based redirect logic.
-  ///
-  /// The router reacts to auth state changes via [refreshListenable],
-  /// triggering redirect logic whenever authentication status changes.
-  ///
-  /// Parameters:
-  /// - [authNotifier]: Listenable that notifies when auth state changes
-  /// - [splashGate]: Listenable that controls splash gating
-  ///
-  /// Returns configured GoRouter instance ready for MaterialApp.router
   static GoRouter createRouter({
     required AuthStateNotifier authNotifier,
     required SplashGateNotifier splashGate,
@@ -124,7 +115,8 @@ class AppRouter {
           ],
         ),
 
-        /// Movie screens - only accessible when authenticated
+        /// Movie list screen — passes initialItems and optional category for
+        /// infinite scroll support.
         GoRoute(
           parentNavigatorKey: _rootKey,
           path: RoutePaths.movies,
@@ -132,10 +124,13 @@ class AppRouter {
             final args = state.extra as MovieListArgs?;
             return MovieListScreen(
               title: args?.title ?? 'Movies',
-              items: args?.items ?? const <MoviePoster>[],
+              initialItems: args?.items ?? const <MoviePoster>[],
+              totalPages: args?.totalPages ?? 1,
+              category: args?.category,
             );
           },
         ),
+
         GoRoute(
           parentNavigatorKey: _rootKey,
           path: RoutePaths.movieDetails,
@@ -151,13 +146,11 @@ class AppRouter {
   /// Implements authentication-based route protection and redirection.
   ///
   /// Redirect logic:
-  /// 1. If auth not initialized, redirects all routes to splash for proper initialization
-  /// 2. When initialized, `/` redirects to `/home` or `/login` when splash gate opens
-  /// 3. Protected app routes require authentication - redirects to `/login` if not authenticated
-  /// 4. Auth screens (`/login`, `/sign-up`) redirect to `/home` if already authenticated
-  /// 5. All other routes proceed without redirection
-  ///
-  /// Returns the route to redirect to, or `null` to allow navigation to proceed.
+  /// 1. If auth not initialized, redirects all routes to splash.
+  /// 2. When initialized, `/` redirects to `/home` or `/login` when splash gate opens.
+  /// 3. Protected routes require authentication - redirects to `/login` if not.
+  /// 4. Auth screens redirect to `/home` when already authenticated.
+  /// 5. All other routes proceed without redirection.
   static String? _handleRedirect(
     GoRouterState state,
     AuthStateNotifier authNotifier,
@@ -166,14 +159,12 @@ class AppRouter {
     final location = state.matchedLocation;
     String? destination;
 
-    // If auth not initialized yet, force to splash for loading.
     if (!authNotifier.isInitialized) {
       destination = RoutePaths.splash;
     } else if (location == RoutePaths.splash) {
       if (!splashGate.isReady) {
         return null;
       }
-
       destination = authNotifier.isAuthenticated
           ? RoutePaths.home
           : RoutePaths.login;
@@ -243,24 +234,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     if (nextState == lastState) {
       return;
     }
-
     lastState = nextState;
     refreshNotifier.value++;
   }
 
-  // Listen to auth state changes directly from authStateProvider (single source of truth).
-  // This ensures the router reacts to authentication updates consistently with the rest of the app.
-  // authStateNotifier self-synchronizes with this same stream, so its getters reflect current state.
   ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
     bumpIfNeeded();
   });
 
-  // Listen to sign-out flag to redirect immediately before auth stream updates.
   ref.listen<bool>(signOutInProgressProvider, (previous, next) {
     bumpIfNeeded();
   });
 
-  // Also listen to splashGate completion changes
   splashGate.addListener(bumpIfNeeded);
 
   ref.onDispose(() {

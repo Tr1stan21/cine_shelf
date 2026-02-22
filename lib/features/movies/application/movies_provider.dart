@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/movie_poster.dart';
+import '../models/paginated_movies.dart';
 import '../models/tmdb/list_category.dart';
 import '../data/movies_providers.dart';
 
@@ -15,9 +15,8 @@ import '../data/movies_providers.dart';
 /// ref.watch(moviesProvider(MovieCategory.popular))
 /// ref.watch(moviesProvider(MovieCategory.topRated))
 /// ```
-final moviesProvider = FutureProvider.family<List<MoviePoster>, ListCategory>((
-  ref,
-  category,
-) {
-  return ref.watch(moviesRepositoryProvider).getMovies(category);
-});
+final moviesProvider = FutureProvider.family<PaginatedMoviesPage, ListCategory>(
+  (ref, category) {
+    return ref.watch(moviesRepositoryProvider).getMoviesPage(category);
+  },
+);

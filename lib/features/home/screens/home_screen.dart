@@ -42,9 +42,10 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-/// Widget auxiliar que encapsula la lógica async de cada sección.
+/// Auxiliary widget that encapsulates the async logic for each home section.
 ///
-/// Extraerlo evita repetir el mismo bloque `asyncValue.when(…)` 4 veces.
+/// Passes [category] to [MovieListSection] so that when the user taps "see all"
+/// the full-screen list can load additional pages via infinite scroll.
 class _MovieSection extends ConsumerWidget {
   const _MovieSection({required this.category, required this.title});
 
@@ -56,7 +57,12 @@ class _MovieSection extends ConsumerWidget {
     final asyncMovies = ref.watch(moviesProvider(category));
 
     return asyncMovies.when(
-      data: (items) => MovieListSection(title: title, items: items),
+      data: (page) => MovieListSection(
+        title: title,
+        items: page.movies,
+        totalPages: page.totalPages,
+        category: category, // ← enables infinite scroll in MovieListScreen
+      ),
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
         child: Center(child: CircularProgressIndicator()),
