@@ -36,6 +36,28 @@ class NavShell extends StatelessWidget {
   }
 }
 
+/// Keeps user-related autoDispose providers alive during authenticated session.
+///
+/// **Why this exists:**
+/// The user data providers (currentUserProvider, watchedCountProvider, etc.)
+/// are autoDispose providers that clean up automatically when no longer watched.
+/// Without this watcher, they would reload every time AccountScreen mounts/unmounts,
+/// causing unnecessary Firestore reads and increased costs.
+///
+/// **Why this is NOT an anti-pattern here:**
+/// 1. These are StreamProviders with active Firestore subscriptions (not one-time fetches)
+/// 2. The data is needed across navigation (badges, account screen, etc.)
+/// 3. Keeping them alive during the session is more efficient than repeated subscriptions
+/// 4. Alternative would be removing autoDispose, but that prevents cleanup on sign-out
+///
+/// **Trade-off:**
+/// - Memory: ~few KB of user data kept in memory (acceptable for session duration)
+/// - Network: Prevents repeated Firestore reads (saves costs and improves UX)
+/// - Clarity: Yes, this is a side-effect widget, but it's a deliberate caching strategy
+///
+/// If these providers are needed less frequently, consider:
+/// - Removing autoDispose and manually invalidating on sign-out
+/// - Converting to regular state management without streams
 class _UserPreloadWatcher extends ConsumerWidget {
   const _UserPreloadWatcher();
 
@@ -49,6 +71,7 @@ class _UserPreloadWatcher extends ConsumerWidget {
           return const SizedBox.shrink();
         }
 
+        // Keep these providers alive while user is authenticated
         ref.watch(currentUserProvider);
         ref.watch(watchedCountProvider);
         ref.watch(watchlistCountProvider);

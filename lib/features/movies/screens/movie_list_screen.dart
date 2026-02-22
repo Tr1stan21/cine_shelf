@@ -104,7 +104,7 @@ class _MoviePosterCard extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(CineRadius.md),
           child: CachedNetworkImage(
-            imageUrl: item.posterPath,
+            imageUrl: AppConstants.tmdbPosterUrl(item.posterPath),
             fit: BoxFit.cover,
             filterQuality: FilterQuality.low,
             placeholder: (context, url) =>

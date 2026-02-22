@@ -178,9 +178,7 @@ class AppRouter {
           ? RoutePaths.home
           : RoutePaths.login;
     } else {
-      final isProtectedRoute = RoutePaths.protectedPrefixes.any(
-        (prefix) => location.startsWith(prefix),
-      );
+      final isProtectedRoute = RoutePaths.isProtectedRoute(location);
 
       if (isProtectedRoute && !authNotifier.isAuthenticated) {
         destination = RoutePaths.login;

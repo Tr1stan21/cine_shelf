@@ -18,4 +18,19 @@ class RoutePaths {
   ];
 
   static const Set<String> authRoutes = <String>{login, signUp};
+
+  /// Checks if the given location is a protected route.
+  ///
+  /// Returns true if the location exactly matches a protected prefix
+  /// or is a sub-route (starts with prefix followed by '/').
+  ///
+  /// This prevents false positives from simple startsWith checks:
+  /// - '/home' -> true (exact match)
+  /// - '/home/settings' -> true (sub-route)
+  /// - '/homecoming' -> false (not a sub-route)
+  static bool isProtectedRoute(String location) {
+    return protectedPrefixes.any((prefix) {
+      return location == prefix || location.startsWith('$prefix/');
+    });
+  }
 }

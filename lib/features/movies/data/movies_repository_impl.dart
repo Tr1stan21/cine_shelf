@@ -1,6 +1,6 @@
 import 'movies_repository.dart';
 import '../models/movie_poster.dart';
-import '../mappers/movie_mapper.dart';
+import '../mappers/movie_poster_dto_mapper.dart';
 import '../mappers/movie_detail_dto_mapper.dart';
 import 'tmdb_remote_data_source.dart';
 import '../models/tmdb/list_category.dart';

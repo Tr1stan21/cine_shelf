@@ -17,14 +17,14 @@ class CategoryMoviesDto {
 
 class MoviePosterDto {
   final int id;
-  final String posterPath;
+  final String? posterPath;
 
   MoviePosterDto({required this.id, required this.posterPath});
 
   factory MoviePosterDto.fromJson(Map<String, dynamic> json) {
     return MoviePosterDto(
       id: (json['id'] as num).toInt(),
-      posterPath: json['poster_path'] as String,
+      posterPath: json['poster_path'] as String?,
     );
   }
 }
