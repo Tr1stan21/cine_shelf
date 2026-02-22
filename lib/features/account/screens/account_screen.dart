@@ -1,6 +1,7 @@
 import 'package:cine_shelf/features/account/widgets/account_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
@@ -9,6 +10,7 @@ import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
+import 'package:cine_shelf/router/route_paths.dart';
 
 /// User profile and account management screen.
 ///
@@ -162,10 +164,10 @@ class AccountScreen extends ConsumerWidget {
             onTap: null,
           ),
           const ThinDivider(),
-          const AccountRow(
+          AccountRow(
             icon: Icons.format_list_bulleted,
             label: 'Credits',
-            onTap: null,
+            onTap: () => context.push(RoutePaths.credits),
           ),
           const ThinDivider(),
           AccountRow(

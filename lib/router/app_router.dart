@@ -18,6 +18,7 @@ import 'package:cine_shelf/features/movies/screens/movie_details_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_list_screen.dart';
 import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
+import 'package:cine_shelf/features/credits/screens/credits.dart';
 import 'package:cine_shelf/router/shell.dart';
 
 /// Central routing configuration for the CineShelf application.
@@ -138,6 +139,12 @@ class AppRouter {
             final args = state.extra as MovieDetailsArgs?;
             return MovieDetailsScreen(movie: args!.movie);
           },
+        ),
+
+        GoRoute(
+          parentNavigatorKey: _rootKey,
+          path: RoutePaths.credits,
+          builder: (context, state) => const CreditsScreen(),
         ),
       ],
     );

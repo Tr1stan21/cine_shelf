@@ -72,7 +72,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   /// 2. Creates Firebase Auth account
   /// 3. Creates Firestore profile document (with Cloud Function enrichment)
   /// 4. Rollback auth account if profile creation fails
-  /// 5. Navigates to splash (which redirects to home) on success
+  /// 5. Navigates directly to home on success (avoids splash gate race condition)
   ///
   /// Captures ScaffoldMessenger and GoRouter before async operations
   /// to avoid BuildContext issues across async gaps.
@@ -99,8 +99,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
       if (!mounted) return;
 
-      // Navigate to splash - router will redirect to home automatically
-      router.go(RoutePaths.splash);
+      // Navigate directly to home - auth state management will handle preload
+      router.go(RoutePaths.home);
     } catch (e, st) {
       debugPrint('SIGNUP ERROR TYPE: ${e.runtimeType}');
       debugPrint('SIGNUP ERROR: $e');

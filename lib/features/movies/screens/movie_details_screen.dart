@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/shared/widgets/back_button.dart';
 import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 import 'package:cine_shelf/features/movies/application/movie_details_provider.dart';
 
@@ -187,27 +188,10 @@ class MovieDetailsScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            SafeArea(
+            const SafeArea(
               child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: GestureDetector(
-                  onTap: () => context.pop(),
-                  child: Container(
-                    width: 34,
-                    height: 34,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF101012),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.arrow_back,
-                        size: 18,
-                        color: CineColors.amber,
-                      ),
-                    ),
-                  ),
-                ),
+                padding: EdgeInsets.all(16.0),
+                child: CineBackButton(),
               ),
             ),
           ],

@@ -68,7 +68,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   /// Flow:
   /// 1. Validates form completeness
   /// 2. Triggers authentication via AuthController
-  /// 3. Navigates to splash (which redirects to home) on success
+  /// 3. Navigates directly to home on success (avoids splash gate race condition)
   /// 4. Displays user-friendly error message on failure
   ///
   /// Loading state prevents multiple concurrent submissions.
@@ -88,7 +88,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       await ref.read(authControllerProvider).signIn(email, password);
 
       if (!mounted) return;
-      context.go(RoutePaths.splash);
+      context.go(RoutePaths.home);
     } catch (e, st) {
       debugPrint('LOGIN ERROR TYPE: ${e.runtimeType}');
       debugPrint('LOGIN ERROR: $e');

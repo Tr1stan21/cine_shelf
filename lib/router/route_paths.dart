@@ -9,12 +9,14 @@ class RoutePaths {
   static const String account = '/account';
   static const String movies = '/movies';
   static const String movieDetails = '/movies/details';
+  static const String credits = '/credits';
 
   static const List<String> protectedPrefixes = <String>[
     home,
     myLists,
     account,
     movies,
+    credits,
   ];
 
   static const Set<String> authRoutes = <String>{login, signUp};
