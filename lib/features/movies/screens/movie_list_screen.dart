@@ -50,6 +50,7 @@ class MovieListScreen extends ConsumerStatefulWidget {
 
 class _MovieListScreenState extends ConsumerState<MovieListScreen> {
   late final ScrollController _scrollController;
+  bool _isAtTop = true;
 
   @override
   void initState() {
@@ -81,11 +82,18 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     super.dispose();
   }
 
-  /// Triggers loadMore when the user reaches 85 % of the current scroll extent.
+  /// Triggers loadMore when the user reaches 80 % of the current scroll extent.
   void _onScroll() {
     if (widget.category == null) return;
+    final atTop =
+        !_scrollController.hasClients || _scrollController.offset <= 0;
+    if (atTop != _isAtTop) {
+      setState(() {
+        _isAtTop = atTop;
+      });
+    }
     final pos = _scrollController.position;
-    if (pos.pixels >= pos.maxScrollExtent * 0.85) {
+    if (pos.pixels >= pos.maxScrollExtent * 0.80) {
       ref.read(paginatedMoviesProvider(widget.category!).notifier).loadMore();
     }
   }
@@ -96,6 +104,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     final List<MoviePoster> items;
     final bool isLoadingMore;
     final String? error;
+    final int currentPage;
 
     if (widget.category != null) {
       final s = ref.watch(paginatedMoviesProvider(widget.category!));
@@ -104,10 +113,12 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
       items = s.items.isNotEmpty ? s.items : widget.initialItems;
       isLoadingMore = s.isLoadingMore;
       error = s.error;
+      currentPage = s.currentPage;
     } else {
       items = widget.initialItems;
       isLoadingMore = false;
       error = null;
+      currentPage = 0;
     }
 
     // Number of grid rows needed for the current item list.
@@ -117,97 +128,141 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     final int extraRows = (isLoadingMore ? 1 : 0) + (error != null ? 1 : 0);
     final int totalRows = gridRows + extraRows;
 
-    return Background(
-      padding: const EdgeInsets.symmetric(horizontal: CineSpacing.md),
-      child: Column(
-        children: [
-          Text(widget.title, style: CineTypography.headline2),
-          const SizedBox(height: CineSpacing.md),
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
-              padding: const EdgeInsets.all(8),
-              itemCount: totalRows,
-              addRepaintBoundaries: true,
-              itemBuilder: (context, rowIndex) {
-                // ── Loading indicator row ─────────────────────────────────
-                if (rowIndex == gridRows && isLoadingMore) {
-                  return const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 24),
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          CineColors.amber,
-                        ),
-                      ),
-                    ),
-                  );
-                }
+    final showScrollToTop =
+        widget.category != null && currentPage >= 2 && !_isAtTop;
 
-                // ── Error row ─────────────────────────────────────────────
-                final isErrorRow =
-                    error != null &&
-                    rowIndex == gridRows + (isLoadingMore ? 1 : 0);
-                if (isErrorRow) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Column(
-                      children: [
-                        Text(
-                          'Failed to load more movies.',
-                          style: const TextStyle(
-                            color: Color(0xFFEF5350),
-                            fontSize: 14,
+    return Stack(
+      children: [
+        Background(
+          padding: const EdgeInsets.symmetric(horizontal: CineSpacing.md),
+          child: Column(
+            children: [
+              Text(widget.title, style: CineTypography.headline2),
+              const SizedBox(height: CineSpacing.md),
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(8),
+                  itemCount: totalRows,
+                  addRepaintBoundaries: true,
+                  itemBuilder: (context, rowIndex) {
+                    // ── Loading indicator row ─────────────────────────────────
+                    if (rowIndex == gridRows && isLoadingMore) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 24),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              CineColors.amber,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: () => ref
-                              .read(
-                                paginatedMoviesProvider(
-                                  widget.category!,
-                                ).notifier,
-                              )
-                              .loadMore(),
-                          child: const Text(
-                            'Retry',
-                            style: TextStyle(color: CineColors.amber),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                // ── Movie grid row ────────────────────────────────────────
-                final start = rowIndex * AppConstants.moviesPerRow;
-                final end = (start + AppConstants.moviesPerRow).clamp(
-                  0,
-                  items.length,
-                );
-                final rowItems = items.sublist(start, end);
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    children: List.generate(AppConstants.moviesPerRow, (i) {
-                      if (i >= rowItems.length) {
-                        return const Expanded(child: SizedBox());
-                      }
-                      return Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: _MoviePosterCard(item: rowItems[i]),
                         ),
                       );
-                    }),
+                    }
+
+                    // ── Error row ─────────────────────────────────────────────
+                    final isErrorRow =
+                        error != null &&
+                        rowIndex == gridRows + (isLoadingMore ? 1 : 0);
+                    if (isErrorRow) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Column(
+                          children: [
+                            const Text(
+                              'Failed to load more movies.',
+                              style: TextStyle(
+                                color: Color(0xFFEF5350),
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton(
+                              onPressed: () => ref
+                                  .read(
+                                    paginatedMoviesProvider(
+                                      widget.category!,
+                                    ).notifier,
+                                  )
+                                  .loadMore(),
+                              child: const Text(
+                                'Retry',
+                                style: TextStyle(color: CineColors.amber),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    // ── Movie grid row ────────────────────────────────────────
+                    final start = rowIndex * AppConstants.moviesPerRow;
+                    final end = (start + AppConstants.moviesPerRow).clamp(
+                      0,
+                      items.length,
+                    );
+                    final rowItems = items.sublist(start, end);
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Row(
+                        children: List.generate(AppConstants.moviesPerRow, (i) {
+                          if (i >= rowItems.length) {
+                            return const Expanded(child: SizedBox());
+                          }
+                          return Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                              ),
+                              child: _MoviePosterCard(item: rowItems[i]),
+                            ),
+                          );
+                        }),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showScrollToTop)
+          Positioned(
+            right: 16,
+            bottom: 24,
+            child: SafeArea(
+              top: false,
+              left: false,
+              right: false,
+              child: GestureDetector(
+                onTap: () {
+                  if (!_scrollController.hasClients) return;
+                  _scrollController.animateTo(
+                    0,
+                    duration: const Duration(milliseconds: 350),
+                    curve: Curves.easeOutCubic,
+                  );
+                },
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF101012),
+                    shape: BoxShape.circle,
                   ),
-                );
-              },
+                  child: const Center(
+                    child: Icon(
+                      Icons.keyboard_arrow_up,
+                      size: 18,
+                      color: CineColors.amber,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
-        ],
-      ),
+      ],
     );
   }
 }

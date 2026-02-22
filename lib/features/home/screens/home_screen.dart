@@ -67,7 +67,7 @@ class _MovieSection extends ConsumerWidget {
         padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 }
