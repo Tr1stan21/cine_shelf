@@ -134,20 +134,50 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     return Stack(
       children: [
         Background(
-          padding: const EdgeInsets.symmetric(horizontal: CineSpacing.md),
+          padding: const EdgeInsets.symmetric(horizontal: CineSpacing.sm),
           child: Column(
             children: [
-              Text(widget.title, style: CineTypography.headline2),
-              const SizedBox(height: CineSpacing.md),
               Expanded(
                 child: ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(8),
-                  itemCount: totalRows,
+                  itemCount: totalRows + 1,
                   addRepaintBoundaries: true,
                   itemBuilder: (context, rowIndex) {
+                    if (rowIndex == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.only(
+                          top: CineSpacing.sm,
+                          bottom: CineSpacing.md,
+                        ),
+                        child: Row(
+                          children: [
+                            IconButton(
+                              onPressed: () => context.pop(),
+                              icon: const Icon(
+                                Icons.arrow_back_ios_new,
+                                color: CineColors.amber,
+                                size: 18,
+                              ),
+                              splashRadius: 18,
+                            ),
+                            Expanded(
+                              child: Center(
+                                child: Text(
+                                  widget.title,
+                                  style: CineTypography.headline2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 44),
+                          ],
+                        ),
+                      );
+                    }
+
+                    final gridRowIndex = rowIndex - 1;
+
                     // ── Loading indicator row ─────────────────────────────────
-                    if (rowIndex == gridRows && isLoadingMore) {
+                    if (gridRowIndex == gridRows && isLoadingMore) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
                         child: Center(
@@ -163,7 +193,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                     // ── Error row ─────────────────────────────────────────────
                     final isErrorRow =
                         error != null &&
-                        rowIndex == gridRows + (isLoadingMore ? 1 : 0);
+                        gridRowIndex == gridRows + (isLoadingMore ? 1 : 0);
                     if (isErrorRow) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -196,7 +226,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                     }
 
                     // ── Movie grid row ────────────────────────────────────────
-                    final start = rowIndex * AppConstants.moviesPerRow;
+                    final start = gridRowIndex * AppConstants.moviesPerRow;
                     final end = (start + AppConstants.moviesPerRow).clamp(
                       0,
                       items.length,
