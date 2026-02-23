@@ -16,21 +16,21 @@ class CreditsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return const Scaffold(
       body: Background(
         padding: EdgeInsets.zero,
         child: Stack(
           children: [
             // Main scrollable content
             SingleChildScrollView(
-              padding: const EdgeInsets.all(CineSpacing.xl),
+              padding: EdgeInsets.all(CineSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 50),
+                  SizedBox(height: 50),
 
                   // Title
-                  const Text(
+                  Text(
                     'Credits',
                     style: TextStyle(
                       fontSize: 32,
@@ -39,67 +39,61 @@ class CreditsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: CineSpacing.xxl),
+                  SizedBox(height: CineSpacing.xxl),
 
                   // App Info Card
-                  const _AppInfoCard(),
+                  _AppInfoCard(),
 
-                  const SizedBox(height: CineSpacing.xxxl),
+                  SizedBox(height: CineSpacing.xxxl),
 
                   // Technologies Section
-                  const _SectionHeader(
-                    icon: Icons.code,
-                    title: 'Technologies used',
-                  ),
-                  const SizedBox(height: CineSpacing.lg),
-                  const _TechItem(
+                  _SectionHeader(icon: Icons.code, title: 'Technologies used'),
+                  SizedBox(height: CineSpacing.lg),
+                  _TechItem(
                     name: 'Flutter',
                     subtitle: 'Framework',
                     version: '3.29.0',
                   ),
-                  const _TechItem(
+                  _TechItem(
                     name: 'Dart',
                     subtitle: 'Language',
                     version: '3.10.1',
                   ),
-                  const _TechItem(
+                  _TechItem(
                     name: 'Go Router',
                     subtitle: 'Navigation',
                     version: '17.1.0',
                   ),
-                  const _TechItem(
+                  _TechItem(
                     name: 'Riverpod',
                     subtitle: 'State Management',
                     version: '3.2.1',
                   ),
-                  const _TechItem(
+                  _TechItem(
                     name: 'Firebase',
                     subtitle: 'Backend Services',
                     version: '4.4.0',
                   ),
 
-                  const SizedBox(height: CineSpacing.xxxl),
+                  SizedBox(height: CineSpacing.xxxl),
 
                   // APIs & Services Section
-                  const _SectionHeader(
-                    icon: Icons.api,
-                    title: 'APIs and services',
-                  ),
-                  const SizedBox(height: CineSpacing.lg),
-                  const _TechItem(
+                  _SectionHeader(icon: Icons.api, title: 'APIs and services'),
+                  SizedBox(height: CineSpacing.lg),
+                  _TechItem(
                     name: 'The Movie Database (TMDB)',
                     subtitle: 'Movie database',
                   ),
 
-                  const SizedBox(height: CineSpacing.xxxl),
+                  SizedBox(height: CineSpacing.xxxl),
 
                   // Developed By Section
-                  const _SectionHeader(
+                  _SectionHeader(
                     icon: Icons.person_outline,
                     title: 'Developed by',
                   ),
-                  const SizedBox(height: CineSpacing.lg),
-                  const Text(
+                  SizedBox(height: CineSpacing.lg),
+                  Text(
                     'Javier Tristán Chacón Domínguez',
                     style: TextStyle(
                       fontSize: 15,
@@ -108,16 +102,13 @@ class CreditsScreen extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: CineSpacing.xxl),
+                  SizedBox(height: CineSpacing.xxl),
                 ],
               ),
             ),
 
             // Back button overlay
-            const Padding(
-              padding: EdgeInsets.all(16.0),
-              child: CineBackButton(),
-            ),
+            Padding(padding: EdgeInsets.all(16.0), child: CineBackButton()),
           ],
         ),
       ),
