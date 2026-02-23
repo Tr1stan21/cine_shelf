@@ -33,10 +33,6 @@ import '../../shared/config/env.dart';
 /// // In remote data sources:
 /// final dio = ref.watch(dioProvider);
 /// final response = await dio.get('/movie/popular');
-///
-/// // In tests (mock it):
-/// final mockDio = MockDio();
-/// ref.override(dioProvider, provider.overrideWithValue(mockDio));
 /// ```
 final dioProvider = Provider<Dio>((ref) {
   return Dio(

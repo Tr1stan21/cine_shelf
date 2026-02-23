@@ -16,7 +16,8 @@ import 'package:cine_shelf/router/route_paths.dart';
 ///
 /// When [category] is provided the screen supports infinite scroll:
 /// - [initialItems] (page 1) are shown immediately without a network call.
-/// - Scrolling to ~85 % of the list triggers [PaginatedMoviesNotifier.loadMore].
+/// - Scrolling to 80% of the current scroll extent triggers
+///   [PaginatedMoviesNotifier.loadMore].
 /// - A loading indicator row is appended while the next page is fetching.
 /// - On error, an inline retry button lets the user try again without losing
 ///   the items already displayed.
@@ -24,10 +25,10 @@ import 'package:cine_shelf/router/route_paths.dart';
 /// When [category] is null the list is static — identical to the original
 /// behaviour so existing call-sites that do not pass a category are unaffected.
 ///
-/// Performance optimisations carried over from the original:
-/// - ListView.builder for lazy row rendering.
-/// - addRepaintBoundaries to isolate off-screen row repaints.
-/// - CachedNetworkImage with low filter quality for smooth scrolling.
+/// **Performance optimisations:**
+/// - [ListView.builder] for lazy row rendering.
+/// - `addRepaintBoundaries: true` to isolate off-screen row repaints.
+/// - [CachedNetworkImage] with [FilterQuality.low] for smooth scrolling.
 class MovieListScreen extends ConsumerStatefulWidget {
   const MovieListScreen({
     required this.title,
@@ -50,6 +51,10 @@ class MovieListScreen extends ConsumerStatefulWidget {
 
 class _MovieListScreenState extends ConsumerState<MovieListScreen> {
   late final ScrollController _scrollController;
+
+  /// Tracks whether the list is scrolled to the very top.
+  /// Used to show/hide the scroll-to-top floating button — the button is only
+  /// shown after the user has scrolled past page 2 and is no longer at top.
   bool _isAtTop = true;
 
   @override
@@ -128,6 +133,8 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     final int extraRows = (isLoadingMore ? 1 : 0) + (error != null ? 1 : 0);
     final int totalRows = gridRows + extraRows;
 
+    // Only show the scroll-to-top button once the user is at least on page 2
+    // and has scrolled away from the top — avoids premature button appearance.
     final showScrollToTop =
         widget.category != null && currentPage >= 2 && !_isAtTop;
 
@@ -140,9 +147,11 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
               Expanded(
                 child: ListView.builder(
                   controller: _scrollController,
+                  // +1 for the sticky header row at index 0.
                   itemCount: totalRows + 1,
                   addRepaintBoundaries: true,
                   itemBuilder: (context, rowIndex) {
+                    // Row 0 is the screen header (back button + title).
                     if (rowIndex == 0) {
                       return Padding(
                         padding: const EdgeInsets.only(
@@ -168,6 +177,8 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                                 ),
                               ),
                             ),
+                            // Spacer balances the back button so the title
+                            // appears visually centered.
                             const SizedBox(width: 44),
                           ],
                         ),
@@ -176,7 +187,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
 
                     final gridRowIndex = rowIndex - 1;
 
-                    // ── Loading indicator row ─────────────────────────────────
+                    // Loading indicator row — shown while fetching the next page.
                     if (gridRowIndex == gridRows && isLoadingMore) {
                       return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 24),
@@ -190,7 +201,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                       );
                     }
 
-                    // ── Error row ─────────────────────────────────────────────
+                    // Error row — shown after a failed page fetch with a retry button.
                     final isErrorRow =
                         error != null &&
                         gridRowIndex == gridRows + (isLoadingMore ? 1 : 0);
@@ -225,7 +236,10 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                       );
                     }
 
-                    // ── Movie grid row ────────────────────────────────────────
+                    // Movie grid row — renders up to [AppConstants.moviesPerRow]
+                    // posters side by side. The last row may have fewer items;
+                    // empty slots are filled with invisible [SizedBox] widgets
+                    // to maintain consistent column widths.
                     final start = gridRowIndex * AppConstants.moviesPerRow;
                     final end = (start + AppConstants.moviesPerRow).clamp(
                       0,
@@ -297,10 +311,11 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
   }
 }
 
-/// Extracted widget for an individual movie poster card.
+/// Isolated widget for an individual movie poster card.
 ///
-/// Isolated into its own widget to reduce unnecessary rebuilds of the full row
-/// and to allow Flutter to manage its lifecycle independently.
+/// Extracted from the list builder to reduce unnecessary rebuilds of sibling
+/// cards and to allow Flutter to manage its lifecycle independently via
+/// element reuse.
 class _MoviePosterCard extends StatelessWidget {
   const _MoviePosterCard({required this.item});
 
@@ -320,6 +335,8 @@ class _MoviePosterCard extends StatelessWidget {
           child: CachedNetworkImage(
             imageUrl: AppConstants.tmdbPosterUrl(item.posterPath),
             fit: BoxFit.cover,
+            // Low filter quality reduces GPU cost during fast scrolling
+            // while remaining visually acceptable for poster thumbnails.
             filterQuality: FilterQuality.low,
             placeholder: (context, url) =>
                 const Center(child: CircularProgressIndicator()),

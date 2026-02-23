@@ -10,12 +10,14 @@ import 'package:cine_shelf/features/lists/application/list_providers.dart';
 
 /// Navigation shell wrapper for tab-based navigation.
 ///
-/// Wraps the StatefulNavigationShell provided by GoRouter to add:
-/// - Branded background
-/// - Consistent padding
-/// - Bottom navigation bar
+/// Wraps the [StatefulNavigationShell] provided by GoRouter to add:
+/// - Branded background image via [Background].
+/// - Consistent padding applied to all tab content.
+/// - [BottomNavBar] for tab switching.
+/// - [_UserPreloadWatcher] to keep user-related providers alive during the
+///   authenticated session (see that class for rationale).
 ///
-/// Used as the builder for StatefulShellRoute in AppRouter.
+/// Used as the builder for [StatefulShellRoute] in [AppRouter].
 class NavShell extends StatelessWidget {
   const NavShell({required this.navigationShell, super.key});
 
@@ -36,28 +38,28 @@ class NavShell extends StatelessWidget {
   }
 }
 
-/// Keeps user-related autoDispose providers alive during authenticated session.
+/// Invisible widget that keeps user-related autoDispose providers alive
+/// for the duration of the authenticated session.
 ///
 /// **Why this exists:**
-/// The user data providers (currentUserProvider, watchedCountProvider, etc.)
-/// are autoDispose providers that clean up automatically when no longer watched.
-/// Without this watcher, they would reload every time AccountScreen mounts/unmounts,
-/// causing unnecessary Firestore reads and increased costs.
+/// [currentUserProvider], [watchedCountProvider], [watchlistCountProvider],
+/// and [favoritesCountProvider] are all declared as `.autoDispose`. Without
+/// an active watcher, Riverpod frees their cache when no widget is watching.
+/// This means every tab navigation that mounts [AccountScreen] or [MyListsScreen]
+/// would trigger a fresh Firestore read, increasing latency and costs.
 ///
-/// **Why this is NOT an anti-pattern here:**
-/// 1. These are StreamProviders with active Firestore subscriptions (not one-time fetches)
-/// 2. The data is needed across navigation (badges, account screen, etc.)
-/// 3. Keeping them alive during the session is more efficient than repeated subscriptions
-/// 4. Alternative would be removing autoDispose, but that prevents cleanup on sign-out
+/// By placing this watcher inside [NavShell] (which lives for the entire
+/// authenticated session), all four providers remain subscribed continuously
+/// from login until sign-out — even when the screens that display them are
+/// not in the widget tree.
 ///
-/// **Trade-off:**
-/// - Memory: ~few KB of user data kept in memory (acceptable for session duration)
-/// - Network: Prevents repeated Firestore reads (saves costs and improves UX)
-/// - Clarity: Yes, this is a side-effect widget, but it's a deliberate caching strategy
+/// **Memory trade-off:**
+/// A few KB of user data are kept in memory for the session lifetime.
+/// This is acceptable given the benefit of avoided repeated Firestore reads.
 ///
-/// If these providers are needed less frequently, consider:
-/// - Removing autoDispose and manually invalidating on sign-out
-/// - Converting to regular state management without streams
+/// **Cross-reference:**
+/// [currentUserProvider] documents its autoDispose behavior and references
+/// this watcher. If either is changed, update both.
 class _UserPreloadWatcher extends ConsumerWidget {
   const _UserPreloadWatcher();
 
@@ -68,10 +70,14 @@ class _UserPreloadWatcher extends ConsumerWidget {
     return authState.when(
       data: (user) {
         if (user == null) {
+          // User is not authenticated — do not watch user providers.
+          // They will dispose themselves since nothing is observing them.
           return const SizedBox.shrink();
         }
 
-        // Keep these providers alive while user is authenticated
+        // Watching these providers keeps them alive and their Firestore streams
+        // open. The return value is intentionally discarded — this widget
+        // renders nothing; it exists purely as a keep-alive mechanism.
         ref.watch(currentUserProvider);
         ref.watch(watchedCountProvider);
         ref.watch(watchlistCountProvider);

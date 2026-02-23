@@ -7,33 +7,34 @@ import 'app.dart';
 
 /// Application entry point.
 ///
-/// Performs necessary initialization:
-/// - Ensures Flutter binding is initialized before async operations
-/// - Initializes Firebase with platform-specific configuration
-/// - Configures global image caching for improved performance and data efficiency
-/// - Wraps the app in ProviderScope for Riverpod state management
+/// Performs necessary initialization before the widget tree is mounted:
+/// - Ensures Flutter binding is initialized before any async operations.
+/// - Initializes Firebase with platform-specific configuration.
+/// - Configures the Flutter image cache size.
+/// - Wraps the app in [ProviderScope] for Riverpod state management.
 ///
 /// **Image Caching Strategy:**
-/// - CachedNetworkImage automatically caches movie posters locally
-/// - Configured to store up to 100 images (~256 MB typical size)
-/// - Cache persists across app sessions unless manually cleared
-/// - First load: downloads from network; subsequent loads: uses local cache
+/// [CachedNetworkImage] is used throughout the app for movie posters. It
+/// maintains two cache layers:
+/// - **In-memory (LRU):** Configured below via [imageCache.maximumSizeBytes].
+///   Limited to 128 MB to balance performance and memory pressure.
+/// - **Disk cache:** Managed automatically by the `cached_network_image`
+///   package. No additional initialization is required; caching is automatic
+///   and persists across app sessions until manually cleared.
 ///
-/// This reduces data usage significantly and improves app responsiveness.
+/// First load: downloads from network and stores in both caches.
+/// Subsequent loads: served from disk or memory without a network request,
+/// reducing data usage and improving scroll performance.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // Configure global image cache settings for Flutter's native image cache
-  // These settings affect all image loading, including CachedNetworkImage
-  imageCache.maximumSizeBytes = 128 * 1024 * 1024; // 256 MB maximum cache size
+  // Limit Flutter's native in-memory image cache to 128 MB.
+  // The default is unbounded, which can cause excessive memory usage when
+  // scrolling through large movie poster grids.
+  imageCache.maximumSizeBytes = 128 * 1024 * 1024;
 
-  // CachedNetworkImage package automatically:
-  // - Caches images to device storage (persistent cache)
-  // - Validates cache on each request (smart cache invalidation)
-  // - Provides in-memory LRU cache as well
-  // No additional initialization needed; caching is automatic.
   runApp(const ProviderScope(child: App()));
 }

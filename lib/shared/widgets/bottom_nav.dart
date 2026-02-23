@@ -7,24 +7,34 @@ import 'package:cine_shelf/shared/config/theme.dart';
 ///
 /// Displays three navigation items:
 /// - Home: Browse and discover movies
-/// - My Lists: Access user's collections
+/// - My Lists: Access user's collections (disabled — see note below)
 /// - Account: Profile and settings
 ///
-/// Integrates with GoRouter's StatefulNavigationShell for
+/// Integrates with GoRouter's [StatefulNavigationShell] for
 /// persistent tab state and independent navigation stacks.
+///
+/// **Note on My Lists tab:**
+/// The My Lists tab item is currently not rendered in the bar even though
+/// its branch is registered in the router and [MyListsScreen] is fully
+/// implemented. It is hidden until list management actions (add/remove movies)
+/// are complete. Re-enable by uncommenting the corresponding [_BottomNavItem].
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({required this.navigationShell, super.key});
 
   final StatefulNavigationShell navigationShell;
 
-  /// Handles tab selection.
+  /// Handles tab selection from the bottom navigation bar.
   ///
-  /// If tapping the currently active tab, resets to root of that tab's stack.
-  /// Otherwise, switches to the selected tab.
+  /// If the user taps the tab that is already active, [goBranch] is called
+  /// with `initialLocation: true`, which pops the tab's navigation stack back
+  /// to its root route. This mirrors standard iOS/Android tab bar behavior.
+  ///
+  /// If the user taps a different tab, [goBranch] switches to that branch
+  /// while preserving each tab's independent navigation stack.
   void _onTap(int newIndex) {
     navigationShell.goBranch(
       newIndex,
-      // If you tap the active tab: return to the root of the tab.
+      // Re-tapping the active tab resets it to its root route.
       initialLocation: newIndex == navigationShell.currentIndex,
     );
   }
@@ -66,7 +76,8 @@ class BottomNavBar extends StatelessWidget {
 
 /// Individual navigation item within the bottom bar.
 ///
-/// Displays icon and label with selected/unselected visual states.
+/// Renders an icon and a label. Visual state (color and font weight) changes
+/// based on whether this item is the currently [selected] tab.
 class _BottomNavItem extends StatelessWidget {
   const _BottomNavItem({
     required this.selected,
@@ -75,9 +86,16 @@ class _BottomNavItem extends StatelessWidget {
     required this.onTap,
   });
 
+  /// Whether this item represents the currently active tab.
   final bool selected;
+
+  /// Icon to display for this navigation destination.
   final IconData icon;
+
+  /// Short label displayed below the icon.
   final String label;
+
+  /// Callback invoked when the user taps this item.
   final VoidCallback onTap;
 
   @override

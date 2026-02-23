@@ -14,18 +14,28 @@ import 'package:cine_shelf/router/route_paths.dart';
 
 /// User profile and account management screen.
 ///
-/// Displays:
-/// - Profile avatar (placeholder with icon)
-/// - Username and email from Firestore
-/// - Statistics pill showing watched, watchlist, and favorites counts
-/// - Account management options: Edit Profile, Credits, Sign Out
+/// **Currently active:**
+/// - Profile avatar placeholder (icon only; photo upload not yet implemented)
+/// - Username and email loaded from Firestore via [currentUserProvider]
+/// - Navigation to Credits screen
+/// - Sign Out action
 ///
-/// Data is loaded from Firestore via Riverpod providers with loading/error states.
-/// Sign out invalidates cached user data and triggers auth state change.
+/// **Temporarily disabled (pending feature completion):**
+/// - Statistics pill ([StatsPill]) showing watched, watchlist, and favorites counts
+/// - Edit Profile option ([AccountRow] for profile editing)
+///
+/// Data is loaded from Firestore via [currentUserProvider] with
+/// loading/error states handled inline. Sign out is delegated to
+/// [AuthController.signOut], which sets [signOutInProgressProvider] before
+/// the Firebase stream updates, ensuring GoRouter redirects immediately.
 class AccountScreen extends ConsumerWidget {
   const AccountScreen({super.key});
 
   /// Handles sign out with proper state cleanup.
+  ///
+  /// Delegates to [AuthController.signOut], which sets [signOutInProgressProvider]
+  /// to `true` before calling Firebase so GoRouter redirects to login before
+  /// the auth stream emits `null`. Errors are shown in a [SnackBar].
   Future<void> _onSignOut(BuildContext context, WidgetRef ref) async {
     try {
       await ref.read(authControllerProvider).signOut();
@@ -52,6 +62,7 @@ class AccountScreen extends ConsumerWidget {
         children: [
           const SizedBox(height: CineSpacing.xxxl),
 
+          // Avatar placeholder.
           Container(
             width: 110,
             height: 110,

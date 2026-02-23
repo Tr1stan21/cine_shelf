@@ -2,15 +2,28 @@ import 'package:flutter/material.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 
-/// Custom text field for login form
+/// Custom text field for authentication forms.
 ///
-/// Supports two modes: email (default) and password.
-/// In password mode, includes a button to show/hide the text.
+/// Supports two modes controlled by [isPassword]:
+/// - **Email mode** (default): Displays an email icon prefix and the hint
+///   text "Email".
+/// - **Password mode**: Displays a lock icon prefix, obscures the text by
+///   default, and includes a suffix button to toggle visibility.
+///
+/// The optional [onChanged] callback allows parent widgets to react to input
+/// changes in real time, enabling form validation as the user types.
 class AuthTextField extends StatefulWidget {
   const AuthTextField({required this.isPassword, this.onChanged, super.key});
 
+  /// When `true`, the field operates in password mode: text is obscured
+  /// and a visibility toggle button is shown.
   final bool isPassword;
-  final ValueChanged<String>? onChanged; // <-- NUEVO
+
+  /// Called with the current field value on every keystroke.
+  ///
+  /// Use this to drive real-time validation in the parent widget.
+  /// If `null`, input changes are not reported to the parent.
+  final ValueChanged<String>? onChanged;
 
   static const String _emailHint = 'Email';
   static const String _passwordHint = 'Password';
@@ -20,6 +33,8 @@ class AuthTextField extends StatefulWidget {
 }
 
 class _AuthTextFieldState extends State<AuthTextField> {
+  /// Controls whether the password text is hidden. Starts `true` (hidden).
+  /// Only relevant when [AuthTextField.isPassword] is `true`.
   bool _obscureText = true;
 
   @override

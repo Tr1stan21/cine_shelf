@@ -9,6 +9,18 @@ import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:cine_shelf/features/movies/application/movies_provider.dart';
 
+/// Main home screen displaying categorized movie carousels.
+///
+/// Renders four horizontally scrollable sections, one per [ListCategory]:
+/// - Popular
+/// - Now Playing
+/// - Upcoming
+/// - Top Rated
+///
+/// Each section is separated by a [GlowSeparator] and delegates loading
+/// and error state to [_MovieSection].
+///
+/// This widget is stateless; all async data is managed by [moviesProvider].
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
@@ -42,14 +54,25 @@ class HomeScreen extends ConsumerWidget {
   }
 }
 
-/// Auxiliary widget that encapsulates the async logic for each home section.
+/// Private widget that encapsulates async loading logic for a single home section.
 ///
-/// Passes [category] to [MovieListSection] so that when the user taps "see all"
-/// the full-screen list can load additional pages via infinite scroll.
+/// Watches [moviesProvider] for the given [category] and renders:
+/// - [MovieListSection] on success, forwarding [category] to enable infinite
+///   scroll when the user navigates to the full list screen.
+/// - A centered [CircularProgressIndicator] while loading.
+/// - An empty [SizedBox] on error — errors are silently swallowed here to
+///   avoid breaking the rest of the home layout. Individual sections fail
+///   independently without taking down the whole screen.
+///
+/// [category] is forwarded to [MovieListSection] so that [MovieListScreen]
+/// can request additional pages when the user scrolls to the bottom.
 class _MovieSection extends ConsumerWidget {
   const _MovieSection({required this.category, required this.title});
 
+  /// The TMDB category this section represents (e.g., popular, top_rated).
   final ListCategory category;
+
+  /// Display title shown as the section header.
   final String title;
 
   @override
@@ -61,7 +84,7 @@ class _MovieSection extends ConsumerWidget {
         title: title,
         items: page.movies,
         totalPages: page.totalPages,
-        category: category, // ← enables infinite scroll in MovieListScreen
+        category: category,
       ),
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),

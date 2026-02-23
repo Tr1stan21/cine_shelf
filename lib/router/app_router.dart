@@ -196,6 +196,17 @@ class AppRouter {
   }
 }
 
+/// Immutable snapshot of the three boolean states that drive GoRouter's
+/// redirect logic.
+///
+/// Used by [goRouterProvider] to deduplicate [refreshListenable] notifications.
+/// The [goRouterProvider] only increments the refresh counter when at least one
+/// of these values changes — preventing redundant router evaluations triggered
+/// by unrelated Riverpod state updates that happen to call [bumpIfNeeded].
+///
+/// Equality is implemented by comparing all three fields, so a bump is skipped
+/// when auth state emits but the effective redirect outcome would be identical
+/// (e.g., multiple `data` emissions with the same authenticated user).
 class _RedirectState {
   const _RedirectState({
     required this.isAuthenticated,
@@ -203,10 +214,20 @@ class _RedirectState {
     required this.isInitialized,
   });
 
+  /// Whether a user is currently authenticated and not in the process of
+  /// signing out. Derived from [AuthStateNotifier.isAuthenticated].
   final bool isAuthenticated;
+
+  /// Whether the splash gate has completed its minimum delay and data
+  /// preloading. Derived from [SplashGateNotifier.isReady].
   final bool isGateOpen;
+
+  /// Whether the auth stream has emitted at least one value, meaning the
+  /// initial auth state is known. Derived from [AuthStateNotifier.isInitialized].
   final bool isInitialized;
 
+  /// Constructs a [_RedirectState] snapshot from the current state of
+  /// [authNotifier] and [splashGate].
   factory _RedirectState.from(
     AuthStateNotifier authNotifier,
     SplashGateNotifier splashGate,
@@ -218,6 +239,9 @@ class _RedirectState {
     );
   }
 
+  /// Two [_RedirectState] instances are equal when all three fields match,
+  /// meaning the router redirect outcome would be identical and no refresh
+  /// notification is needed.
   @override
   bool operator ==(Object other) {
     return other is _RedirectState &&
@@ -230,12 +254,43 @@ class _RedirectState {
   int get hashCode => Object.hash(isAuthenticated, isGateOpen, isInitialized);
 }
 
+/// Provider for the application's [GoRouter] instance.
+///
+/// **What it exposes:**
+/// A fully configured [GoRouter] that reacts to changes in authentication
+/// state, sign-out progress, and splash gate readiness.
+///
+/// **Dependencies:**
+/// - [authStateNotifierProvider]: Subscribes to auth and sign-out state.
+/// - [splashGateNotifierProvider]: Subscribes to splash gate readiness.
+/// - [authStateProvider]: Listens for Firebase auth stream changes.
+/// - [signOutInProgressProvider]: Listens for sign-out flag changes.
+///
+/// **Deduplication strategy:**
+/// Rather than passing [AuthStateNotifier] or [SplashGateNotifier] directly
+/// as `refreshListenable` (which would trigger a redirect evaluation on every
+/// `notifyListeners` call regardless of outcome), this provider uses a
+/// [ValueNotifier<int>] counter that is only incremented when the
+/// [_RedirectState] snapshot actually changes. This avoids redundant redirect
+/// evaluations during rapid successive state emissions.
+///
+/// **Lifecycle:**
+/// This is a non-autoDispose provider. The router lives for the entire app
+/// session. Listeners added to [splashGate] are explicitly removed in
+/// [ref.onDispose] to prevent memory leaks.
 final goRouterProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.read(authStateNotifierProvider);
   final splashGate = ref.read(splashGateNotifierProvider);
+
+  // A simple integer counter used as the refresh listenable.
+  // GoRouter re-evaluates its redirect logic whenever this value changes.
+  // We only increment it when the effective redirect state actually changes
+  // (see _RedirectState) to avoid redundant evaluations.
   final refreshNotifier = ValueNotifier<int>(0);
   var lastState = _RedirectState.from(authNotifier, splashGate);
 
+  /// Compares the current [_RedirectState] to the last known state and
+  /// increments [refreshNotifier] only if something changed.
   void bumpIfNeeded() {
     final nextState = _RedirectState.from(authNotifier, splashGate);
     if (nextState == lastState) {
@@ -245,14 +300,18 @@ final goRouterProvider = Provider<GoRouter>((ref) {
     refreshNotifier.value++;
   }
 
+  // Listen to Firebase auth stream changes via Riverpod.
   ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
     bumpIfNeeded();
   });
 
+  // Listen to the sign-out flag so the router redirects immediately when
+  // sign-out starts, before the auth stream emits null.
   ref.listen<bool>(signOutInProgressProvider, (previous, next) {
     bumpIfNeeded();
   });
 
+  // Listen to splash gate readiness (ChangeNotifier, not a Riverpod provider).
   splashGate.addListener(bumpIfNeeded);
 
   ref.onDispose(() {

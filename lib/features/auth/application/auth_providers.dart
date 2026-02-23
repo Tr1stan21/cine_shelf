@@ -10,7 +10,7 @@ final firebaseAuthProvider = Provider<FirebaseAuth>(
   (ref) => FirebaseAuth.instance,
 );
 
-/// Provides AuthRepository instance with FirebaseAuth dependency.
+/// Provides [AuthRepository] instance with [FirebaseAuth] dependency.
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
   return AuthRepository(ref.watch(firebaseAuthProvider));
 });
@@ -20,14 +20,14 @@ final firebaseFirestoreProvider = Provider<FirebaseFirestore>(
   (ref) => FirebaseFirestore.instance,
 );
 
-/// Provides UserRepository instance with FirebaseFirestore dependency.
+/// Provides [UserRepository] instance with [FirebaseFirestore] dependency.
 final userRepositoryProvider = Provider<UserRepository>((ref) {
   return UserRepository(ref.watch(firebaseFirestoreProvider));
 });
 
 /// Stream provider that emits current authentication state.
 ///
-/// Emits User object when signed in, null when signed out.
+/// Emits [User] object when signed in, `null` when signed out.
 /// Used throughout the app to react to auth changes.
 final authStateProvider = StreamProvider<User?>((ref) {
   return ref.watch(authRepositoryProvider).authStateChanges();
@@ -49,21 +49,22 @@ class SignOutFlagNotifier extends Notifier<bool> {
   }
 }
 
-/// Future provider that fetches the full UserModel for the authenticated user.
+/// Future provider that fetches the full [UserModel] for the authenticated user.
 ///
-/// Flow:
-/// 1. Waits for authentication state to be determined via [authStateProvider.future]
-/// 2. If no user is authenticated, returns null
-/// 3. If authenticated, fetches the user's profile document from Firestore
+/// **Flow:**
+/// 1. Awaits [authStateProvider] to determine the current [User].
+/// 2. Returns `null` if no user is authenticated.
+/// 3. Fetches the user's Firestore profile document via [UserRepository].
 ///
-/// Uses .autoDispose to automatically clean up resources when no longer watched,
-/// reducing memory usage and preventing stale cached data.
+/// **Dependencies:**
+/// - [authStateProvider]: Determines which user to fetch.
+/// - [userRepositoryProvider]: Performs the Firestore read.
 ///
-/// Typical usage:
-/// ```dart
-/// final userModel = await ref.read(currentUserProvider.future);
-/// final userAsyncValue = ref.watch(currentUserProvider);
-/// ```
+/// **Lifecycle (autoDispose):**
+/// This provider is autoDisposed — it frees its cache when no widget is
+/// watching it. During an authenticated session, [NavShell._UserPreloadWatcher]
+/// (see `lib/router/shell.dart`) keeps this provider alive to prevent repeated
+/// Firestore reads as the user navigates between tabs.
 final currentUserProvider = FutureProvider.autoDispose<UserModel?>((ref) async {
   // Wait for auth state to be determined (converts StreamProvider to Future)
   final user = await ref.watch(authStateProvider.future);

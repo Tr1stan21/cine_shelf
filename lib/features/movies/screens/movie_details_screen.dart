@@ -10,20 +10,26 @@ import 'package:cine_shelf/shared/widgets/back_button.dart';
 //import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 import 'package:cine_shelf/features/movies/application/movie_details_provider.dart';
 
-/// Detailed view of a single movie.
+/// Full-screen detail view for a single movie.
 ///
-/// Layout structure:
-/// - Full-width hero poster image at top
-/// - Scrollable content panel overlapping poster with rounded top corners
-/// - Movie metadata: title, year, genres
-/// - Synopsis text
-/// - Star rating display
+/// **Layout structure:**
+/// - Full-width hero poster image occupying the top ~56% of the screen.
+/// - Scrollable content panel that begins [overlap] pixels above the poster's
+///   bottom edge, creating a layered card effect.
+/// - Movie metadata: title, release year, genres.
+/// - Overview/synopsis text.
+/// - Back button overlay anchored to the top-left safe area.
+///
+/// **Currently disabled (pending list management implementation):**
+/// - Star rating row
 /// - Action buttons: Favorite, Watchlist, Watched, Add to List
-/// - Back button overlay in top-left corner
 ///
+/// Data is fetched via [movieDetailProvider] parametrized by [MoviePoster.id].
+/// Loading and error states are handled inline within the [Stack].
 class MovieDetailsScreen extends ConsumerWidget {
   const MovieDetailsScreen({required this.movie, super.key});
 
+  /// Lightweight poster model carrying the TMDB [id] used to fetch full details.
   final MoviePoster movie;
 
   //static const int _maxStars = 5;
@@ -34,7 +40,12 @@ class MovieDetailsScreen extends ConsumerWidget {
 
     final size = MediaQuery.sizeOf(context);
 
+    // The content panel overlaps the poster by this many pixels, creating
+    // the layered card visual where the panel slides over the image.
     const overlap = 26.0;
+
+    // Height of the scrollable content panel. The poster fills the remaining
+    // space above it (size.height - panelHeight + overlap).
     final panelHeight = size.height * 0.44;
 
     return Scaffold(
@@ -198,6 +209,7 @@ class MovieDetailsScreen extends ConsumerWidget {
                   ],
                 ),
               ),
+              // Back button floated over the poster in the top-left safe area.
               const SafeArea(
                 child: Padding(
                   padding: EdgeInsets.all(16.0),
