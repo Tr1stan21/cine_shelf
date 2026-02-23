@@ -5,11 +5,11 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
-import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
+//import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/lists/application/list_providers.dart';
+//import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 
 /// User profile and account management screen.
@@ -42,9 +42,9 @@ class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userDocument = ref.watch(currentUserProvider);
-    final watchedCount = ref.watch(watchedCountProvider);
-    final watchlistCount = ref.watch(watchlistCountProvider);
-    final favoritesCount = ref.watch(favoritesCountProvider);
+    // final watchedCount = ref.watch(watchedCountProvider);
+    // final watchlistCount = ref.watch(watchlistCountProvider);
+    // final favoritesCount = ref.watch(favoritesCountProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
@@ -148,21 +148,20 @@ class AccountScreen extends ConsumerWidget {
           const SizedBox(height: CineSpacing.xxl),
 
           // Stats (1 pill, 4 items)
-          StatsPill(
-            watchedValue: watchedCount.value ?? 0,
-            favoriteValue: favoritesCount.value ?? 0,
-            watchlistValue: watchlistCount.value ?? 0,
-          ),
-
+          // StatsPill(
+          //   watchedValue: watchedCount.value ?? 0,
+          //   favoriteValue: favoritesCount.value ?? 0,
+          //   watchlistValue: watchlistCount.value ?? 0,
+          // ),
           const SizedBox(height: CineSpacing.xxl),
           const GlowSeparator(),
           const SizedBox(height: CineSpacing.xxl),
 
-          const AccountRow(
-            icon: Icons.person_outline,
-            label: 'Edit Profile',
-            onTap: null,
-          ),
+          // const AccountRow(
+          //   icon: Icons.person_outline,
+          //   label: 'Edit Profile',
+          //   onTap: null,
+          // ),
           const ThinDivider(),
           AccountRow(
             icon: Icons.format_list_bulleted,

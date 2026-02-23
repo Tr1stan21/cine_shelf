@@ -45,12 +45,12 @@ class BottomNavBar extends StatelessWidget {
               label: 'Home',
               onTap: () => _onTap(0),
             ),
-            _BottomNavItem(
-              selected: index == 1,
-              icon: Icons.view_list_rounded,
-              label: 'My Lists',
-              onTap: () => _onTap(1),
-            ),
+            // _BottomNavItem(
+            //   selected: index == 1,
+            //   icon: Icons.view_list_rounded,
+            //   label: 'My Lists',
+            //   onTap: () => _onTap(1),
+            // ),
             _BottomNavItem(
               selected: index == 2,
               icon: Icons.person_rounded,

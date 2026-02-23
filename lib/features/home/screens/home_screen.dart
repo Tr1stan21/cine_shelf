@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
-import 'package:cine_shelf/features/home/widgets/search_bar.dart';
+//import 'package:cine_shelf/features/home/widgets/search_bar.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:cine_shelf/features/movies/application/movies_provider.dart';
@@ -19,7 +19,7 @@ class HomeScreen extends ConsumerWidget {
         children: [
           Image.asset(AppConstants.logoPath, height: 100),
           const SizedBox(height: 20),
-          CineSearchBar(onChanged: (v) {}, onSubmitted: (v) {}),
+          //CineSearchBar(onChanged: (v) {}, onSubmitted: (v) {}),
           const _MovieSection(category: ListCategory.popular, title: 'Popular'),
           const GlowSeparator(),
           const _MovieSection(
