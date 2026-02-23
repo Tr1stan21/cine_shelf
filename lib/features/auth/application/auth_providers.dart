@@ -40,10 +40,29 @@ final signOutInProgressProvider = NotifierProvider<SignOutFlagNotifier, bool>(
   SignOutFlagNotifier.new,
 );
 
+/// Notifier that tracks whether a sign-out operation is currently in progress.
+///
+/// Set to `true` immediately before calling Firebase's sign-out method so that
+/// [AuthStateNotifier] can treat the user as unauthenticated right away —
+/// before the Firebase auth stream emits `null`. This prevents a window where
+/// GoRouter's redirect logic still sees the user as authenticated while
+/// sign-out is underway.
+///
+/// Reset to `false` in the `finally` block of [AuthController.signOut],
+/// regardless of success or failure.
+///
+/// **Usage:**
+/// ```dart
+/// final isSigningOut = ref.watch(signOutInProgressProvider);
+/// ```
 class SignOutFlagNotifier extends Notifier<bool> {
   @override
   bool build() => false;
 
+  /// Updates the sign-out progress flag.
+  ///
+  /// - Pass `true` before initiating sign-out to block authenticated access.
+  /// - Pass `false` in `finally` to restore normal auth evaluation.
   void setInProgress(bool value) {
     state = value;
   }
