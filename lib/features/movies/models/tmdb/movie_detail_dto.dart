@@ -1,9 +1,16 @@
 import 'genres_dto.dart';
 
-/// DTO para la respuesta del endpoint GET /movie/{movie_id}
+/// Data Transfer Object for TMDB GET /movie/{movie_id} response.
 ///
-/// TMDB retorna el detalle completo de una película, incluyendo
-/// los géneros como objetos con id y nombre, no solo como IDs.
+/// Represents the complete movie detail returned by the TMDB API.
+/// Includes resolved genre objects (not just IDs), which simplifies downstream mapping.
+///
+/// **Note:** TMDB's `/movie/{id}` endpoint returns genres as full objects with `id` and `name`,
+/// unlike other endpoints that return genre IDs only. This is why [genres] is a list of [GenreDto]
+/// rather than simple integers.
+///
+/// This DTO is database-agnostic and should be mapped to domain models ([MovieDetail])
+/// before being used in business logic.
 class MovieDetailDto {
   final int id;
   final String title;

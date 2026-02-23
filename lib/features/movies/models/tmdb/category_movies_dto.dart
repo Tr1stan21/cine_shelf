@@ -1,8 +1,25 @@
+/// Data Transfer Object for TMDB paginated movie list response.
+///
+/// Represents the paginated response from TMDB's `/movie/{category}` endpoints
+/// (e.g., `/movie/popular`, `/movie/top_rated`).
+///
+/// **Response Structure:**
+/// - `page`: Current page number in the paginated result set
+/// - `total_pages`: Total number of pages available
+/// - `results`: Array of movies on this page with minimal info (id, poster_path)
+///
+/// Used by [TmdbRemoteDataSource] for infinite scroll pagination.
 class CategoryMoviesDto {
+  /// Current page number in the paginated result set.
   final int page;
+
+  /// Total number of pages available for this category.
   final int totalPages;
+
+  /// Movie posters on the current page.
   final List<MoviePosterDto> results;
 
+  /// Creates a CategoryMoviesDto with pagination metadata and results.
   CategoryMoviesDto({
     required this.page,
     required this.totalPages,
