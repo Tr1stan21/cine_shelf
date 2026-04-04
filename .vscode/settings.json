@@ -1,3 +1,9 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive"
+    "java.configuration.updateBuildConfiguration": "interactive",
+    "editor.fontSize": 14,
+    "editor.minimap.enabled": true,
+    "breadcrumbs.enabled": true,
+    "workbench.activityBar.location": "default",
+    "workbench.editor.showTabs": "multiple",
+    "workbench.statusBar.visible": true
 }

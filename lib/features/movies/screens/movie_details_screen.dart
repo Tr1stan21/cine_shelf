@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/back_button.dart';
-//import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
+import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 import 'package:cine_shelf/features/movies/application/movie_details_provider.dart';
 
 /// Full-screen detail view for a single movie.
@@ -32,7 +32,7 @@ class MovieDetailsScreen extends ConsumerWidget {
   /// Lightweight poster model carrying the TMDB [id] used to fetch full details.
   final MoviePoster movie;
 
-  //static const int _maxStars = 5;
+  static const int _maxStars = 5;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -100,12 +100,12 @@ class MovieDetailsScreen extends ConsumerWidget {
                       top: false,
                       child: Container(
                         padding: const EdgeInsets.all(CineSpacing.xl),
-                        // decoration: const BoxDecoration(
-                        //   image: DecorationImage(
-                        //     image: AssetImage(AppConstants.backgroundPath),
-                        //     fit: BoxFit.cover,
-                        //   ),
-                        // ),
+                        decoration: const BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage(AppConstants.backgroundPath),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -145,63 +145,63 @@ class MovieDetailsScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: CineSpacing.lg),
-                            // Row(
-                            //   children: List.generate(
-                            //     _maxStars,
-                            //     (_) => const Padding(
-                            //       padding: EdgeInsets.only(right: 6),
-                            //       child: Icon(
-                            //         Icons.star,
-                            //         size: 22,
-                            //         color: CineColors.amber,
-                            //       ),
-                            //     ),
-                            //   ),
-                            // ),
-                            // const SizedBox(height: CineSpacing.xxxl),
-                            // const Row(
-                            //   children: [
-                            //     Expanded(
-                            //       child: MovieActionButton(
-                            //         label: 'Favorite',
-                            //         icon: Icons.favorite,
-                            //         backgroundColor: Color(0xFFB56610),
-                            //         foregroundColor: CineColors.white,
-                            //       ),
-                            //     ),
-                            //     SizedBox(width: CineSpacing.md),
-                            //     Expanded(
-                            //       child: MovieActionButton(
-                            //         label: 'Watchlist',
-                            //         icon: Icons.access_time_rounded,
-                            //         outlined: true,
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                            // const SizedBox(height: CineSpacing.md),
-                            // const Row(
-                            //   children: [
-                            //     Expanded(
-                            //       child: MovieActionButton(
-                            //         label: 'Watched',
-                            //         icon: Icons.check_rounded,
-                            //         backgroundColor: Color(0xFF7A3E07),
-                            //         foregroundColor: CineColors.amber,
-                            //         trailingIcon: Icons.check_rounded,
-                            //       ),
-                            //     ),
-                            //     SizedBox(width: CineSpacing.md),
-                            //     Expanded(
-                            //       child: MovieActionButton(
-                            //         label: 'List...',
-                            //         icon: Icons.add,
-                            //         outlined: true,
-                            //         trailingIcon: Icons.chevron_right_rounded,
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
+                            Row(
+                              children: List.generate(
+                                _maxStars,
+                                (_) => const Padding(
+                                  padding: EdgeInsets.only(right: 6),
+                                  child: Icon(
+                                    Icons.star,
+                                    size: 22,
+                                    color: CineColors.amber,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: CineSpacing.xxxl),
+                            const Row(
+                              children: [
+                                Expanded(
+                                  child: MovieActionButton(
+                                    label: 'Favorite',
+                                    icon: Icons.favorite,
+                                    backgroundColor: Color(0xFFB56610),
+                                    foregroundColor: CineColors.white,
+                                  ),
+                                ),
+                                SizedBox(width: CineSpacing.md),
+                                Expanded(
+                                  child: MovieActionButton(
+                                    label: 'Watchlist',
+                                    icon: Icons.access_time_rounded,
+                                    outlined: true,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: CineSpacing.md),
+                            const Row(
+                              children: [
+                                Expanded(
+                                  child: MovieActionButton(
+                                    label: 'Watched',
+                                    icon: Icons.check_rounded,
+                                    backgroundColor: Color(0xFF7A3E07),
+                                    foregroundColor: CineColors.amber,
+                                    trailingIcon: Icons.check_rounded,
+                                  ),
+                                ),
+                                SizedBox(width: CineSpacing.md),
+                                Expanded(
+                                  child: MovieActionButton(
+                                    label: 'List...',
+                                    icon: Icons.add,
+                                    outlined: true,
+                                    trailingIcon: Icons.chevron_right_rounded,
+                                  ),
+                                ),
+                              ],
+                            ),
                           ],
                         ),
                       ),
