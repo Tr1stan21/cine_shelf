@@ -24,10 +24,9 @@ exports.bootstrapUser = onDocumentCreated("user/{uid}", async (event) => {
   const now = FieldValue.serverTimestamp();
   const batch = db.batch();
 
-  // Asegura username=email y timestamps (sin romper lo ya creado)
+  // Conserva el username inicial del cliente y solo enriquece metadata.
   batch.set(userRef, {
     email,
-    username: email,
     updatedAt: now,
     createdAt: now,
   }, { merge: true });

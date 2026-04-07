@@ -7,13 +7,13 @@ class UserModel {
   final String uid;
   final String username;
   final String email;
-  final DateTime createdAt;
+  final DateTime? createdAt;
 
   UserModel({
     required this.uid,
     required this.username,
     required this.email,
-    required this.createdAt,
+    this.createdAt,
   });
 
   /// Deserializes UserModel from Firestore document snapshot.
@@ -22,17 +22,18 @@ class UserModel {
   /// - `username`: defaults to 'User'
   /// - `email`: defaults to empty string
   ///
-  /// Requires `createdAt` timestamp to be present.
+  /// `createdAt` may be null during the bootstrap race window.
   factory UserModel.fromFirestore(
     DocumentSnapshot<Map<String, dynamic>> doc,
     String uid,
   ) {
     final data = doc.data()!;
+    final createdAtTimestamp = data['createdAt'] as Timestamp?;
     return UserModel(
       uid: uid,
       username: data['username'] ?? 'User',
       email: data['email'] ?? '',
-      createdAt: (data['createdAt'] as Timestamp).toDate(),
+      createdAt: createdAtTimestamp?.toDate(),
     );
   }
 }

@@ -8,7 +8,7 @@ agents: [flutter-feature-planner]
 handoffs:
   - label: Start Planning
     agent: flutter-feature-planner
-    prompt: "Architecture validated. Build phased implementation plan from this architecture output."
+    prompt: "Architecture validated. Build phased implementation plan from this architecture output. Create or reuse only an isolated plan_path under /memories/session/plans/. Validate metadata (feature_slug and architecture_fingerprint) before reuse."
     send: true
 ---
 You are a Flutter architecture reviewer specialized in design validation before implementation.

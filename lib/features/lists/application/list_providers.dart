@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
@@ -32,7 +33,10 @@ final watchedCountProvider = StreamProvider.autoDispose<int>((ref) {
           .watchListCount(uid: user.uid, listId: _watchedListId);
     },
     loading: () => Stream<int>.value(0),
-    error: (_, _) => Stream<int>.value(0),
+    error: (error, stackTrace) {
+      debugPrint('WATCHED COUNT PROVIDER AUTH ERROR: $error\n$stackTrace');
+      return Stream<int>.value(0);
+    },
   );
 });
 
@@ -55,7 +59,10 @@ final watchlistCountProvider = StreamProvider.autoDispose<int>((ref) {
           .watchListCount(uid: user.uid, listId: _watchlistListId);
     },
     loading: () => Stream<int>.value(0),
-    error: (_, _) => Stream<int>.value(0),
+    error: (error, stackTrace) {
+      debugPrint('WATCHLIST COUNT PROVIDER AUTH ERROR: $error\n$stackTrace');
+      return Stream<int>.value(0);
+    },
   );
 });
 
@@ -78,6 +85,9 @@ final favoritesCountProvider = StreamProvider.autoDispose<int>((ref) {
           .watchListCount(uid: user.uid, listId: _favoritesListId);
     },
     loading: () => Stream<int>.value(0),
-    error: (_, _) => Stream<int>.value(0),
+    error: (error, stackTrace) {
+      debugPrint('FAVORITES COUNT PROVIDER AUTH ERROR: $error\n$stackTrace');
+      return Stream<int>.value(0);
+    },
   );
 });

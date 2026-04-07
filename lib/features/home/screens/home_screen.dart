@@ -60,9 +60,8 @@ class HomeScreen extends ConsumerWidget {
 /// - [MovieListSection] on success, forwarding [category] to enable infinite
 ///   scroll when the user navigates to the full list screen.
 /// - A centered [CircularProgressIndicator] while loading.
-/// - An empty [SizedBox] on error — errors are silently swallowed here to
-///   avoid breaking the rest of the home layout. Individual sections fail
-///   independently without taking down the whole screen.
+/// - An informative placeholder on error with a retry action scoped to this
+///   section's category.
 ///
 /// [category] is forwarded to [MovieListSection] so that [MovieListScreen]
 /// can request additional pages when the user scrolls to the bottom.
@@ -90,7 +89,78 @@ class _MovieSection extends ConsumerWidget {
         padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (_, _) => const SizedBox.shrink(),
+      error: (_, _) => _SectionErrorPlaceholder(
+        sectionTitle: title,
+        onRetry: () {
+          ref.invalidate(moviesProvider(category));
+        },
+      ),
+    );
+  }
+}
+
+class _SectionErrorPlaceholder extends StatelessWidget {
+  const _SectionErrorPlaceholder({
+    required this.sectionTitle,
+    required this.onRetry,
+  });
+
+  final String sectionTitle;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: CineSpacing.xxl,
+        vertical: CineSpacing.xxxl,
+      ),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 560),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(CineSpacing.xxl),
+            decoration: BoxDecoration(
+              color: CineColors.black,
+              borderRadius: BorderRadius.circular(CineRadius.md),
+              border: Border.all(color: CineColors.textHint),
+            ),
+            child: Column(
+              children: [
+                const Icon(Icons.error_outline, color: CineColors.amber),
+                const SizedBox(height: CineSpacing.md),
+                Text(
+                  'Could not load $sectionTitle movies.',
+                  textAlign: TextAlign.center,
+                  style: CineTypography.bodyMedium,
+                ),
+                const SizedBox(height: CineSpacing.sm),
+                Text(
+                  'Please try again.',
+                  textAlign: TextAlign.center,
+                  style: CineTypography.bodyMedium.copyWith(
+                    color: CineColors.textSecondary,
+                  ),
+                ),
+                const SizedBox(height: CineSpacing.lg),
+                OutlinedButton(
+                  onPressed: onRetry,
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: CineColors.amber,
+                    side: const BorderSide(color: CineColors.amber),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: CineSpacing.xxl,
+                      vertical: CineSpacing.md,
+                    ),
+                  ),
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

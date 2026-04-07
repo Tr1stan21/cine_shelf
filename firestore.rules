@@ -15,6 +15,12 @@ service cloud.firestore {
       allow write: if false; // Only Cloud Functions can write
     }
 
+    /// Allow authenticated users to read movies inside their own lists
+    match /user/{uid}/list/{listId}/movies/{movieId} {
+      allow read: if request.auth.uid == uid;
+      allow write: if false;
+    }
+
     /// Movies and other public data - read-only from app
     match /movies/{document=**} {
       allow read: if request.auth != null;

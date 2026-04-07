@@ -42,9 +42,8 @@ class UserRepository {
   /// The Cloud Function runs asynchronously after this write returns. If the
   /// user document is read immediately after creation (e.g., in [getUserDocument]),
   /// the `createdAt` field may not yet be present. [UserModel.fromFirestore]
-  /// will throw if `createdAt` is missing. The splash gate's [preloadUserData]
-  /// call introduces enough delay for the function to complete in practice,
-  /// but this is not guaranteed.
+  /// now tolerates this and returns `createdAt` as null until bootstrap
+  /// enrichment completes.
   ///
   /// **Error behavior:** Rethrows any exception so [AuthController] can
   /// perform a compensating delete of the Firebase Auth account.
@@ -76,7 +75,7 @@ class UserRepository {
   /// Fetches the user profile document from Firestore.
   ///
   /// Returns:
-  /// - [UserModel] if the document exists and contains a valid `createdAt` timestamp.
+  /// - [UserModel] if the document exists (`createdAt` may be null initially).
   /// - `null` if the document does not exist or any error occurs.
   ///
   /// **Error behavior:** Errors are logged but not rethrown. A missing profile

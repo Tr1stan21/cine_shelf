@@ -1,7 +1,7 @@
 ---
 name: flutter-tester
 description: "Use after flutter-reviewer approves a feature. Writes unit tests for validators, mappers, and notifiers, plus widget tests for forms and critical interactive components. Never tests purely visual widgets."
-argument-hint: "Incluye: lista de archivos aprobados por flutter-reviewer y, opcionalmente, /memories/session/plan.md para validar alcance."
+argument-hint: "Incluye: lista de archivos aprobados por flutter-reviewer y, opcionalmente, plan_path para validar alcance."
 target: vscode
 tools: [read, search, edit, create, execute, execute/testFailure, agent]
 agents: [flutter-debugger]
@@ -17,7 +17,7 @@ Your goal is to write tests that catch real bugs, not to maximize coverage metri
 
 ## Scope And Inputs
 - Accept only the approved file list from flutter-reviewer.
-- Optionally use /memories/session/plan.md to verify feature scope.
+- Optionally use plan_path to verify feature scope.
 - If approved file list is missing, stop and request it.
 
 ## Test Priorities (in order)

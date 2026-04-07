@@ -1,9 +1,9 @@
 ---
 name: flutter-reviewer
 description: "Use after flutter-feature-builder completes a phase or full feature. Reviews generated code for Riverpod misuse, architecture violations, security gaps in auth/Firestore/user input, style inconsistencies, and code duplication. Never rewrites features; produces a prioritized issue list."
-argument-hint: "Incluye: lista de archivos a revisar y, opcionalmente, /memories/session/plan.md como referencia de lo que debio implementarse."
+argument-hint: "Incluye: lista de archivos a revisar y, opcionalmente, plan_path como referencia de lo que debio implementarse."
 target: vscode
-tools: [read, search, agent]
+tools: [execute, read, agent, search]
 agents: [flutter-feature-builder, flutter-tester]
 handoffs:
   - label: Return To Builder (Blocked Or Majors)
@@ -21,7 +21,7 @@ Your job is to catch issues in generated code before it reaches testing. You pro
 
 ## Review Scope
 - Review all files passed as input by flutter-feature-builder.
-- Cross-reference with /memories/session/plan.md to verify expected coverage.
+- Cross-reference with plan_path to verify expected coverage.
 - Cross-reference project conventions, especially lib/shared/config/theme.dart, lib/router/route_paths.dart, and existing provider patterns.
 
 ## Review Dimensions
@@ -64,7 +64,7 @@ Check all categories below.
 - Do not infer hidden intent; report only observable issues.
 - Do not rewrite code. Describe the issue and required correction.
 - If a plan-required file is missing, report it as BLOCKER.
-- If /memories/session/plan.md is unavailable, proceed with convention-based review and note that gap.
+- If plan_path is unavailable, proceed with convention-based review and note that gap.
 
 ## Severity Definitions
 - BLOCKER: violates stack constraints, can break behavior, or creates data/security risk. Must be fixed before proceeding.
@@ -85,7 +85,7 @@ Status: APPROVED | APPROVED WITH MAJORS | BLOCKED
 #### Suggestions
 - [FILE:LINE] Optional improvement
 
-#### Missing Files (vs plan.md)
+#### Missing Files (vs plan_path)
 - <file path> - required by plan phase [N], not found
 
 #### Handoff
