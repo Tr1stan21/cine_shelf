@@ -8,6 +8,7 @@ import 'package:cine_shelf/features/home/widgets/search_bar.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:cine_shelf/features/movies/application/movies_provider.dart';
+import 'package:cine_shelf/features/region/application/region_providers.dart';
 
 /// Main home screen displaying categorized movie carousels.
 ///
@@ -76,7 +77,8 @@ class _MovieSection extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncMovies = ref.watch(moviesProvider(category));
+    final query = ref.watch(movieQueryParamsByCategoryProvider(category));
+    final asyncMovies = ref.watch(moviesProvider(query));
 
     return asyncMovies.when(
       data: (page) => MovieListSection(
@@ -84,6 +86,7 @@ class _MovieSection extends ConsumerWidget {
         items: page.movies,
         totalPages: page.totalPages,
         category: category,
+        region: query.region,
       ),
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
@@ -92,7 +95,7 @@ class _MovieSection extends ConsumerWidget {
       error: (_, _) => _SectionErrorPlaceholder(
         sectionTitle: title,
         onRetry: () {
-          ref.invalidate(moviesProvider(category));
+          ref.invalidate(moviesProvider(query));
         },
       ),
     );

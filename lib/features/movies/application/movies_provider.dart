@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/paginated_movies.dart';
-import '../models/tmdb/list_category.dart';
+import '../models/movie_query_params.dart';
 import '../data/movies_providers.dart';
 
 /// Parametrized FutureProvider for fetching paginated movies by category.
@@ -31,8 +31,9 @@ import '../data/movies_providers.dart';
 ///   error: (err, stack) => ErrorWidget(error: err),
 /// );
 /// ```
-final moviesProvider = FutureProvider.family<PaginatedMoviesPage, ListCategory>(
-  (ref, category) {
-    return ref.watch(moviesRepositoryProvider).getMoviesPage(category);
-  },
-);
+final moviesProvider =
+    FutureProvider.family<PaginatedMoviesPage, MovieQueryParams>((ref, query) {
+      return ref
+          .watch(moviesRepositoryProvider)
+          .getMoviesPage(query.category, region: query.region);
+    });

@@ -4,10 +4,15 @@ import '../models/movie_detail.dart';
 import '../models/paginated_movies.dart';
 
 abstract class MoviesRepository {
-  Future<List<MoviePoster>> getMovies(ListCategory category, {int page = 1});
+  Future<List<MoviePoster>> getMovies(
+    ListCategory category, {
+    int page = 1,
+    String region = 'US',
+  });
   Future<PaginatedMoviesPage> getMoviesPage(
     ListCategory category, {
     int page = 1,
+    String region = 'US',
   });
   Future<MovieDetail> getMovieDetail(int movieId);
 }

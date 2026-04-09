@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
+import 'package:cine_shelf/features/account/widgets/region_dropdown.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
@@ -60,19 +61,24 @@ class AccountScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
       child: Column(
         children: [
+          const RegionDropdown(),
           const SizedBox(height: CineSpacing.xxxl),
 
           // Avatar placeholder.
           Container(
-            width: 110,
-            height: 110,
+            width: CineSizes.profileAvatar,
+            height: CineSizes.profileAvatar,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(color: CineColors.amber, width: 2),
               color: CineColors.bgDark,
             ),
             child: const Center(
-              child: Icon(Icons.person, size: 46, color: CineColors.textMuted),
+              child: Icon(
+                Icons.person,
+                size: CineSizes.profileAvatarIcon,
+                color: CineColors.textMuted,
+              ),
             ),
           ),
 
@@ -84,52 +90,26 @@ class AccountScreen extends ConsumerWidget {
               if (user == null) {
                 return const Column(
                   children: [
-                    Text(
-                      'User',
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w600,
-                        color: CineColors.amber,
-                      ),
-                    ),
-                    SizedBox(height: 6),
-                    Text(
-                      'No email',
-                      style: TextStyle(
-                        fontSize: 16,
-                        color: CineColors.textSecondary,
-                      ),
-                    ),
+                    Text('User', style: CineTypography.profileName),
+                    SizedBox(height: CineSpacing.xs),
+                    Text('No email', style: CineTypography.profileEmail),
                   ],
                 );
               }
 
               return Column(
                 children: [
-                  Text(
-                    user.username,
-                    style: const TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w600,
-                      color: CineColors.amber,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    user.email,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: CineColors.textSecondary,
-                    ),
-                  ),
+                  Text(user.username, style: CineTypography.profileName),
+                  const SizedBox(height: CineSpacing.xs),
+                  Text(user.email, style: CineTypography.profileEmail),
                 ],
               );
             },
             loading: () => const Column(
               children: [
                 SizedBox(
-                  width: 24,
-                  height: 24,
+                  width: CineSizes.loaderSmall,
+                  height: CineSizes.loaderSmall,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     valueColor: AlwaysStoppedAnimation<Color>(CineColors.amber),
@@ -139,18 +119,11 @@ class AccountScreen extends ConsumerWidget {
             ),
             error: (error, stackTrace) => const Column(
               children: [
-                Text(
-                  'User',
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w600,
-                    color: CineColors.amber,
-                  ),
-                ),
-                SizedBox(height: 6),
+                Text('User', style: CineTypography.profileName),
+                SizedBox(height: CineSpacing.xs),
                 Text(
                   'Error loading profile',
-                  style: TextStyle(fontSize: 16, color: Color(0xFFEF5350)),
+                  style: CineTypography.profileEmail,
                 ),
               ],
             ),
@@ -164,6 +137,7 @@ class AccountScreen extends ConsumerWidget {
             favoriteValue: favoritesCount.value ?? 0,
             watchlistValue: watchlistCount.value ?? 0,
           ),
+          const SizedBox(height: CineSpacing.xl),
           const SizedBox(height: CineSpacing.xxl),
           const GlowSeparator(),
           const SizedBox(height: CineSpacing.xxl),

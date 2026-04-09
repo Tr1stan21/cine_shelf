@@ -1,7 +1,9 @@
 import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
+import 'package:cine_shelf/features/movies/models/movie_query_params.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:cine_shelf/features/movies/application/paginated_movies_notifier.dart';
+import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +37,7 @@ class MovieListScreen extends ConsumerStatefulWidget {
     required this.initialItems,
     required this.totalPages,
     this.category,
+    this.region,
     super.key,
   });
 
@@ -45,12 +48,16 @@ class MovieListScreen extends ConsumerStatefulWidget {
   /// When non-null, enables infinite scroll for this category.
   final ListCategory? category;
 
+  /// Region snapshot for this screen's pagination context.
+  final String? region;
+
   @override
   ConsumerState<MovieListScreen> createState() => _MovieListScreenState();
 }
 
 class _MovieListScreenState extends ConsumerState<MovieListScreen> {
   late final ScrollController _scrollController;
+  late final MovieQueryParams? _queryParams;
 
   /// Tracks whether the list is scrolled to the very top.
   /// Used to show/hide the scroll-to-top floating button — the button is only
@@ -60,14 +67,20 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
   @override
   void initState() {
     super.initState();
+    _queryParams = widget.category == null
+        ? null
+        : MovieQueryParams(
+            category: widget.category!,
+            region: widget.region ?? ref.read(selectedRegionCodeProvider),
+          ).normalized();
     _scrollController = ScrollController()..addListener(_onScroll);
 
     // Seed the paginated provider with the items already loaded by HomeScreen
     // so the list appears instantly without an extra network round-trip.
-    if (widget.category != null) {
+    if (_queryParams != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         final notifier = ref.read(
-          paginatedMoviesProvider(widget.category!).notifier,
+          paginatedMoviesProvider(_queryParams).notifier,
         );
         if (widget.initialItems.isNotEmpty) {
           notifier.seed(
@@ -89,7 +102,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
 
   /// Triggers loadMore when the user reaches 80 % of the current scroll extent.
   void _onScroll() {
-    if (widget.category == null) return;
+    if (_queryParams == null) return;
     final atTop =
         !_scrollController.hasClients || _scrollController.offset <= 0;
     if (atTop != _isAtTop) {
@@ -99,7 +112,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     }
     final pos = _scrollController.position;
     if (pos.pixels >= pos.maxScrollExtent * 0.80) {
-      ref.read(paginatedMoviesProvider(widget.category!).notifier).loadMore();
+      ref.read(paginatedMoviesProvider(_queryParams).notifier).loadMore();
     }
   }
 
@@ -111,8 +124,8 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     final String? error;
     final int currentPage;
 
-    if (widget.category != null) {
-      final s = ref.watch(paginatedMoviesProvider(widget.category!));
+    if (_queryParams != null) {
+      final s = ref.watch(paginatedMoviesProvider(_queryParams));
       // Fall back to initialItems while the seed hasn't been applied yet
       // (i.e. currentPage == 0 on the very first frame).
       items = s.items.isNotEmpty ? s.items : widget.initialItems;
@@ -136,7 +149,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     // Only show the scroll-to-top button once the user is at least on page 2
     // and has scrolled away from the top — avoids premature button appearance.
     final showScrollToTop =
-        widget.category != null && currentPage >= 2 && !_isAtTop;
+        _queryParams != null && currentPage >= 2 && !_isAtTop;
 
     return Stack(
       children: [
@@ -222,7 +235,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                               onPressed: () => ref
                                   .read(
                                     paginatedMoviesProvider(
-                                      widget.category!,
+                                      _queryParams!,
                                     ).notifier,
                                   )
                                   .loadMore(),

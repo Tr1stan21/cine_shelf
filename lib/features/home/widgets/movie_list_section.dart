@@ -25,6 +25,7 @@ class MovieListSection extends StatelessWidget {
     required this.items,
     required this.totalPages,
     required this.category,
+    required this.region,
     super.key,
   });
 
@@ -34,6 +35,9 @@ class MovieListSection extends StatelessWidget {
 
   /// TMDB category — passed through to MovieListScreen to enable infinite scroll.
   final ListCategory category;
+
+  /// Region snapshot used to keep list pagination on the same region context.
+  final String region;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +55,7 @@ class MovieListSection extends StatelessWidget {
                 items: items,
                 totalPages: totalPages,
                 category: category,
+                region: region,
               ),
             ),
             child: Row(

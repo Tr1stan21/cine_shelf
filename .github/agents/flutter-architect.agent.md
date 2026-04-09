@@ -3,7 +3,7 @@ name: FlutterArchitect
 description: "Use when validating Flutter architecture before coding a new feature or changing existing architecture. Reviews Riverpod provider structure, repository contracts, GoRouter navigation, Drift schema impact, and Firestore rules."
 argument-hint: "Incluye: descripcion de la feature, archivos relevantes (router, providers existentes, theme) y restricciones del negocio."
 target: vscode
-tools: [read, search, agent]
+tools: [read, agent, search, web]
 agents: [flutter-feature-planner]
 handoffs:
   - label: Start Planning

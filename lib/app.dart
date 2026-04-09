@@ -6,6 +6,7 @@ import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/router/app_router.dart';
 import 'package:cine_shelf/router/splash_gate_notifier.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/region/application/region_providers.dart';
 
 /// Main entry point of the CineShelf application
 ///
@@ -75,6 +76,9 @@ class _AppState extends ConsumerState<App> {
     ref.listen<AsyncValue<User?>>(authStateProvider, (previous, next) {
       _handleAuthChange(next);
     });
+
+    // Bootstrap local region preference early in the app lifecycle.
+    ref.watch(selectedRegionProvider);
 
     final router = ref.read(goRouterProvider);
 

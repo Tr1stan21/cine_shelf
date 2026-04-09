@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/movies_providers.dart';
 import '../data/movies_repository.dart';
 import '../models/movie_poster.dart';
-import '../models/tmdb/list_category.dart';
+import '../models/movie_query_params.dart';
 
 /// Immutable state for paginated movie list.
 ///
@@ -98,13 +98,13 @@ class PaginatedMoviesState {
 /// - Next navigation to the same category: new instance created (cache cleared)
 /// - Prevents memory leaks and stale data
 class PaginatedMoviesNotifier extends Notifier<PaginatedMoviesState> {
-  /// Creates a PaginatedMoviesNotifier for the given movie category.
+  /// Creates a PaginatedMoviesNotifier for the given movie query params.
   ///
   /// Parameters:
-  /// - [_category]: The movie category to manage (popular, top_rated, etc.)
-  PaginatedMoviesNotifier(this._category);
+  /// - [_queryParams]: Composite key with category and region
+  PaginatedMoviesNotifier(this._queryParams);
 
-  final ListCategory _category;
+  final MovieQueryParams _queryParams;
   late final MoviesRepository _repository;
 
   @override
@@ -155,7 +155,11 @@ class PaginatedMoviesNotifier extends Notifier<PaginatedMoviesState> {
 
     state = state.copyWith(isLoadingInitial: true, clearError: true);
     try {
-      final dto = await _repository.getMoviesPage(_category, page: 1);
+      final dto = await _repository.getMoviesPage(
+        _queryParams.category,
+        page: 1,
+        region: _queryParams.region,
+      );
 
       state = state.copyWith(
         items: dto.movies,
@@ -191,7 +195,11 @@ class PaginatedMoviesNotifier extends Notifier<PaginatedMoviesState> {
 
     try {
       final nextPage = state.currentPage + 1;
-      final dto = await _repository.getMoviesPage(_category, page: nextPage);
+      final dto = await _repository.getMoviesPage(
+        _queryParams.category,
+        page: nextPage,
+        region: _queryParams.region,
+      );
 
       state = state.copyWith(
         items: [...state.items, ...dto.movies],
@@ -230,6 +238,6 @@ class PaginatedMoviesNotifier extends Notifier<PaginatedMoviesState> {
 /// await notifier.loadMore();
 /// ```
 final paginatedMoviesProvider = NotifierProvider.autoDispose
-    .family<PaginatedMoviesNotifier, PaginatedMoviesState, ListCategory>(
+    .family<PaginatedMoviesNotifier, PaginatedMoviesState, MovieQueryParams>(
       PaginatedMoviesNotifier.new,
     );

@@ -26,6 +26,7 @@ abstract class CineColors {
 ///
 /// Provides a harmonic spacing system for layout consistency.
 abstract class CineSpacing {
+  static const double xs = 6.0;
   static const double sm = 10.0;
   static const double md = 12.0;
   static const double lg = 14.0;
@@ -47,6 +48,10 @@ abstract class CineSizes {
   static const double buttonHeight = 56.0;
   static const double iconSize = 24.0;
   static const double iconSizeSmall = 18.0;
+  static const double profileAvatar = 110.0;
+  static const double profileAvatarIcon = 46.0;
+  static const double loaderSmall = 24.0;
+  static const double loaderTiny = 22.0;
 }
 
 /// Predefined typography styles for consistent text rendering.
@@ -69,6 +74,17 @@ abstract class CineTypography {
   static const TextStyle bodyMedium = TextStyle(
     fontSize: 16,
     color: CineColors.white,
+  );
+
+  static const TextStyle profileName = TextStyle(
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    color: CineColors.amber,
+  );
+
+  static const TextStyle profileEmail = TextStyle(
+    fontSize: 16,
+    color: CineColors.textSecondary,
   );
 }
 

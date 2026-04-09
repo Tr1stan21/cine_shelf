@@ -12,6 +12,7 @@ class MovieListArgs {
     required this.items,
     required this.totalPages,
     this.category,
+    this.region,
   });
 
   final String title;
@@ -20,4 +21,7 @@ class MovieListArgs {
 
   /// When present, the screen will support infinite scroll using this category.
   final ListCategory? category;
+
+  /// Region code snapshot used to keep pagination consistent after navigation.
+  final String? region;
 }

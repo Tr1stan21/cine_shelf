@@ -128,6 +128,7 @@ class AppRouter {
               initialItems: args?.items ?? const <MoviePoster>[],
               totalPages: args?.totalPages ?? 1,
               category: args?.category,
+              region: args?.region,
             );
           },
         ),

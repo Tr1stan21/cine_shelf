@@ -18,6 +18,8 @@ import '../models/tmdb/movie_detail_dto.dart';
 /// - DioException is not caught here; propagation allows repository to handle per-use-case logic
 /// - Consider adding error mapping if specific TMDB error codes need special handling
 class TmdbRemoteDataSource {
+  static const String _fixedLanguage = 'en-US';
+
   final Dio _dio;
 
   /// Creates a TmdbRemoteDataSource with the provided Dio HTTP client.
@@ -42,10 +44,15 @@ class TmdbRemoteDataSource {
   Future<CategoryMoviesDto> getMovies(
     ListCategory category, {
     int page = 1,
+    String region = 'US',
   }) async {
     final response = await _dio.get(
       '/movie/${category.path}',
-      queryParameters: {'page': page},
+      queryParameters: {
+        'page': page,
+        'region': region.toUpperCase(),
+        'language': _fixedLanguage,
+      },
     );
     return CategoryMoviesDto.fromJson(response.data as Map<String, dynamic>);
   }
@@ -66,7 +73,10 @@ class TmdbRemoteDataSource {
   /// Throws:
   /// - [DioException] if the movie is not found (404) or on network errors
   Future<MovieDetailDto> getMovieDetail(int movieId) async {
-    final response = await _dio.get('/movie/$movieId');
+    final response = await _dio.get(
+      '/movie/$movieId',
+      queryParameters: {'language': _fixedLanguage},
+    );
     return MovieDetailDto.fromJson(response.data as Map<String, dynamic>);
   }
 }

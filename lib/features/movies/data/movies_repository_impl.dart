@@ -35,8 +35,9 @@ class MoviesRepositoryImpl implements MoviesRepository {
   Future<List<MoviePoster>> getMovies(
     ListCategory category, {
     int page = 1,
+    String region = 'US',
   }) async {
-    final dto = await _remote.getMovies(category, page: page);
+    final dto = await _remote.getMovies(category, page: page, region: region);
     return dto.results.map((e) => e.toAppModel()).toList();
   }
 
@@ -47,8 +48,9 @@ class MoviesRepositoryImpl implements MoviesRepository {
   Future<PaginatedMoviesPage> getMoviesPage(
     ListCategory category, {
     int page = 1,
+    String region = 'US',
   }) async {
-    final dto = await _remote.getMovies(category, page: page);
+    final dto = await _remote.getMovies(category, page: page, region: region);
     return PaginatedMoviesPage(
       page: dto.page,
       totalPages: dto.totalPages,
