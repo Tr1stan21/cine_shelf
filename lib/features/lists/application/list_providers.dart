@@ -3,11 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/data/list_repository.dart';
-
-/// Firestore list identifiers for system-provided lists.
-const String _watchedListId = 'watched';
-const String _watchlistListId = 'watchlist';
-const String _favoritesListId = 'favorites';
+import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 
 /// Provides ListRepository instance with Firestore dependency.
 final listRepositoryProvider = Provider<ListRepository>((ref) {
@@ -30,7 +26,7 @@ final watchedCountProvider = StreamProvider.autoDispose<int>((ref) {
 
       return ref
           .watch(listRepositoryProvider)
-          .watchListCount(uid: user.uid, listId: _watchedListId);
+          .watchListCount(uid: user.uid, listId: watchedListId);
     },
     loading: () => Stream<int>.value(0),
     error: (error, stackTrace) {
@@ -56,7 +52,7 @@ final watchlistCountProvider = StreamProvider.autoDispose<int>((ref) {
 
       return ref
           .watch(listRepositoryProvider)
-          .watchListCount(uid: user.uid, listId: _watchlistListId);
+          .watchListCount(uid: user.uid, listId: watchlistListId);
     },
     loading: () => Stream<int>.value(0),
     error: (error, stackTrace) {
@@ -82,7 +78,7 @@ final favoritesCountProvider = StreamProvider.autoDispose<int>((ref) {
 
       return ref
           .watch(listRepositoryProvider)
-          .watchListCount(uid: user.uid, listId: _favoritesListId);
+          .watchListCount(uid: user.uid, listId: favoritesListId);
     },
     loading: () => Stream<int>.value(0),
     error: (error, stackTrace) {
@@ -91,3 +87,34 @@ final favoritesCountProvider = StreamProvider.autoDispose<int>((ref) {
     },
   );
 });
+
+// ---------------------------------------------------------------------------
+// Membership providers — used by MovieDetailsScreen to reflect button state
+// ---------------------------------------------------------------------------
+
+/// Emits [true] when [movieId] exists in the given [listId] for the current user.
+///
+/// Parametrized by a record `({String listId, int movieId})` so a single
+/// family covers all three lists without code duplication.
+final movieInListProvider = StreamProvider.autoDispose
+    .family<bool, ({String listId, int movieId})>((ref, params) {
+      final authState = ref.watch(authStateProvider);
+
+      return authState.when(
+        data: (user) {
+          if (user == null) return Stream<bool>.value(false);
+          return ref
+              .watch(listRepositoryProvider)
+              .watchMovieInList(
+                uid: user.uid,
+                listId: params.listId,
+                movieId: params.movieId,
+              );
+        },
+        loading: () => Stream<bool>.value(false),
+        error: (error, stackTrace) {
+          debugPrint('MOVIE IN LIST PROVIDER ERROR: $error\n$stackTrace');
+          return Stream<bool>.value(false);
+        },
+      );
+    });

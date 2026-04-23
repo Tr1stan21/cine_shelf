@@ -15,10 +15,16 @@ service cloud.firestore {
       allow write: if false; // Only Cloud Functions can write
     }
 
-    /// Allow authenticated users to read movies inside their own lists
+    /// Allow authenticated users to read/write movies inside their own lists.
+    /// Write validation enforces the expected document shape produced by
+    /// ListRepository.addMovieToList to prevent arbitrary data injection.
     match /user/{uid}/list/{listId}/movies/{movieId} {
       allow read: if request.auth.uid == uid;
-      allow write: if false;
+      allow create, update: if request.auth.uid == uid
+          && request.resource.data.keys().hasAll(['movieId', 'posterPath', 'addedAt'])
+          && request.resource.data.movieId is int
+          && request.resource.data.addedAt == request.time;
+      allow delete: if request.auth.uid == uid;
     }
 
     /// Movies and other public data - read-only from app

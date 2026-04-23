@@ -9,6 +9,9 @@ import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/back_button.dart';
 import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 import 'package:cine_shelf/features/movies/application/movie_details_provider.dart';
+import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/lists/application/list_providers.dart';
+import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 
 /// Full-screen detail view for a single movie.
 ///
@@ -20,9 +23,9 @@ import 'package:cine_shelf/features/movies/application/movie_details_provider.da
 /// - Overview/synopsis text.
 /// - Back button overlay anchored to the top-left safe area.
 ///
-/// **Currently disabled (pending list management implementation):**
-/// - Star rating row
-/// - Action buttons: Favorite, Watchlist, Watched, Add to List
+/// Action buttons (Favorite, Watchlist, Watched) are connected to Firestore
+/// via [movieInListProvider] and [listRepositoryProvider]. State is reactive —
+/// each button reflects real-time membership and toggles on tap.
 ///
 /// Data is fetched via [movieDetailProvider] parametrized by [MoviePoster.id].
 /// Loading and error states are handled inline within the [Stack].
@@ -159,49 +162,7 @@ class MovieDetailsScreen extends ConsumerWidget {
                               ),
                             ),
                             const SizedBox(height: CineSpacing.xxxl),
-                            const Row(
-                              children: [
-                                Expanded(
-                                  child: MovieActionButton(
-                                    label: 'Favorite',
-                                    icon: Icons.favorite,
-                                    backgroundColor: Color(0xFFB56610),
-                                    foregroundColor: CineColors.white,
-                                  ),
-                                ),
-                                SizedBox(width: CineSpacing.md),
-                                Expanded(
-                                  child: MovieActionButton(
-                                    label: 'Watchlist',
-                                    icon: Icons.access_time_rounded,
-                                    outlined: true,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: CineSpacing.md),
-                            const Row(
-                              children: [
-                                Expanded(
-                                  child: MovieActionButton(
-                                    label: 'Watched',
-                                    icon: Icons.check_rounded,
-                                    backgroundColor: Color(0xFF7A3E07),
-                                    foregroundColor: CineColors.amber,
-                                    trailingIcon: Icons.check_rounded,
-                                  ),
-                                ),
-                                SizedBox(width: CineSpacing.md),
-                                Expanded(
-                                  child: MovieActionButton(
-                                    label: 'List...',
-                                    icon: Icons.add,
-                                    outlined: true,
-                                    trailingIcon: Icons.chevron_right_rounded,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            _ListActionButtons(movie: movie),
                           ],
                         ),
                       ),
@@ -220,6 +181,116 @@ class MovieDetailsScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Action buttons (Favorite, Watchlist, Watched, List...) for the detail screen.
+///
+/// Extracted as a [ConsumerWidget] so [ref.watch] is called directly in its
+/// own [build] method — avoiding the anti-pattern of capturing ref inside a
+/// [Builder] callback of a parent widget.
+///
+/// Each list button:
+/// - Reads membership state reactively from [movieInListProvider].
+/// - Disables tap while the stream is still loading to prevent double-writes.
+/// - Calls [listRepositoryProvider] at tap time (not at build time) to avoid
+///   holding a stale repository reference across rebuilds.
+class _ListActionButtons extends ConsumerWidget {
+  const _ListActionButtons({required this.movie});
+
+  final MoviePoster movie;
+
+  void _toggle(WidgetRef ref, String listId, bool isIn) {
+    final uid = ref.read(authStateProvider).asData?.value?.uid;
+    if (uid == null) return;
+    final repo = ref.read(listRepositoryProvider);
+    if (isIn) {
+      repo.removeMovieFromList(uid: uid, listId: listId, movieId: movie.id);
+    } else {
+      repo.addMovieToList(
+        uid: uid,
+        listId: listId,
+        movieId: movie.id,
+        posterPath: movie.posterPath,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isFavAsync = ref.watch(
+      movieInListProvider((listId: favoritesListId, movieId: movie.id)),
+    );
+    final isWatchlistAsync = ref.watch(
+      movieInListProvider((listId: watchlistListId, movieId: movie.id)),
+    );
+    final isWatchedAsync = ref.watch(
+      movieInListProvider((listId: watchedListId, movieId: movie.id)),
+    );
+
+    final isFav = isFavAsync.asData?.value ?? false;
+    final isWatchlist = isWatchlistAsync.asData?.value ?? false;
+    final isWatched = isWatchedAsync.asData?.value ?? false;
+
+    return Column(
+      children: [
+        Row(
+          children: [
+            Expanded(
+              child: MovieActionButton(
+                label: 'Favorite',
+                icon: Icons.favorite,
+                backgroundColor: isFav ? const Color(0xFFB56610) : null,
+                foregroundColor: isFav ? CineColors.white : CineColors.amber,
+                outlined: !isFav,
+                onTap: isFavAsync.isLoading
+                    ? null
+                    : () => _toggle(ref, favoritesListId, isFav),
+              ),
+            ),
+            const SizedBox(width: CineSpacing.md),
+            Expanded(
+              child: MovieActionButton(
+                label: 'Watchlist',
+                icon: Icons.access_time_rounded,
+                backgroundColor: isWatchlist ? const Color(0xFF5C4B2A) : null,
+                foregroundColor: CineColors.amber,
+                outlined: !isWatchlist,
+                onTap: isWatchlistAsync.isLoading
+                    ? null
+                    : () => _toggle(ref, watchlistListId, isWatchlist),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: CineSpacing.md),
+        Row(
+          children: [
+            Expanded(
+              child: MovieActionButton(
+                label: 'Watched',
+                icon: Icons.visibility_outlined,
+                backgroundColor: isWatched ? const Color(0xFF7A3E07) : null,
+                foregroundColor: CineColors.amber,
+                outlined: !isWatched,
+                onTap: isWatchedAsync.isLoading
+                    ? null
+                    : () => _toggle(ref, watchedListId, isWatched),
+              ),
+            ),
+            const SizedBox(width: CineSpacing.md),
+            const Expanded(
+              child: MovieActionButton(
+                label: 'List...',
+                icon: Icons.add,
+                outlined: true,
+                trailingIcon: Icons.chevron_right_rounded,
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

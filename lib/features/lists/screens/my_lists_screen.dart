@@ -1,9 +1,40 @@
+import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/lists/application/list_providers.dart';
+import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 import 'package:cine_shelf/features/lists/widgets/list_row.dart';
+import 'package:cine_shelf/features/movies/models/movie_list_args.dart';
+import 'package:cine_shelf/router/route_paths.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
+
+void _navigateToList(
+  BuildContext context,
+  WidgetRef ref,
+  String listId,
+  String title,
+) {
+  final uid = ref.read(authStateProvider).asData?.value?.uid;
+  if (uid == null) return;
+  ref
+      .read(listRepositoryProvider)
+      .getListMovies(uid: uid, listId: listId)
+      .then((movies) {
+        if (context.mounted) {
+          context.push(
+            RoutePaths.movies,
+            extra: MovieListArgs(title: title, items: movies, totalPages: 1),
+          );
+        }
+      })
+      .catchError((Object error, StackTrace stack) {
+        debugPrint('_navigateToList [$listId] error: $error\n$stack');
+      });
+}
 
 /// User's personal movie lists screen.
 ///
@@ -15,29 +46,18 @@ import 'package:cine_shelf/shared/widgets/separators.dart';
 ///
 /// 2. My Lists - User-created custom lists (currently placeholder)
 ///
-/// Each list row shows the list name, icon, and current movie count.
-/// Tapping a list navigates to the detailed list view.
-class MyListsScreen extends StatelessWidget {
-  const MyListsScreen({
-    super.key,
-    this.watchedCount = 0,
-    this.watchlistCount = 0,
-    this.favoritesCount = 0,
-    this.onWatchedTap,
-    this.onWatchlistTap,
-    this.onFavoritesTap,
-  });
-
-  final int watchedCount;
-  final int watchlistCount;
-  final int favoritesCount;
-
-  final VoidCallback? onWatchedTap;
-  final VoidCallback? onWatchlistTap;
-  final VoidCallback? onFavoritesTap;
+/// Counts and movie content are observed from Firestore in real time via
+/// Riverpod stream providers. Tapping a list navigates to [MovieListScreen]
+/// in static mode (no infinite scroll) with the current list contents.
+class MyListsScreen extends ConsumerWidget {
+  const MyListsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final watchedCount = ref.watch(watchedCountProvider).asData?.value ?? 0;
+    final watchlistCount = ref.watch(watchlistCountProvider).asData?.value ?? 0;
+    final favoritesCount = ref.watch(favoritesCountProvider).asData?.value ?? 0;
+
     return SingleChildScrollView(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
@@ -59,21 +79,24 @@ class MyListsScreen extends StatelessWidget {
               icon: Icons.visibility_outlined,
               label: 'Watched',
               numMovies: watchedCount,
-              onTap: onWatchedTap,
+              onTap: () =>
+                  _navigateToList(context, ref, watchedListId, 'Watched'),
             ),
             const SizedBox(height: CineSpacing.md),
             ListRow(
-              icon: Icons.bookmark_border,
+              icon: Icons.access_time_rounded,
               label: 'Watchlist',
               numMovies: watchlistCount,
-              onTap: onWatchlistTap,
+              onTap: () =>
+                  _navigateToList(context, ref, watchlistListId, 'Watchlist'),
             ),
             const SizedBox(height: CineSpacing.md),
             ListRow(
               icon: Icons.favorite_border,
               label: 'Favorites',
               numMovies: favoritesCount,
-              onTap: onFavoritesTap,
+              onTap: () =>
+                  _navigateToList(context, ref, favoritesListId, 'Favorites'),
             ),
             const SizedBox(height: CineSpacing.xl),
             const GlowSeparator(),
