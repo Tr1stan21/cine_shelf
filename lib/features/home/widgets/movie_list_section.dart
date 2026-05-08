@@ -1,6 +1,6 @@
 import 'package:cine_shelf/features/movies/models/movie_list_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
-import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
+import 'package:cine_shelf/features/movies/models/movie_query_params.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -24,8 +24,7 @@ class MovieListSection extends StatelessWidget {
     required this.title,
     required this.items,
     required this.totalPages,
-    required this.category,
-    required this.region,
+    this.query,
     super.key,
   });
 
@@ -33,11 +32,8 @@ class MovieListSection extends StatelessWidget {
   final List<MoviePoster> items;
   final int totalPages;
 
-  /// TMDB category — passed through to MovieListScreen to enable infinite scroll.
-  final ListCategory category;
-
-  /// Region snapshot used to keep list pagination on the same region context.
-  final String region;
+  /// Optional explicit query used by MovieListScreen for infinite scroll.
+  final MovieQueryParams? query;
 
   @override
   Widget build(BuildContext context) {
@@ -54,8 +50,7 @@ class MovieListSection extends StatelessWidget {
                 title: title,
                 items: items,
                 totalPages: totalPages,
-                category: category,
-                region: region,
+                query: query,
               ),
             ),
             child: Row(

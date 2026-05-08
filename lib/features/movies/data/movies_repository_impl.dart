@@ -6,6 +6,7 @@ import 'tmdb_remote_data_source.dart';
 import '../models/tmdb/list_category.dart';
 import '../models/movie_detail.dart';
 import '../models/paginated_movies.dart';
+import '../models/movie_discovery_query.dart';
 
 /// Implementation of the movies repository using TMDB as the remote data source.
 ///
@@ -37,8 +38,12 @@ class MoviesRepositoryImpl implements MoviesRepository {
     int page = 1,
     String region = 'US',
   }) async {
-    final dto = await _remote.getMovies(category, page: page, region: region);
-    return dto.results.map((e) => e.toAppModel()).toList();
+    final pageResult = await getMoviesPageByQuery(
+      MovieDiscoveryQuery.category(category),
+      page: page,
+      region: region,
+    );
+    return pageResult.movies;
   }
 
   /// Fetches paginated movies with metadata for infinite scroll.
@@ -50,7 +55,24 @@ class MoviesRepositoryImpl implements MoviesRepository {
     int page = 1,
     String region = 'US',
   }) async {
-    final dto = await _remote.getMovies(category, page: page, region: region);
+    return getMoviesPageByQuery(
+      MovieDiscoveryQuery.category(category),
+      page: page,
+      region: region,
+    );
+  }
+
+  @override
+  Future<PaginatedMoviesPage> getMoviesPageByQuery(
+    MovieDiscoveryQuery query, {
+    int page = 1,
+    String region = 'US',
+  }) async {
+    final dto = await _remote.getMoviesByDiscoveryQuery(
+      query,
+      page: page,
+      region: region,
+    );
     return PaginatedMoviesPage(
       page: dto.page,
       totalPages: dto.totalPages,

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../models/tmdb/category_movies_dto.dart';
 import '../models/tmdb/list_category.dart';
 import '../models/tmdb/movie_detail_dto.dart';
+import '../models/movie_discovery_query.dart';
 
 /// Remote data source for TMDB API integration.
 ///
@@ -55,6 +56,38 @@ class TmdbRemoteDataSource {
       },
     );
     return CategoryMoviesDto.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Fetches paginated movies from TMDB discover endpoint filtered by genre.
+  ///
+  /// Calls GET `/discover/movie` with `with_genres={genreId}`.
+  Future<CategoryMoviesDto> getMoviesByGenre(
+    int genreId, {
+    int page = 1,
+    String region = 'US',
+  }) async {
+    final response = await _dio.get(
+      '/discover/movie',
+      queryParameters: {
+        'with_genres': genreId,
+        'page': page,
+        'region': region.toUpperCase(),
+        'language': _fixedLanguage,
+      },
+    );
+    return CategoryMoviesDto.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Resolves category or genre discovery query to the corresponding TMDB call.
+  Future<CategoryMoviesDto> getMoviesByDiscoveryQuery(
+    MovieDiscoveryQuery query, {
+    int page = 1,
+    String region = 'US',
+  }) {
+    if (query.category != null) {
+      return getMovies(query.category!, page: page, region: region);
+    }
+    return getMoviesByGenre(query.genreId!, page: page, region: region);
   }
 
   /// Fetches detailed information for a specific movie.

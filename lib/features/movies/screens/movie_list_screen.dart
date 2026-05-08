@@ -1,9 +1,7 @@
 import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/features/movies/models/movie_query_params.dart';
-import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:cine_shelf/features/movies/application/paginated_movies_notifier.dart';
-import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -36,8 +34,7 @@ class MovieListScreen extends ConsumerStatefulWidget {
     required this.title,
     required this.initialItems,
     required this.totalPages,
-    this.category,
-    this.region,
+    this.query,
     super.key,
   });
 
@@ -45,11 +42,8 @@ class MovieListScreen extends ConsumerStatefulWidget {
   final List<MoviePoster> initialItems;
   final int totalPages;
 
-  /// When non-null, enables infinite scroll for this category.
-  final ListCategory? category;
-
-  /// Region snapshot for this screen's pagination context.
-  final String? region;
+  /// When non-null, enables infinite scroll for this query.
+  final MovieQueryParams? query;
 
   @override
   ConsumerState<MovieListScreen> createState() => _MovieListScreenState();
@@ -67,18 +61,14 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
   @override
   void initState() {
     super.initState();
-    _queryParams = widget.category == null
-        ? null
-        : MovieQueryParams(
-            category: widget.category!,
-            region: widget.region ?? ref.read(selectedRegionCodeProvider),
-          ).normalized();
+    _queryParams = widget.query?.normalized();
     _scrollController = ScrollController()..addListener(_onScroll);
 
     // Seed the paginated provider with the items already loaded by HomeScreen
     // so the list appears instantly without an extra network round-trip.
     if (_queryParams != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         final notifier = ref.read(
           paginatedMoviesProvider(_queryParams).notifier,
         );
@@ -226,7 +216,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                             const Text(
                               'Failed to load more movies.',
                               style: TextStyle(
-                                color: Color(0xFFEF5350),
+                                color: CineColors.error,
                                 fontSize: 14,
                               ),
                             ),
@@ -305,7 +295,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                   width: 34,
                   height: 34,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF101012),
+                    color: CineColors.surfaceRaised,
                     shape: BoxShape.circle,
                   ),
                   child: const Center(
@@ -336,6 +326,8 @@ class _MoviePosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final posterPath = item.posterPath;
+
     return GestureDetector(
       onTap: () => context.push(
         RoutePaths.movieDetails,
@@ -345,17 +337,29 @@ class _MoviePosterCard extends StatelessWidget {
         aspectRatio: AppConstants.posterAspectRatio,
         child: ClipRRect(
           borderRadius: BorderRadius.circular(CineRadius.md),
-          child: CachedNetworkImage(
-            imageUrl: AppConstants.tmdbPosterUrl(item.posterPath),
-            fit: BoxFit.cover,
-            // Low filter quality reduces GPU cost during fast scrolling
-            // while remaining visually acceptable for poster thumbnails.
-            filterQuality: FilterQuality.low,
-            placeholder: (context, url) =>
-                const Center(child: CircularProgressIndicator()),
-            errorWidget: (context, url, error) =>
-                const Icon(Icons.error_outline, color: Colors.grey),
-          ),
+          child: posterPath == null
+              ? const ColoredBox(
+                  color: CineColors.surfaceRaised,
+                  child: Center(
+                    child: Icon(Icons.image_not_supported_outlined),
+                  ),
+                )
+              : CachedNetworkImage(
+                  imageUrl: AppConstants.tmdbPosterUrl(posterPath),
+                  fit: BoxFit.cover,
+                  // Low filter quality reduces GPU cost during fast scrolling
+                  // while remaining visually acceptable for poster thumbnails.
+                  filterQuality: FilterQuality.low,
+                  placeholder: (context, url) => const Center(
+                    child: SizedBox(
+                      width: CineSizes.loaderSmall,
+                      height: CineSizes.loaderSmall,
+                      child: CircularProgressIndicator(),
+                    ),
+                  ),
+                  errorWidget: (context, url, error) =>
+                      const Icon(Icons.error_outline, color: Colors.grey),
+                ),
         ),
       ),
     );

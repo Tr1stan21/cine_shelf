@@ -17,6 +17,12 @@ abstract class CineColors {
   static const Color textLight = Color(0xFFD6D1CD);
   static const Color textHint = Color(0x99FFFFFF);
 
+  // States
+  static const Color error = Color(0xFFEF5350);
+
+  // Surfaces
+  static const Color surfaceRaised = Color(0xFF101012);
+
   // Other
   static const Color white = Color(0xFFFFFFFF);
   static const Color black = Color(0xFF000000);

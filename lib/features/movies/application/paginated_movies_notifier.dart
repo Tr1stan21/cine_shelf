@@ -155,8 +155,8 @@ class PaginatedMoviesNotifier extends Notifier<PaginatedMoviesState> {
 
     state = state.copyWith(isLoadingInitial: true, clearError: true);
     try {
-      final dto = await _repository.getMoviesPage(
-        _queryParams.category,
+      final dto = await _repository.getMoviesPageByQuery(
+        _queryParams.discoveryQuery,
         page: 1,
         region: _queryParams.region,
       );
@@ -195,8 +195,8 @@ class PaginatedMoviesNotifier extends Notifier<PaginatedMoviesState> {
 
     try {
       final nextPage = state.currentPage + 1;
-      final dto = await _repository.getMoviesPage(
-        _queryParams.category,
+      final dto = await _repository.getMoviesPageByQuery(
+        _queryParams.discoveryQuery,
         page: nextPage,
         region: _queryParams.region,
       );

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../movies/models/movie_discovery_query.dart';
 import '../../movies/models/movie_query_params.dart';
 import '../../movies/models/tmdb/list_category.dart';
 import '../data/drift_region_preferences_repository.dart';
@@ -46,6 +47,18 @@ final movieQueryParamsByCategoryProvider =
       final region = ref.watch(selectedRegionCodeProvider);
       return MovieQueryParams(category: category, region: region).normalized();
     });
+
+/// Derived provider that builds the composite query key from genre + region.
+final movieQueryParamsByGenreProvider = Provider.family<MovieQueryParams, int>((
+  ref,
+  genreId,
+) {
+  final region = ref.watch(selectedRegionCodeProvider);
+  return MovieQueryParams.discovery(
+    discoveryQuery: MovieDiscoveryQuery.genre(genreId),
+    region: region,
+  ).normalized();
+});
 
 /// Async notifier that owns the selected region preference lifecycle.
 ///
