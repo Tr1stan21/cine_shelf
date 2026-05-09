@@ -190,18 +190,39 @@ class _ListActionButtons extends ConsumerWidget {
 
   final MoviePoster movie;
 
-  void _toggle(WidgetRef ref, String listId, bool isIn) {
+  Future<void> _toggle(
+    BuildContext context,
+    WidgetRef ref,
+    String listId,
+    bool isIn,
+  ) async {
     final uid = ref.read(authStateProvider).asData?.value?.uid;
     if (uid == null) return;
+
     final repo = ref.read(listRepositoryProvider);
-    if (isIn) {
-      repo.removeMovieFromList(uid: uid, listId: listId, movieId: movie.id);
-    } else {
-      repo.addMovieToList(
-        uid: uid,
-        listId: listId,
-        movieId: movie.id,
-        posterPath: movie.posterPath,
+
+    try {
+      if (isIn) {
+        await repo.removeMovieFromList(
+          uid: uid,
+          listId: listId,
+          movieId: movie.id,
+        );
+      } else {
+        await repo.addMovieToList(
+          uid: uid,
+          listId: listId,
+          movieId: movie.id,
+          posterPath: movie.posterPath,
+        );
+      }
+    } catch (_) {
+      if (!context.mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Could not update the list. Please try again.'),
+        ),
       );
     }
   }
@@ -235,7 +256,7 @@ class _ListActionButtons extends ConsumerWidget {
                 outlined: !isFav,
                 onTap: isFavAsync.isLoading
                     ? null
-                    : () => _toggle(ref, favoritesListId, isFav),
+                    : () => _toggle(context, ref, favoritesListId, isFav),
               ),
             ),
             const SizedBox(width: CineSpacing.md),
@@ -248,7 +269,7 @@ class _ListActionButtons extends ConsumerWidget {
                 outlined: !isWatchlist,
                 onTap: isWatchlistAsync.isLoading
                     ? null
-                    : () => _toggle(ref, watchlistListId, isWatchlist),
+                    : () => _toggle(context, ref, watchlistListId, isFav),
               ),
             ),
           ],
@@ -265,7 +286,7 @@ class _ListActionButtons extends ConsumerWidget {
                 outlined: !isWatched,
                 onTap: isWatchedAsync.isLoading
                     ? null
-                    : () => _toggle(ref, watchedListId, isWatched),
+                    : () => _toggle(context, ref, watchedListId, isFav),
               ),
             ),
             const SizedBox(width: CineSpacing.md),

@@ -12,6 +12,7 @@ import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/router/route_paths.dart';
+import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 
 /// User profile and account management screen.
 ///
@@ -53,9 +54,9 @@ class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userDocument = ref.watch(currentUserProvider);
-    final watchedCount = ref.watch(watchedCountProvider);
-    final watchlistCount = ref.watch(watchlistCountProvider);
-    final favoritesCount = ref.watch(favoritesCountProvider);
+    final watchedCount = ref.watch(listCountProvider(watchedListId));
+    final watchlistCount = ref.watch(listCountProvider(watchlistListId));
+    final favoritesCount = ref.watch(listCountProvider(favoritesListId));
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),

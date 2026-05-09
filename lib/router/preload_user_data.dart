@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
+import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 
 /// Preloads all user-related data and waits for completion.
 ///
@@ -17,8 +18,8 @@ import 'package:cine_shelf/features/lists/application/list_providers.dart';
 Future<void> preloadUserData(Ref ref) async {
   await Future.wait([
     ref.refresh(currentUserProvider.future),
-    ref.refresh(watchedCountProvider.future),
-    ref.refresh(watchlistCountProvider.future),
-    ref.refresh(favoritesCountProvider.future),
+    ref.refresh(listCountProvider(watchedListId).future),
+    ref.refresh(listCountProvider(watchlistListId).future),
+    ref.refresh(listCountProvider(favoritesListId).future),
   ]);
 }

@@ -7,6 +7,7 @@ import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/shared/widgets/bottom_nav.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
+import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 
 /// Navigation shell wrapper for tab-based navigation.
 ///
@@ -79,9 +80,9 @@ class _UserPreloadWatcher extends ConsumerWidget {
         // open. The return value is intentionally discarded — this widget
         // renders nothing; it exists purely as a keep-alive mechanism.
         ref.watch(currentUserProvider);
-        ref.watch(watchedCountProvider);
-        ref.watch(watchlistCountProvider);
-        ref.watch(favoritesCountProvider);
+        ref.watch(listCountProvider(watchedListId));
+        ref.watch(listCountProvider(watchlistListId));
+        ref.watch(listCountProvider(favoritesListId));
 
         return const SizedBox.shrink();
       },

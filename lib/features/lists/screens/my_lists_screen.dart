@@ -12,28 +12,37 @@ import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 
-void _navigateToList(
+Future<void> _navigateToList(
   BuildContext context,
   WidgetRef ref,
   String listId,
   String title,
-) {
+) async {
   final uid = ref.read(authStateProvider).asData?.value?.uid;
   if (uid == null) return;
-  ref
-      .read(listRepositoryProvider)
-      .getListMovies(uid: uid, listId: listId)
-      .then((movies) {
-        if (context.mounted) {
-          context.push(
-            RoutePaths.movies,
-            extra: MovieListArgs(title: title, items: movies, totalPages: 1),
-          );
-        }
-      })
-      .catchError((Object error, StackTrace stack) {
-        debugPrint('_navigateToList [$listId] error: $error\n$stack');
-      });
+
+  try {
+    final movies = await ref
+        .read(listRepositoryProvider)
+        .getListMovies(uid: uid, listId: listId);
+
+    if (!context.mounted) return;
+
+    context.push(
+      RoutePaths.movies,
+      extra: MovieListArgs(title: title, items: movies, totalPages: 1),
+    );
+  } catch (error, stackTrace) {
+    debugPrint('_navigateToList [$listId] error: $error\n$stackTrace');
+
+    if (!context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Could not open this list. Please try again.'),
+      ),
+    );
+  }
 }
 
 /// User's personal movie lists screen.
@@ -54,9 +63,14 @@ class MyListsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final watchedCount = ref.watch(watchedCountProvider).asData?.value ?? 0;
-    final watchlistCount = ref.watch(watchlistCountProvider).asData?.value ?? 0;
-    final favoritesCount = ref.watch(favoritesCountProvider).asData?.value ?? 0;
+    final watchedCount =
+        ref.watch(listCountProvider(watchedListId)).asData?.value ?? 0;
+
+    final watchlistCount =
+        ref.watch(listCountProvider(watchlistListId)).asData?.value ?? 0;
+
+    final favoritesCount =
+        ref.watch(listCountProvider(favoritesListId)).asData?.value ?? 0;
 
     return SingleChildScrollView(
       child: Padding(

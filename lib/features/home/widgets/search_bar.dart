@@ -11,11 +11,17 @@ class CineSearchBar extends StatelessWidget {
     this.controller,
     this.onChanged,
     this.onSubmitted,
+    this.onTap,
+    this.readOnly = false,
+    this.autofocus = false,
   });
 
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
+  final VoidCallback? onTap;
+  final bool readOnly;
+  final bool autofocus;
 
   static const String _searchHint = 'Search movies...';
 
@@ -37,6 +43,9 @@ class CineSearchBar extends StatelessWidget {
             controller: controller,
             onChanged: onChanged,
             onSubmitted: onSubmitted,
+            onTap: onTap,
+            readOnly: readOnly,
+            autofocus: autofocus,
             textAlignVertical: TextAlignVertical.center,
             style: CineTypography.bodyMedium,
             decoration: const InputDecoration(
