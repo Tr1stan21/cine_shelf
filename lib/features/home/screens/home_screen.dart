@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
-import 'package:cine_shelf/features/home/application/home_random_genre_sections_provider.dart';
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
 import 'package:cine_shelf/features/home/widgets/search_bar.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/movie_genres_catalog.dart';
@@ -29,8 +28,6 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final randomGenres = ref.watch(homeRandomGenreSectionsProvider);
-
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -53,28 +50,8 @@ class HomeScreen extends ConsumerWidget {
             category: ListCategory.topRated,
             title: 'Top Rated',
           ),
-          ...randomGenres.when(
-            data: (genres) => [
-              for (final genre in genres) ...[
-                const GlowSeparator(),
-                _GenreMovieSection(genre: genre),
-              ],
-            ],
-            loading: () => const [
-              GlowSeparator(),
-              Padding(
-                padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
-                child: Center(child: CircularProgressIndicator()),
-              ),
-            ],
-            error: (_, _) => [
-              const GlowSeparator(),
-              _SectionErrorPlaceholder(
-                sectionTitle: 'genre sections',
-                onRetry: () => ref.invalidate(homeRandomGenreSectionsProvider),
-              ),
-            ],
-          ),
+          const _GenreMovieSection(genreId: 878, title: 'Science Fiction'),
+          const _GenreMovieSection(genreId: 878, title: 'Science Fiction'),
         ],
       ),
     );
@@ -128,102 +105,30 @@ class _MovieSection extends ConsumerWidget {
 }
 
 class _GenreMovieSection extends ConsumerWidget {
-  const _GenreMovieSection({required this.genre});
+  const _GenreMovieSection({required this.genreId, required this.title});
 
-  final MovieGenre genre;
+  final int genreId;
+  final String title;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final query = ref.watch(movieQueryParamsByGenreProvider(genre.id));
+    final query = ref.watch(movieQueryParamsByGenreProvider(genreId));
     final asyncMovies = ref.watch(moviesProvider(query));
 
     return asyncMovies.when(
-      data: (page) {
-        if (page.movies.isEmpty) {
-          return _SectionEmptyPlaceholder(
-            sectionTitle: genre.name,
-            onTryAnother: () {
-              ref.invalidate(homeRandomGenreSectionsProvider);
-            },
-          );
-        }
-        return MovieListSection(
-          title: genre.name,
-          items: page.movies,
-          totalPages: page.totalPages,
-          query: query,
-        );
-      },
+      data: (page) => MovieListSection(
+        title: title,
+        items: page.movies,
+        totalPages: page.totalPages,
+        query: query,
+      ),
       loading: () => const Padding(
         padding: EdgeInsets.symmetric(vertical: CineSpacing.xxxl),
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (_, _) => _SectionErrorPlaceholder(
-        sectionTitle: genre.name,
-        onRetry: () {
-          ref.invalidate(moviesProvider(query));
-        },
-      ),
-    );
-  }
-}
-
-class _SectionEmptyPlaceholder extends StatelessWidget {
-  const _SectionEmptyPlaceholder({
-    required this.sectionTitle,
-    required this.onTryAnother,
-  });
-
-  final String sectionTitle;
-  final VoidCallback onTryAnother;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: CineSpacing.xxl,
-        vertical: CineSpacing.xxxl,
-      ),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 560),
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(CineSpacing.xxl),
-            decoration: BoxDecoration(
-              color: CineColors.black,
-              borderRadius: BorderRadius.circular(CineRadius.md),
-              border: Border.all(color: CineColors.textHint),
-            ),
-            child: Column(
-              children: [
-                const Icon(
-                  Icons.movie_filter_outlined,
-                  color: CineColors.amber,
-                ),
-                const SizedBox(height: CineSpacing.md),
-                Text(
-                  'No movies available for $sectionTitle in your region.',
-                  textAlign: TextAlign.center,
-                  style: CineTypography.bodyMedium,
-                ),
-                const SizedBox(height: CineSpacing.lg),
-                OutlinedButton(
-                  onPressed: onTryAnother,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: CineColors.amber,
-                    side: const BorderSide(color: CineColors.amber),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: CineSpacing.xxl,
-                      vertical: CineSpacing.md,
-                    ),
-                  ),
-                  child: const Text('Try other genres'),
-                ),
-              ],
-            ),
-          ),
-        ),
+        sectionTitle: title,
+        onRetry: () => ref.invalidate(moviesProvider(query)),
       ),
     );
   }

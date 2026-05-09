@@ -7,17 +7,17 @@ import 'movie_discovery_query.dart';
 /// to isolate results by both discovery query and region.
 class MovieQueryParams {
   /// Backward-compatible constructor for category-based queries.
-  const MovieQueryParams({required ListCategory category, required this.region})
+  MovieQueryParams({required ListCategory category, required this.region})
     : discoveryQuery = MovieDiscoveryQuery.category(category),
       assert(region.length == 2, 'Region must be an ISO-3166 alpha-2 code.');
 
   /// Constructor for any supported discovery query (category or genre).
-  const MovieQueryParams.discovery({
+  MovieQueryParams.discovery({
     required this.discoveryQuery,
     required this.region,
   }) : assert(region.length == 2, 'Region must be an ISO-3166 alpha-2 code.');
 
-  final MovieDiscoveryQuery discoveryQuery;
+  MovieDiscoveryQuery discoveryQuery;
   final String region;
 
   /// Legacy getter kept while category-only call sites are migrated.
