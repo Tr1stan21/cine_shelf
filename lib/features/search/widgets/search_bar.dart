@@ -11,7 +11,6 @@ class CineSearchBar extends StatelessWidget {
     this.controller,
     this.onChanged,
     this.onSubmitted,
-    this.onTap,
     this.readOnly = false,
     this.autofocus = false,
   });
@@ -19,7 +18,6 @@ class CineSearchBar extends StatelessWidget {
   final TextEditingController? controller;
   final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onSubmitted;
-  final VoidCallback? onTap;
   final bool readOnly;
   final bool autofocus;
 
@@ -43,7 +41,6 @@ class CineSearchBar extends StatelessWidget {
             controller: controller,
             onChanged: onChanged,
             onSubmitted: onSubmitted,
-            onTap: onTap,
             readOnly: readOnly,
             autofocus: autofocus,
             textAlignVertical: TextAlignVertical.center,

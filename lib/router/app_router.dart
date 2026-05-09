@@ -16,6 +16,7 @@ import 'package:cine_shelf/features/auth/screens/sign_up_screen.dart';
 import 'package:cine_shelf/features/home/screens/home_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_details_screen.dart';
 import 'package:cine_shelf/features/movies/screens/movie_list_screen.dart';
+import 'package:cine_shelf/features/search/screens/movie_search_screen.dart';
 import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/features/credits/screens/credits.dart';
@@ -32,7 +33,7 @@ import 'package:cine_shelf/router/shell.dart';
 /// Route structure:
 /// - `/` - Splash screen (initial route, router decides redirect)
 /// - `/login`, `/sign-up` - Authentication screens (blocked when authenticated)
-/// - `/home`, `/mylists`, `/account` - Tab-based protected routes
+/// - `/home`, `/mylists`, `/search`, `/account` - Tab-based protected routes
 /// - `/movies`, `/movies/details` - Full-screen protected routes
 class AppRouter {
   AppRouter._();
@@ -45,6 +46,8 @@ class AppRouter {
       GlobalKey<NavigatorState>(debugLabel: 'homeTab');
   static final GlobalKey<NavigatorState> _myListsTabKey =
       GlobalKey<NavigatorState>(debugLabel: 'myListsTab');
+  static final GlobalKey<NavigatorState> _searchTabKey =
+      GlobalKey<NavigatorState>(debugLabel: 'searchTab');
   static final GlobalKey<NavigatorState> _accountTabKey =
       GlobalKey<NavigatorState>(debugLabel: 'accountTab');
 
@@ -100,6 +103,16 @@ class AppRouter {
                   path: RoutePaths.myLists,
                   pageBuilder: (context, state) =>
                       const NoTransitionPage(child: MyListsScreen()),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              navigatorKey: _searchTabKey,
+              routes: <RouteBase>[
+                GoRoute(
+                  path: RoutePaths.search,
+                  pageBuilder: (context, state) =>
+                      const NoTransitionPage(child: MovieSearchScreen()),
                 ),
               ],
             ),

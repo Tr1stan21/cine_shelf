@@ -1,12 +1,13 @@
 import 'movies_repository.dart';
-import '../models/movie_poster.dart';
 import '../mappers/movie_poster_dto_mapper.dart';
+import '../mappers/movie_search_dto_mapper.dart';
 import '../mappers/movie_detail_dto_mapper.dart';
 import 'tmdb_remote_data_source.dart';
 import '../models/tmdb/list_category.dart';
 import '../models/movie_detail.dart';
 import '../models/paginated_movies.dart';
 import '../models/movie_discovery_query.dart';
+import '../models/paginated_movie_search_results.dart';
 
 /// Implementation of the movies repository using TMDB as the remote data source.
 ///
@@ -60,6 +61,20 @@ class MoviesRepositoryImpl implements MoviesRepository {
       totalPages: dto.totalPages,
       movies: dto.results.map((e) => e.toAppModel()).toList(),
     );
+  }
+
+  @override
+  Future<PaginatedMovieSearchResults> searchMovies({
+    required String query,
+    int page = 1,
+    String region = 'US',
+  }) async {
+    final dto = await _remote.searchMovies(
+      query: query,
+      page: page,
+      region: region,
+    );
+    return dto.toAppModel();
   }
 
   /// Fetches detailed information for a specific movie.

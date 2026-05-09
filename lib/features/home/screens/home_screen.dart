@@ -1,11 +1,8 @@
 import 'package:cine_shelf/features/home/widgets/movies_section.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
-import 'package:cine_shelf/router/route_paths.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
-import 'package:cine_shelf/features/home/widgets/search_bar.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 
@@ -31,10 +28,6 @@ class HomeScreen extends ConsumerWidget {
         children: [
           Image.asset(AppConstants.logoPath, height: 100),
           const SizedBox(height: 20),
-          CineSearchBar(
-            readOnly: true,
-            onTap: () => context.push(RoutePaths.search),
-          ),
           const MovieSection(category: ListCategory.popular, title: 'Popular'),
           const GlowSeparator(),
           const MovieSection(

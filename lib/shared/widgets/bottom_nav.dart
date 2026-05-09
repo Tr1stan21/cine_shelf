@@ -5,19 +5,15 @@ import 'package:cine_shelf/shared/config/theme.dart';
 
 /// Custom bottom navigation bar for main app tabs.
 ///
-/// Displays three navigation items:
+/// Displays four navigation items:
 /// - Home: Browse and discover movies
-/// - My Lists: Access user's collections (disabled — see note below)
+/// - My Lists: Access user's collections
+/// - Search: Find movies by title
 /// - Account: Profile and settings
 ///
 /// Integrates with GoRouter's [StatefulNavigationShell] for
 /// persistent tab state and independent navigation stacks.
 ///
-/// **Note on My Lists tab:**
-/// The My Lists tab item is currently not rendered in the bar even though
-/// its branch is registered in the router and [MyListsScreen] is fully
-/// implemented. It is hidden until list management actions (add/remove movies)
-/// are complete. Re-enable by uncommenting the corresponding [_BottomNavItem].
 class BottomNavBar extends StatelessWidget {
   const BottomNavBar({required this.navigationShell, super.key});
 
@@ -63,9 +59,15 @@ class BottomNavBar extends StatelessWidget {
             ),
             _BottomNavItem(
               selected: index == 2,
+              icon: Icons.search_rounded,
+              label: 'Search',
+              onTap: () => _onTap(2),
+            ),
+            _BottomNavItem(
+              selected: index == 3,
               icon: Icons.person_rounded,
               label: 'Account',
-              onTap: () => _onTap(2),
+              onTap: () => _onTap(3),
             ),
           ],
         ),

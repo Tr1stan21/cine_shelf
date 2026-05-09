@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import '../models/tmdb/category_movies_dto.dart';
 import '../models/tmdb/list_category.dart';
 import '../models/tmdb/movie_detail_dto.dart';
+import '../models/tmdb/search_movies_dto.dart';
 import '../models/movie_discovery_query.dart';
 
 /// Remote data source for TMDB API integration.
@@ -88,6 +89,25 @@ class TmdbRemoteDataSource {
       return getMovies(query.category!, page: page, region: region);
     }
     return getMoviesByGenre(query.genreId!, page: page, region: region);
+  }
+
+  /// Searches movies by title using TMDB `/search/movie`.
+  Future<SearchMoviesDto> searchMovies({
+    required String query,
+    int page = 1,
+    String region = 'US',
+  }) async {
+    final response = await _dio.get(
+      '/search/movie',
+      queryParameters: {
+        'query': query,
+        'page': page,
+        'include_adult': false,
+        'region': region.toUpperCase(),
+        'language': _fixedLanguage,
+      },
+    );
+    return SearchMoviesDto.fromJson(response.data as Map<String, dynamic>);
   }
 
   /// Fetches detailed information for a specific movie.

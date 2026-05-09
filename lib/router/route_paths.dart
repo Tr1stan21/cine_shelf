@@ -5,7 +5,8 @@
 ///
 /// **Route groups:**
 /// - Public: [splash], [login], [signUp] — accessible without authentication.
-/// - Protected: [home], [myLists], [account], [movies], [movieDetails], [credits]
+/// - Protected: [home], [myLists], [account], [movies], [search],
+///   [movieDetails], [credits]
 ///   — redirect to [login] when the user is not authenticated.
 ///
 /// Use [isProtectedRoute] to check membership at runtime (e.g., in redirect logic).
@@ -39,6 +40,9 @@ class RoutePaths {
   /// Full-screen movie grid list (supports infinite scroll).
   static const String movies = '/movies';
 
+  /// Dedicated movie search screen.
+  static const String search = '/search';
+
   /// Movie detail screen (poster, overview, genres).
   static const String movieDetails = '/movies/details';
 
@@ -55,6 +59,7 @@ class RoutePaths {
     myLists,
     account,
     movies,
+    search,
     credits,
   ];
 
