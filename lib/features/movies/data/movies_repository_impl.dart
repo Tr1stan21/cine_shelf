@@ -28,24 +28,6 @@ class MoviesRepositoryImpl implements MoviesRepository {
   /// - [_remote]: TmdbRemoteDataSource for API calls
   MoviesRepositoryImpl(this._remote);
 
-  /// Fetches a flat list of movies for the given category.
-  ///
-  /// Each poster DTO is mapped to [MoviePoster] app model.
-  /// Does not include pagination metadata.
-  @override
-  Future<List<MoviePoster>> getMovies(
-    ListCategory category, {
-    int page = 1,
-    String region = 'US',
-  }) async {
-    final pageResult = await getMoviesPageByQuery(
-      MovieDiscoveryQuery.category(category),
-      page: page,
-      region: region,
-    );
-    return pageResult.movies;
-  }
-
   /// Fetches paginated movies with metadata for infinite scroll.
   ///
   /// Returns [PaginatedMoviesPage] containing the movie list and pagination info.

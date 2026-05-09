@@ -52,133 +52,122 @@ class MovieDetailsScreen extends ConsumerWidget {
     final panelHeight = size.height * 0.44;
 
     return Scaffold(
-      //Eliminar container
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(AppConstants.backgroundPath),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: detailAsync.when(
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (error, stack) => Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                const SizedBox(height: 16),
-                Text(
-                  'Error al cargar detalles',
-                  style: CineTypography.bodyMedium.copyWith(color: Colors.grey),
-                ),
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: () => context.pop(),
-                  child: const Text('Volver'),
-                ),
-              ],
-            ),
-          ),
-          data: (detail) => Stack(
+      body: detailAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (error, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SingleChildScrollView(
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: size.height - panelHeight + overlap,
-                      width: double.infinity,
-                      child: CachedNetworkImage(
-                        imageUrl: detail.posterUrl,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            const Center(child: CircularProgressIndicator()),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error_outline, color: Colors.grey),
-                      ),
-                    ),
-                    SafeArea(
-                      top: false,
-                      child: Container(
-                        padding: const EdgeInsets.all(CineSpacing.xl),
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(AppConstants.backgroundPath),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 2),
-                            Text(detail.title, style: CineTypography.headline1),
-                            const SizedBox(height: CineSpacing.sm),
-                            Text.rich(
-                              TextSpan(
-                                children: [
-                                  TextSpan(
-                                    text: detail.year,
-                                    style: const TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                      color: CineColors.amber,
-                                    ),
-                                  ),
-                                  if (detail.genres.isNotEmpty)
-                                    TextSpan(
-                                      text: '  |  ${detail.genres.join(', ')}',
-                                      style: const TextStyle(
-                                        color: CineColors.textSecondary,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: CineSpacing.lg),
-                            Text(
-                              detail.overview,
-                              style: const TextStyle(
-                                fontSize: 14,
-                                height: 1.35,
-                                color: CineColors.textLight,
-                              ),
-                            ),
-                            const SizedBox(height: CineSpacing.lg),
-                            Row(
-                              children: List.generate(
-                                _maxStars,
-                                (_) => const Padding(
-                                  padding: EdgeInsets.only(right: 6),
-                                  child: Icon(
-                                    Icons.star,
-                                    size: 22,
-                                    color: CineColors.amber,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: CineSpacing.xxxl),
-                            _ListActionButtons(movie: movie),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              const Icon(Icons.error_outline, size: 64, color: Colors.grey),
+              const SizedBox(height: 16),
+              Text(
+                'Error al cargar detalles',
+                style: CineTypography.bodyMedium.copyWith(color: Colors.grey),
               ),
-              // Back button floated over the poster in the top-left safe area.
-              const SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.all(16.0),
-                  child: CineBackButton(),
-                ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => context.pop(),
+                child: const Text('Volver'),
               ),
             ],
           ),
+        ),
+        data: (detail) => Stack(
+          children: [
+            SingleChildScrollView(
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: size.height - panelHeight + overlap,
+                    width: double.infinity,
+                    child: CachedNetworkImage(
+                      imageUrl: detail.posterUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          const Center(child: CircularProgressIndicator()),
+                      errorWidget: (context, url, error) =>
+                          const Icon(Icons.error_outline, color: Colors.grey),
+                    ),
+                  ),
+                  SafeArea(
+                    top: false,
+                    child: Container(
+                      padding: const EdgeInsets.all(CineSpacing.xl),
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage(AppConstants.backgroundPath),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 2),
+                          Text(detail.title, style: CineTypography.headline1),
+                          const SizedBox(height: CineSpacing.sm),
+                          Text.rich(
+                            TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: detail.year,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w500,
+                                    color: CineColors.amber,
+                                  ),
+                                ),
+                                if (detail.genres.isNotEmpty)
+                                  TextSpan(
+                                    text: '  |  ${detail.genres.join(', ')}',
+                                    style: const TextStyle(
+                                      color: CineColors.textSecondary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: CineSpacing.lg),
+                          Text(
+                            detail.overview,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              height: 1.35,
+                              color: CineColors.textLight,
+                            ),
+                          ),
+                          const SizedBox(height: CineSpacing.lg),
+                          Row(
+                            children: List.generate(
+                              _maxStars,
+                              (_) => const Padding(
+                                padding: EdgeInsets.only(right: 6),
+                                child: Icon(
+                                  Icons.star,
+                                  size: 22,
+                                  color: CineColors.amber,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: CineSpacing.xxxl),
+                          _ListActionButtons(movie: movie),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Back button floated over the poster in the top-left safe area.
+            const SafeArea(
+              child: Padding(
+                padding: EdgeInsets.all(16.0),
+                child: CineBackButton(),
+              ),
+            ),
+          ],
         ),
       ),
     );

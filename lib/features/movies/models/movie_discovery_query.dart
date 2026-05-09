@@ -6,15 +6,13 @@ import 'tmdb/list_category.dart';
 /// (e.g. popular, top_rated) or discover-by-genre.
 class MovieDiscoveryQuery {
   /// Query variant for `/movie/{category}` endpoints.
-  const MovieDiscoveryQuery.category(ListCategory category)
-    : category = category,
-      genreId = null;
+  const MovieDiscoveryQuery.category(ListCategory this.category)
+    : genreId = null;
 
   /// Query variant for `/discover/movie?with_genres={genreId}`.
-  const MovieDiscoveryQuery.genre(int genreId)
+  const MovieDiscoveryQuery.genre(int this.genreId)
     : assert(genreId > 0, 'Genre id must be positive.'),
-      category = null,
-      genreId = genreId;
+      category = null;
 
   final ListCategory? category;
   final int? genreId;

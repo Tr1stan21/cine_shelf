@@ -23,7 +23,7 @@ service cloud.firestore {
       allow create, update: if request.auth.uid == uid
           && request.resource.data.keys().hasAll(['movieId', 'posterPath', 'addedAt'])
           && request.resource.data.movieId is int
-          && request.resource.data.addedAt == request.time;
+          && request.resource.data.addedAt == FieldValue.serverTimestamp();
       allow delete: if request.auth.uid == uid;
     }
 

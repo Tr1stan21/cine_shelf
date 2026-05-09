@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/features/home/application/genre_session_provider.dart';
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
 import 'package:cine_shelf/features/home/widgets/search_bar.dart';
-import 'package:cine_shelf/features/movies/models/tmdb/movie_genres_catalog.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 import 'package:cine_shelf/features/movies/application/movies_provider.dart';
@@ -41,17 +41,21 @@ class HomeScreen extends ConsumerWidget {
             title: 'Now Playing',
           ),
           const GlowSeparator(),
+          const _GenreMovieSection(index: 0),
+          const GlowSeparator(),
           const _MovieSection(
             category: ListCategory.upcoming,
             title: 'Upcoming',
           ),
           const GlowSeparator(),
+          const _GenreMovieSection(index: 1),
+          const GlowSeparator(),
           const _MovieSection(
             category: ListCategory.topRated,
             title: 'Top Rated',
           ),
-          const _GenreMovieSection(genreId: 878, title: 'Science Fiction'),
-          const _GenreMovieSection(genreId: 878, title: 'Science Fiction'),
+          const GlowSeparator(),
+          const _GenreMovieSection(index: 2),
         ],
       ),
     );
@@ -105,19 +109,20 @@ class _MovieSection extends ConsumerWidget {
 }
 
 class _GenreMovieSection extends ConsumerWidget {
-  const _GenreMovieSection({required this.genreId, required this.title});
+  const _GenreMovieSection({required this.index}) : assert(index >= 0);
 
-  final int genreId;
-  final String title;
+  final int index;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final query = ref.watch(movieQueryParamsByGenreProvider(genreId));
+    final genres = ref.watch(genreSessionProvider);
+    final genre = genres[index];
+    final query = ref.watch(movieQueryParamsByGenreProvider(genre.id));
     final asyncMovies = ref.watch(moviesProvider(query));
 
     return asyncMovies.when(
       data: (page) => MovieListSection(
-        title: title,
+        title: genre.name,
         items: page.movies,
         totalPages: page.totalPages,
         query: query,
@@ -127,7 +132,7 @@ class _GenreMovieSection extends ConsumerWidget {
         child: Center(child: CircularProgressIndicator()),
       ),
       error: (_, _) => _SectionErrorPlaceholder(
-        sectionTitle: title,
+        sectionTitle: genre.name,
         onRetry: () => ref.invalidate(moviesProvider(query)),
       ),
     );
