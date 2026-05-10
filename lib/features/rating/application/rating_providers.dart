@@ -5,11 +5,18 @@ import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/rating/data/rating_repository.dart';
 import 'package:cine_shelf/features/rating/data/rating_repository_impl.dart';
 
+/// Provides the [RatingRepository] implementation backed by Firestore.
 final ratingRepositoryProvider = Provider<RatingRepository>((ref) {
   return FirestoreRatingRepository(ref.watch(firebaseFirestoreProvider));
 });
 
-final ratingStreamProvider = StreamProvider.autoDispose.family<double?, int>((
+/// Reactive stream of the current user's rating for a given movie.
+///
+/// Emits [null] when the movie has not been rated yet, or when the user
+/// is not authenticated. Emits the stored star value otherwise.
+///
+/// Parametrized by TMDB movie ID.
+final movieRatingProvider = StreamProvider.autoDispose.family<double?, int>((
   ref,
   movieId,
 ) {
@@ -17,22 +24,25 @@ final ratingStreamProvider = StreamProvider.autoDispose.family<double?, int>((
 
   return authState.when(
     data: (user) {
-      if (user == null) return Stream<double?>.value(null);
-
+      if (user == null) return Stream.value(null);
       return _watchRatingSafely(
         ref.watch(ratingRepositoryProvider),
         uid: user.uid,
         movieId: movieId,
       );
     },
-    loading: () => Stream<double?>.value(null),
+    loading: () => Stream.value(null),
     error: (error, stackTrace) {
-      debugPrint('RATING AUTH PROVIDER ERROR: $error\n$stackTrace');
-      return Stream<double?>.value(null);
+      debugPrint('MOVIE RATING PROVIDER ERROR: $error\n$stackTrace');
+      return Stream.value(null);
     },
   );
 });
 
+/// Wraps the repository stream to swallow errors without crashing the UI.
+///
+/// Yields [null] on error so the widget degrades gracefully to an empty
+/// star state rather than propagating the error up to the screen.
 Stream<double?> _watchRatingSafely(
   RatingRepository repository, {
   required String uid,
@@ -41,29 +51,7 @@ Stream<double?> _watchRatingSafely(
   try {
     yield* repository.watchRating(uid: uid, movieId: movieId);
   } catch (error, stackTrace) {
-    debugPrint('MOVIE RATING PROVIDER ERROR: $error\n$stackTrace');
+    debugPrint('RATING STREAM ERROR: $error\n$stackTrace');
     yield null;
   }
 }
-
-class RatingNotifier extends Notifier<AsyncValue<double?>> {
-  RatingNotifier(this._movieId);
-
-  final int _movieId;
-
-  @override
-  AsyncValue<double?> build() {
-    return ref.watch(ratingStreamProvider(_movieId));
-  }
-
-  void setOptimistic(double? stars) {
-    state = AsyncData(stars);
-  }
-
-  void rollback(AsyncValue<double?> previous) {
-    state = previous;
-  }
-}
-
-final movieRatingProvider = NotifierProvider.autoDispose
-    .family<RatingNotifier, AsyncValue<double?>, int>(RatingNotifier.new);

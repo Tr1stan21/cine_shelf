@@ -12,6 +12,9 @@ import 'package:cine_shelf/features/movies/application/movie_details_provider.da
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/features/lists/domain/list_ids.dart';
+import 'package:cine_shelf/features/rating/application/rating_providers.dart';
+import 'package:cine_shelf/features/rating/application/rating_controller.dart';
+import 'package:cine_shelf/features/rating/widgets/star_rating_widget.dart';
 
 /// Full-screen detail view for a single movie.
 ///
@@ -34,8 +37,6 @@ class MovieDetailsScreen extends ConsumerWidget {
 
   /// Lightweight poster model carrying the TMDB [id] used to fetch full details.
   final MoviePoster movie;
-
-  static const int _maxStars = 5;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -138,20 +139,6 @@ class MovieDetailsScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: CineSpacing.lg),
-                          Row(
-                            children: List.generate(
-                              _maxStars,
-                              (_) => const Padding(
-                                padding: EdgeInsets.only(right: 6),
-                                child: Icon(
-                                  Icons.star,
-                                  size: 22,
-                                  color: CineColors.amber,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: CineSpacing.xxxl),
                           _ListActionButtons(movie: movie),
                         ],
                       ),
@@ -251,6 +238,8 @@ class _ListActionButtons extends ConsumerWidget {
 
     return Column(
       children: [
+        _RatingSection(movie: movie, isWatched: isWatched),
+        const SizedBox(height: CineSpacing.xxxl),
         Row(
           children: [
             Expanded(
@@ -290,6 +279,51 @@ class _ListActionButtons extends ConsumerWidget {
           ],
         ),
       ],
+    );
+  }
+}
+
+/// Star rating widget connected to Firestore for the detail screen.
+///
+/// Disabled with a SnackBar guard when the movie is not in Watched.
+/// Disabled visually (outline-only stars) while the rating stream loads
+/// or when the movie has not been rated yet — matching the unrated appearance.
+class _RatingSection extends ConsumerWidget {
+  const _RatingSection({required this.movie, required this.isWatched});
+
+  final MoviePoster movie;
+  final bool isWatched;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final ratingAsync = ref.watch(movieRatingProvider(movie.id));
+    final rating = ratingAsync.asData?.value; // null while loading or unrated
+
+    return Padding(
+      padding: const EdgeInsets.only(top: CineSpacing.md),
+      child: StarRatingWidget(
+        rating: rating,
+        editable: isWatched && !ratingAsync.isLoading,
+        onRatingUpdate: (stars) {
+          final uid = ref.read(authStateProvider).asData?.value?.uid;
+          if (uid == null) return;
+          ref
+              .read(ratingControllerProvider)
+              .setRating(
+                context: context,
+                uid: uid,
+                movieId: movie.id,
+                stars: stars,
+              );
+        },
+        onDisabledTap: isWatched
+            ? null // loading state — no message needed
+            : () => ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Add the movie to Watched before rating it.'),
+                ),
+              ),
+      ),
     );
   }
 }
