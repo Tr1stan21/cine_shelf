@@ -27,6 +27,17 @@ service cloud.firestore {
       allow delete: if request.auth.uid == uid;
     }
 
+    /// Allow authenticated users to read/write their own movie ratings.
+    match /user/{uid}/movieRating/{movieId} {
+      allow read: if request.auth.uid == uid;
+      allow create, update: if request.auth.uid == uid
+          && request.resource.data.keys().hasAll(['stars', 'updatedAt'])
+          && request.resource.data.stars is number
+          && request.resource.data.stars >= 0
+          && request.resource.data.stars <= 5;
+      allow delete: if request.auth.uid == uid;
+    }
+
     /// Movies and other public data - read-only from app
     match /movies/{document=**} {
       allow read: if request.auth != null;

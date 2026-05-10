@@ -227,6 +227,12 @@ class _ListActionButtons extends ConsumerWidget {
     }
   }
 
+  void _showMustBeWatchedSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Mark the movie as watched first.')),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isFavAsync = ref.watch(
@@ -248,28 +254,22 @@ class _ListActionButtons extends ConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: MovieActionButton(
-                label: 'Favorite',
-                icon: Icons.favorite,
-                backgroundColor: isFav ? const Color(0xFFB56610) : null,
-                foregroundColor: isFav ? CineColors.white : CineColors.amber,
-                outlined: !isFav,
+              child: FavoriteMovieButton(
+                isFavorite: isFav,
                 onTap: isFavAsync.isLoading
                     ? null
-                    : () => _toggle(context, ref, favoritesListId, isFav),
+                    : isWatched
+                    ? () => _toggle(context, ref, favoritesListId, isFav)
+                    : () => _showMustBeWatchedSnackBar(context),
               ),
             ),
             const SizedBox(width: CineSpacing.md),
             Expanded(
-              child: MovieActionButton(
-                label: 'Watchlist',
-                icon: Icons.access_time_rounded,
-                backgroundColor: isWatchlist ? const Color(0xFF5C4B2A) : null,
-                foregroundColor: CineColors.amber,
-                outlined: !isWatchlist,
+              child: WatchlistMovieButton(
+                isWatchlist: isWatchlist,
                 onTap: isWatchlistAsync.isLoading
                     ? null
-                    : () => _toggle(context, ref, watchlistListId, isFav),
+                    : () => _toggle(context, ref, watchlistListId, isWatchlist),
               ),
             ),
           ],
@@ -278,26 +278,15 @@ class _ListActionButtons extends ConsumerWidget {
         Row(
           children: [
             Expanded(
-              child: MovieActionButton(
-                label: 'Watched',
-                icon: Icons.visibility_outlined,
-                backgroundColor: isWatched ? const Color(0xFF7A3E07) : null,
-                foregroundColor: CineColors.amber,
-                outlined: !isWatched,
+              child: WatchedMovieButton(
+                isWatched: isWatched,
                 onTap: isWatchedAsync.isLoading
                     ? null
-                    : () => _toggle(context, ref, watchedListId, isFav),
+                    : () => _toggle(context, ref, watchedListId, isWatched),
               ),
             ),
             const SizedBox(width: CineSpacing.md),
-            const Expanded(
-              child: MovieActionButton(
-                label: 'List...',
-                icon: Icons.add,
-                outlined: true,
-                trailingIcon: Icons.chevron_right_rounded,
-              ),
-            ),
+            const Expanded(child: MovieListButton()),
           ],
         ),
       ],
