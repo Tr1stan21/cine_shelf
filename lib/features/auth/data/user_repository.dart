@@ -1,3 +1,4 @@
+import 'package:cine_shelf/features/account/models/profile_update.dart';
 import 'package:cine_shelf/features/auth/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -95,5 +96,21 @@ class UserRepository {
       debugPrint('Error fetching user document: $e');
       return null;
     }
+  }
+
+  /// Updates only the editable profile fields on `/user/{uid}`.
+  ///
+  /// Ownership of the user aggregate stays in this repository. Binary avatar
+  /// upload remains outside of Firestore and is handled by the account Storage
+  /// repository before its final URL is persisted here.
+  Future<void> updateEditableProfile({
+    required String uid,
+    required ProfileUpdate update,
+  }) async {
+    final data = update.toFirestoreUpdate();
+    if (data.isEmpty) return;
+
+    data['updatedAt'] = FieldValue.serverTimestamp();
+    await _firestore.collection('user').doc(uid).update(data);
   }
 }

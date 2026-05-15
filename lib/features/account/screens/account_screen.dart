@@ -5,6 +5,9 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
+import 'package:cine_shelf/features/account/application/profile_edit_providers.dart';
+import 'package:cine_shelf/features/account/widgets/editable_avatar.dart';
+import 'package:cine_shelf/features/account/widgets/editable_username.dart';
 import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
 import 'package:cine_shelf/features/account/widgets/region_dropdown.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
@@ -17,14 +20,11 @@ import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 /// User profile and account management screen.
 ///
 /// **Currently active:**
-/// - Profile avatar placeholder (icon only; photo upload not yet implemented)
+/// - Editable profile avatar loaded from Firebase Storage URL when present
 /// - Username and email loaded from Firestore via [currentUserProvider]
+/// - Inline username editing
 /// - Navigation to Credits screen
 /// - Sign Out action
-///
-/// **Temporarily disabled (pending feature completion):**
-/// - Statistics pill ([StatsPill]) showing watched, watchlist, and favorites counts
-/// - Edit Profile option ([AccountRow] for profile editing)
 ///
 /// Data is loaded from Firestore via [currentUserProvider] with
 /// loading/error states handled inline. Sign out is delegated to
@@ -54,6 +54,12 @@ class AccountScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userDocument = ref.watch(currentUserProvider);
+    final loadedUser = switch (userDocument) {
+      AsyncData(:final value) => value,
+      _ => null,
+    };
+    final profileEditState = ref.watch(profileEditControllerProvider);
+    final isProfileEditing = profileEditState.isLoading;
     final watchedCount = ref.watch(listCountProvider(watchedListId));
     final watchlistCount = ref.watch(listCountProvider(watchlistListId));
     final favoritesCount = ref.watch(listCountProvider(favoritesListId));
@@ -65,22 +71,14 @@ class AccountScreen extends ConsumerWidget {
           const RegionDropdown(),
           const SizedBox(height: CineSpacing.xxxl),
 
-          // Avatar placeholder.
-          Container(
-            width: CineSizes.profileAvatar,
-            height: CineSizes.profileAvatar,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: CineColors.amber, width: 2),
-              color: CineColors.bgDark,
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.person,
-                size: CineSizes.profileAvatarIcon,
-                color: CineColors.textMuted,
-              ),
-            ),
+          EditableAvatar(
+            avatarUrl: loadedUser?.avatarUrl,
+            isLoading: userDocument.isLoading || isProfileEditing,
+            onTap: loadedUser == null || isProfileEditing
+                ? null
+                : () => ref
+                      .read(profileEditControllerProvider.notifier)
+                      .pickAndUploadAvatar(context),
           ),
 
           const SizedBox(height: CineSpacing.lg),
@@ -100,7 +98,13 @@ class AccountScreen extends ConsumerWidget {
 
               return Column(
                 children: [
-                  Text(user.username, style: CineTypography.profileName),
+                  EditableUsername(
+                    username: user.username,
+                    isLoading: isProfileEditing,
+                    onSave: (username) => ref
+                        .read(profileEditControllerProvider.notifier)
+                        .updateUsername(context: context, username: username),
+                  ),
                   const SizedBox(height: CineSpacing.xs),
                   Text(user.email, style: CineTypography.profileEmail),
                 ],
@@ -143,12 +147,6 @@ class AccountScreen extends ConsumerWidget {
           const GlowSeparator(),
           const SizedBox(height: CineSpacing.xxl),
 
-          const AccountRow(
-            icon: Icons.person_outline,
-            label: 'Edit Profile',
-            onTap: null,
-          ),
-          const ThinDivider(),
           AccountRow(
             icon: Icons.format_list_bulleted,
             label: 'Credits',

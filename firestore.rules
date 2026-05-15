@@ -1,12 +1,40 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
+    function isOwner(uid) {
+      return request.auth != null && request.auth.uid == uid;
+    }
+
+    function validEditableUserProfile() {
+      let changedKeys = request.resource.data.diff(resource.data).affectedKeys();
+
+      return changedKeys.hasOnly(['username', 'avatarUrl', 'updatedAt'])
+        && changedKeys.hasAny(['username', 'avatarUrl'])
+        && request.resource.data.updatedAt == request.time
+        && (
+          !changedKeys.hasAny(['username'])
+          || (
+            request.resource.data.username is string
+            && request.resource.data.username.size() >= 2
+            && request.resource.data.username.size() <= 40
+          )
+        )
+        && (
+          !changedKeys.hasAny(['avatarUrl'])
+          || (
+            request.resource.data.avatarUrl is string
+            && request.resource.data.avatarUrl.size() <= 2048
+          )
+        );
+    }
+
     /// Allow authenticated users to read their own user document
     match /user/{uid} {
-      allow read: if request.auth.uid == uid;
-      allow create: if request.auth.uid == uid && 
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid) && 
                        request.resource.data.keys().hasOnly(['email', 'username']);
-      allow write: if false; // Only Cloud Functions (Admin SDK) can update
+      allow update: if isOwner(uid) && validEditableUserProfile();
+      allow delete: if false;
     }
 
     /// Allow authenticated users to read/write their own lists
@@ -19,12 +47,12 @@ service cloud.firestore {
     /// Write validation enforces the expected document shape produced by
     /// ListRepository.addMovieToList to prevent arbitrary data injection.
     match /user/{uid}/list/{listId}/movies/{movieId} {
-      allow read: if request.auth.uid == uid;
-      allow create, update: if request.auth.uid == uid
-          && request.resource.data.keys().hasAll(['movieId', 'posterPath', 'addedAt'])
+      allow read: if isOwner(uid);
+      allow create, update: if isOwner(uid)
+          && request.resource.data.keys().hasAll(['movieId', 'addedAt'])
           && request.resource.data.movieId is int
-          && request.resource.data.addedAt == FieldValue.serverTimestamp();
-      allow delete: if request.auth.uid == uid;
+          && request.resource.data.addedAt == request.time;
+      allow delete: if isOwner(uid);
     }
 
     /// Allow authenticated users to read/write their own movie ratings.

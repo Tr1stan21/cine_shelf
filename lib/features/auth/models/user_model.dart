@@ -7,12 +7,14 @@ class UserModel {
   final String uid;
   final String username;
   final String email;
+  final String? avatarUrl;
   final DateTime? createdAt;
 
   UserModel({
     required this.uid,
     required this.username,
     required this.email,
+    this.avatarUrl,
     this.createdAt,
   });
 
@@ -31,8 +33,13 @@ class UserModel {
     final createdAtTimestamp = data['createdAt'] as Timestamp?;
     return UserModel(
       uid: uid,
-      username: data['username'] ?? 'User',
-      email: data['email'] ?? '',
+      username: data['username'] is String
+          ? data['username'] as String
+          : 'User',
+      email: data['email'] is String ? data['email'] as String : '',
+      avatarUrl: data['avatarUrl'] is String
+          ? data['avatarUrl'] as String
+          : null,
       createdAt: createdAtTimestamp?.toDate(),
     );
   }
