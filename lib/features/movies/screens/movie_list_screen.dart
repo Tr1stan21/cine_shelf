@@ -1,7 +1,7 @@
-import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/features/movies/models/movie_query_params.dart';
 import 'package:cine_shelf/features/movies/application/paginated_movies_notifier.dart';
+import 'package:cine_shelf/features/movies/widgets/movie_poster_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,7 +10,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
-import 'package:cine_shelf/router/route_paths.dart';
 
 /// Full-screen movie list displaying movies in a responsive grid layout.
 ///
@@ -262,7 +261,7 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 4,
                               ),
-                              child: _MoviePosterCard(item: rowItems[i]),
+                              child: MoviePosterCard(item: rowItems[i]),
                             ),
                           );
                         }),
@@ -310,58 +309,6 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
             ),
           ),
       ],
-    );
-  }
-}
-
-/// Isolated widget for an individual movie poster card.
-///
-/// Extracted from the list builder to reduce unnecessary rebuilds of sibling
-/// cards and to allow Flutter to manage its lifecycle independently via
-/// element reuse.
-class _MoviePosterCard extends StatelessWidget {
-  const _MoviePosterCard({required this.item});
-
-  final MoviePoster item;
-
-  @override
-  Widget build(BuildContext context) {
-    final posterPath = item.posterPath;
-
-    return GestureDetector(
-      onTap: () => context.push(
-        RoutePaths.movieDetails,
-        extra: MovieDetailsArgs(movie: item),
-      ),
-      child: AspectRatio(
-        aspectRatio: AppConstants.posterAspectRatio,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(CineRadius.md),
-          child: posterPath == null
-              ? const ColoredBox(
-                  color: CineColors.surfaceRaised,
-                  child: Center(
-                    child: Icon(Icons.image_not_supported_outlined),
-                  ),
-                )
-              : CachedNetworkImage(
-                  imageUrl: AppConstants.tmdbPosterUrl(posterPath),
-                  fit: BoxFit.cover,
-                  // Low filter quality reduces GPU cost during fast scrolling
-                  // while remaining visually acceptable for poster thumbnails.
-                  filterQuality: FilterQuality.low,
-                  placeholder: (context, url) => const Center(
-                    child: SizedBox(
-                      width: CineSizes.loaderSmall,
-                      height: CineSizes.loaderSmall,
-                      child: CircularProgressIndicator(),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) =>
-                      const Icon(Icons.error_outline, color: Colors.grey),
-                ),
-        ),
-      ),
     );
   }
 }

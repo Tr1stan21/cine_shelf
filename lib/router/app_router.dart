@@ -1,5 +1,5 @@
-import 'package:cine_shelf/features/movies/models/movie_list_args.dart';
-import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
+import 'package:cine_shelf/features/movies/nav/movie_list_args.dart';
+import 'package:cine_shelf/features/movies/nav/movie_details_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

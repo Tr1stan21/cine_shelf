@@ -2,7 +2,7 @@ import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/features/lists/domain/list_ids.dart';
 import 'package:cine_shelf/features/lists/widgets/list_row.dart';
-import 'package:cine_shelf/features/movies/models/movie_list_args.dart';
+import 'package:cine_shelf/features/movies/nav/movie_list_args.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

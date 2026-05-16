@@ -9,7 +9,7 @@ import 'package:cine_shelf/features/account/application/profile_edit_providers.d
 import 'package:cine_shelf/features/account/widgets/editable_avatar.dart';
 import 'package:cine_shelf/features/account/widgets/editable_username.dart';
 import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
-import 'package:cine_shelf/features/account/widgets/region_dropdown.dart';
+import 'package:cine_shelf/features/region/widgets/region_dropdown.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
 import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';

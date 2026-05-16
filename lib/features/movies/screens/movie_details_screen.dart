@@ -1,4 +1,5 @@
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
+import 'package:cine_shelf/features/movies/widgets/list_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -7,14 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/back_button.dart';
-import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
 import 'package:cine_shelf/features/movies/application/movie_details_provider.dart';
-import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
-import 'package:cine_shelf/features/lists/domain/list_ids.dart';
-import 'package:cine_shelf/features/rating/application/rating_providers.dart';
-import 'package:cine_shelf/features/rating/application/rating_controller.dart';
-import 'package:cine_shelf/features/rating/widgets/star_rating_widget.dart';
 
 /// Full-screen detail view for a single movie.
 ///
@@ -139,7 +134,7 @@ class MovieDetailsScreen extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: CineSpacing.lg),
-                          _ListActionButtons(movie: movie),
+                          ListActionButtons(movie: movie),
                         ],
                       ),
                     ),
@@ -156,173 +151,6 @@ class MovieDetailsScreen extends ConsumerWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-/// Action buttons (Favorite, Watchlist, Watched, List...) for the detail screen.
-///
-/// Extracted as a [ConsumerWidget] so [ref.watch] is called directly in its
-/// own [build] method — avoiding the anti-pattern of capturing ref inside a
-/// [Builder] callback of a parent widget.
-///
-/// Each list button:
-/// - Reads membership state reactively from [movieInListProvider].
-/// - Disables tap while the stream is still loading to prevent double-writes.
-/// - Calls [listRepositoryProvider] at tap time (not at build time) to avoid
-///   holding a stale repository reference across rebuilds.
-class _ListActionButtons extends ConsumerWidget {
-  const _ListActionButtons({required this.movie});
-
-  final MoviePoster movie;
-
-  Future<void> _toggle(
-    BuildContext context,
-    WidgetRef ref,
-    String listId,
-    bool isIn,
-  ) async {
-    final uid = ref.read(authStateProvider).asData?.value?.uid;
-    if (uid == null) return;
-
-    final repo = ref.read(listRepositoryProvider);
-
-    try {
-      if (isIn) {
-        await repo.removeMovieFromList(
-          uid: uid,
-          listId: listId,
-          movieId: movie.id,
-        );
-      } else {
-        await repo.addMovieToList(
-          uid: uid,
-          listId: listId,
-          movieId: movie.id,
-          posterPath: movie.posterPath,
-        );
-      }
-    } catch (_) {
-      if (!context.mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not update the list. Please try again.'),
-        ),
-      );
-    }
-  }
-
-  void _showMustBeWatchedSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mark the movie as watched first.')),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isFavAsync = ref.watch(
-      movieInListProvider((listId: favoritesListId, movieId: movie.id)),
-    );
-    final isWatchlistAsync = ref.watch(
-      movieInListProvider((listId: watchlistListId, movieId: movie.id)),
-    );
-    final isWatchedAsync = ref.watch(
-      movieInListProvider((listId: watchedListId, movieId: movie.id)),
-    );
-
-    final isFav = isFavAsync.asData?.value ?? false;
-    final isWatchlist = isWatchlistAsync.asData?.value ?? false;
-    final isWatched = isWatchedAsync.asData?.value ?? false;
-
-    return Column(
-      children: [
-        _RatingSection(movie: movie, isWatched: isWatched),
-        const SizedBox(height: CineSpacing.xxxl),
-        Row(
-          children: [
-            Expanded(
-              child: FavoriteMovieButton(
-                isFavorite: isFav,
-                onTap: isFavAsync.isLoading
-                    ? null
-                    : isWatched
-                    ? () => _toggle(context, ref, favoritesListId, isFav)
-                    : () => _showMustBeWatchedSnackBar(context),
-              ),
-            ),
-            const SizedBox(width: CineSpacing.md),
-            Expanded(
-              child: WatchlistMovieButton(
-                isWatchlist: isWatchlist,
-                onTap: isWatchlistAsync.isLoading
-                    ? null
-                    : () => _toggle(context, ref, watchlistListId, isWatchlist),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: CineSpacing.md),
-        Row(
-          children: [
-            Expanded(
-              child: WatchedMovieButton(
-                isWatched: isWatched,
-                onTap: isWatchedAsync.isLoading
-                    ? null
-                    : () => _toggle(context, ref, watchedListId, isWatched),
-              ),
-            ),
-            const SizedBox(width: CineSpacing.md),
-            const Expanded(child: MovieListButton()),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-/// Star rating widget connected to Firestore for the detail screen.
-///
-/// Disabled with a SnackBar guard when the movie is not in Watched.
-/// Disabled visually (outline-only stars) while the rating stream loads
-/// or when the movie has not been rated yet — matching the unrated appearance.
-class _RatingSection extends ConsumerWidget {
-  const _RatingSection({required this.movie, required this.isWatched});
-
-  final MoviePoster movie;
-  final bool isWatched;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final ratingAsync = ref.watch(movieRatingProvider(movie.id));
-    final rating = ratingAsync.asData?.value; // null while loading or unrated
-
-    return Padding(
-      padding: const EdgeInsets.only(top: CineSpacing.md),
-      child: StarRatingWidget(
-        rating: rating,
-        editable: isWatched && !ratingAsync.isLoading,
-        onRatingUpdate: (stars) {
-          final uid = ref.read(authStateProvider).asData?.value?.uid;
-          if (uid == null) return;
-          ref
-              .read(ratingControllerProvider)
-              .setRating(
-                context: context,
-                uid: uid,
-                movieId: movie.id,
-                stars: stars,
-              );
-        },
-        onDisabledTap: isWatched
-            ? null // loading state — no message needed
-            : () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Add the movie to Watched before rating it.'),
-                ),
-              ),
       ),
     );
   }

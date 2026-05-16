@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cine_shelf/features/search/widgets/poster_image.dart';
 import 'package:cine_shelf/features/search/widgets/search_bar.dart';
-import 'package:cine_shelf/features/movies/models/movie_details_args.dart';
+import 'package:cine_shelf/features/movies/nav/movie_details_args.dart';
 import 'package:cine_shelf/features/movies/models/movie_poster.dart';
 import 'package:cine_shelf/features/movies/models/movie_search_result.dart';
 import 'package:cine_shelf/features/region/application/region_providers.dart';
@@ -180,7 +180,7 @@ class _MovieSearchScreenState extends ConsumerState<MovieSearchScreen> {
                 aspectRatio: AppConstants.posterAspectRatio,
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(CineRadius.sm),
-                  child: _PosterImage(posterPath: movie.posterPath),
+                  child: PosterImage(posterPath: movie.posterPath),
                 ),
               ),
             ),
@@ -212,49 +212,6 @@ class _MovieSearchScreenState extends ConsumerState<MovieSearchScreen> {
             ),
             const Icon(Icons.chevron_right, color: CineColors.textSecondary),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _PosterImage extends StatelessWidget {
-  const _PosterImage({required this.posterPath});
-
-  final String? posterPath;
-
-  @override
-  Widget build(BuildContext context) {
-    final path = posterPath;
-
-    if (path == null || path.isEmpty) {
-      return const ColoredBox(
-        color: CineColors.surfaceRaised,
-        child: Icon(
-          Icons.image_not_supported_outlined,
-          color: CineColors.textSecondary,
-          size: 22,
-        ),
-      );
-    }
-
-    return CachedNetworkImage(
-      imageUrl: AppConstants.tmdbPosterUrl(path),
-      fit: BoxFit.cover,
-      filterQuality: FilterQuality.low,
-      placeholder: (_, _) => const Center(
-        child: SizedBox(
-          width: CineSizes.loaderTiny,
-          height: CineSizes.loaderTiny,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
-      errorWidget: (_, _, _) => const ColoredBox(
-        color: CineColors.surfaceRaised,
-        child: Icon(
-          Icons.broken_image_outlined,
-          color: CineColors.textSecondary,
-          size: 22,
         ),
       ),
     );
