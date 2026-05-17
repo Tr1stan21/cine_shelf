@@ -1,7 +1,7 @@
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
-import 'package:cine_shelf/features/movies/models/movie_query_params.dart';
-import 'package:cine_shelf/features/movies/application/paginated_movies_notifier.dart';
-import 'package:cine_shelf/features/movies/widgets/movie_poster_card.dart';
+import 'package:cine_shelf/features/movie_catalog/models/movie_poster.dart';
+import 'package:cine_shelf/features/movie_catalog/models/movie_query_params.dart';
+import 'package:cine_shelf/features/movie_scroll/application/paginated_movie_notifier.dart';
+import 'package:cine_shelf/features/movie_catalog/widgets/movie_poster_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

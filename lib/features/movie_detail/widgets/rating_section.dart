@@ -1,5 +1,5 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
+import 'package:cine_shelf/features/movie_catalog/models/movie_poster.dart';
 import 'package:cine_shelf/features/rating/application/rating_controller.dart';
 import 'package:cine_shelf/features/rating/application/rating_providers.dart';
 import 'package:cine_shelf/features/rating/widgets/star_rating_widget.dart';

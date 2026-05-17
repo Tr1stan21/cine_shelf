@@ -1,12 +1,12 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/features/lists/domain/list_ids.dart';
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
-import 'package:cine_shelf/features/movies/widgets/movie_button.dart';
+import 'package:cine_shelf/features/movie_catalog/models/movie_poster.dart';
+import 'package:cine_shelf/features/movie_detail/widgets/movie_button.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cine_shelf/features/movies/widgets/rating_section.dart';
+import 'package:cine_shelf/features/movie_detail/widgets/rating_section.dart';
 
 /// Action buttons (Favorite, Watchlist, Watched, List...) for the detail screen.
 ///

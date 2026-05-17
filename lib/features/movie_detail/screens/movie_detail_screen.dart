@@ -1,5 +1,5 @@
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
-import 'package:cine_shelf/features/movies/widgets/list_action_buttons.dart';
+import 'package:cine_shelf/features/movie_catalog/models/movie_poster.dart';
+import 'package:cine_shelf/features/movie_catalog/widgets/list_action_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/back_button.dart';
-import 'package:cine_shelf/features/movies/application/movie_details_provider.dart';
+import 'package:cine_shelf/features/movie_detail/application/movie_detail_provider.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 
 /// Full-screen detail view for a single movie.
