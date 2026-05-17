@@ -1,15 +1,15 @@
 import 'dart:async';
 
-import 'package:cine_shelf/features/search/widgets/poster_image.dart';
-import 'package:cine_shelf/features/search/widgets/search_bar.dart';
-import 'package:cine_shelf/features/movies/nav/movie_details_args.dart';
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
-import 'package:cine_shelf/features/movies/models/movie_search_result.dart';
+import 'package:cine_shelf/features/movie_detail/models/movie_detail_args.dart';
 import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:cine_shelf/features/search/application/movie_search_provider.dart';
+import 'package:cine_shelf/features/search/models/movie_search_result.dart';
+import 'package:cine_shelf/features/search/widgets/poster_image.dart';
+import 'package:cine_shelf/features/search/widgets/search_bar.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/models/movie_poster.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

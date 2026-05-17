@@ -1,15 +1,14 @@
-import 'package:cine_shelf/features/movie_catalog/models/movie_poster.dart';
-import 'package:cine_shelf/features/movie_catalog/models/movie_query_params.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cine_shelf/features/catalog/models/movie_query_params.dart';
+import 'package:cine_shelf/features/catalog/widgets/movie_poster_card.dart';
 import 'package:cine_shelf/features/movie_scroll/application/paginated_movie_notifier.dart';
-import 'package:cine_shelf/features/movie_catalog/widgets/movie_poster_card.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/models/movie_poster.dart';
+import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-
-import 'package:cine_shelf/shared/config/theme.dart';
-import 'package:cine_shelf/shared/config/constants.dart';
-import 'package:cine_shelf/shared/widgets/background.dart';
 
 /// Full-screen movie list displaying movies in a responsive grid layout.
 ///

@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../movies/models/movie_discovery_query.dart';
-import '../../movies/models/movie_query_params.dart';
-import '../../movies/models/tmdb/list_category.dart';
+import '../../catalog/data/dto/tmdb/list_category.dart';
+import '../../catalog/models/movie_discovery_query.dart';
+import '../../catalog/models/movie_query_params.dart';
 import '../data/drift_region_preferences_repository.dart';
 import '../data/local/region_preferences_database.dart';
 import '../data/region_preferences_repository.dart';

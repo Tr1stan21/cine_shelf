@@ -1,10 +1,10 @@
 import 'package:cine_shelf/features/home/widgets/movies_section.dart';
+import 'package:cine_shelf/features/catalog/data/dto/tmdb/list_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
-import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
 
 /// Main home screen displaying categorized movie carousels.
 ///

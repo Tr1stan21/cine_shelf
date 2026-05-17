@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
+import 'package:cine_shelf/shared/models/movie_poster.dart';
 
 /// Repository for managing user's movie lists in Firestore.
 ///

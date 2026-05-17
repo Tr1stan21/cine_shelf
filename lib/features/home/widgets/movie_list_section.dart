@@ -1,14 +1,14 @@
-import 'package:cine_shelf/features/movies/nav/movie_list_args.dart';
-import 'package:cine_shelf/features/movies/nav/movie_details_args.dart';
-import 'package:cine_shelf/features/movies/models/movie_query_params.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cine_shelf/features/catalog/models/movie_query_params.dart';
+import 'package:cine_shelf/features/movie_detail/models/movie_detail_args.dart';
+import 'package:cine_shelf/features/movie_scroll/models/movie_scroll_args.dart';
+import 'package:cine_shelf/router/route_paths.dart';
+import 'package:cine_shelf/shared/models/movie_poster.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
-import 'package:cine_shelf/features/movies/models/movie_poster.dart';
-import 'package:cine_shelf/router/route_paths.dart';
 
 /// Widget displaying a horizontal section of movies with title and navigation button.
 ///

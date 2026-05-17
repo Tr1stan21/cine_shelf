@@ -1,5 +1,5 @@
-import 'package:cine_shelf/features/movie_catalog/models/movie_poster.dart';
-import 'package:cine_shelf/features/movie_catalog/models/movie_query_params.dart';
+import 'package:cine_shelf/features/catalog/models/movie_query_params.dart';
+import 'package:cine_shelf/shared/models/movie_poster.dart';
 
 /// Arguments for MovieListScreen.
 ///

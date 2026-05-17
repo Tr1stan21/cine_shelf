@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cine_shelf/features/movies/models/movie_genre.dart';
-import 'package:cine_shelf/features/movies/models/movie_genres_catalog.dart';
+import 'package:cine_shelf/features/catalog/models/movie_genres_catalog.dart';
+import 'package:cine_shelf/features/movie_detail/models/movie_genre.dart';
 
 /// Shuffled genre order for the current provider session.
 ///

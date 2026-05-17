@@ -1,11 +1,11 @@
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
-import 'package:cine_shelf/features/movies/application/movies_provider.dart';
-import 'package:cine_shelf/features/movies/models/tmdb/list_category.dart';
+import 'package:cine_shelf/features/catalog/application/movies_provider.dart';
+import 'package:cine_shelf/features/catalog/data/dto/tmdb/list_category.dart';
+import 'package:cine_shelf/features/home/application/genre_session_provider.dart';
 import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:cine_shelf/features/home/application/genre_session_provider.dart';
 
 /// Private widget that encapsulates async loading logic for a single home section.
 ///
