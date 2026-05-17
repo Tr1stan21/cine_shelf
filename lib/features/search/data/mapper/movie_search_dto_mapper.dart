@@ -1,6 +1,6 @@
-import '../models/movie_search_result.dart';
-import '../models/paginated_movie_search_results.dart';
-import '../models/tmdb/search_movies_dto.dart';
+import '../../models/movie_search_result.dart';
+import '../../models/paginated_movie_search_results.dart';
+import '../dto/search_movies_dto.dart';
 
 extension SearchMoviesDtoMapper on SearchMoviesDto {
   PaginatedMovieSearchResults toAppModel() {

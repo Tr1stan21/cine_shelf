@@ -1,5 +1,6 @@
-import '../models/movie_poster.dart';
-import '../models/tmdb/category_movies_dto.dart';
+import 'package:cine_shelf/features/catalog/data/dto/tmdb/movie_poster_dto.dart';
+
+import '../../../../shared/models/movie_poster.dart';
 
 /// Extension that maps TMDB DTO to domain model.
 ///

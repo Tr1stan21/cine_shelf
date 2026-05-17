@@ -1,8 +1,8 @@
-import '../models/tmdb/list_category.dart';
-import '../models/movie_detail.dart';
+import 'dto/tmdb/list_category.dart';
+import '../../movie_detail/models/movie_detail.dart';
 import '../models/paginated_movies.dart';
 import '../models/movie_discovery_query.dart';
-import '../models/paginated_movie_search_results.dart';
+import '../../search/models/paginated_movie_search_results.dart';
 
 abstract class MoviesRepository {
   Future<PaginatedMoviesPage> getMoviesPage(

@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
-import '../models/tmdb/category_movies_dto.dart';
-import '../models/tmdb/list_category.dart';
-import '../models/tmdb/movie_detail_dto.dart';
-import '../models/tmdb/search_movies_dto.dart';
+import 'dto/tmdb/category_movies_dto.dart';
+import 'dto/tmdb/list_category.dart';
+import '../../movie_detail/data/dto/movie_detail_dto.dart';
+import '../../search/data/dto/search_movies_dto.dart';
 import '../models/movie_discovery_query.dart';
 
 /// Remote data source for TMDB API integration.

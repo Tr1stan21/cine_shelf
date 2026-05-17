@@ -1,4 +1,4 @@
-import 'tmdb/list_category.dart';
+import '../data/dto/tmdb/list_category.dart';
 
 /// Discriminated query used to discover movie lists from TMDB.
 ///

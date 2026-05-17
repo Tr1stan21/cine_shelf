@@ -1,4 +1,4 @@
-import 'genres_dto.dart';
+import 'movie_genres_dto.dart';
 
 /// Data Transfer Object for TMDB GET /movie/{movie_id} response.
 ///

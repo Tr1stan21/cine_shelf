@@ -1,13 +1,13 @@
 import 'movies_repository.dart';
-import '../mappers/movie_poster_dto_mapper.dart';
-import '../mappers/movie_search_dto_mapper.dart';
-import '../mappers/movie_detail_dto_mapper.dart';
+import 'mappers/movie_poster_dto_mapper.dart';
+import '../../search/data/mapper/movie_search_dto_mapper.dart';
+import '../../movie_detail/data/mapper/movie_detail_dto_mapper.dart';
 import 'tmdb_remote_data_source.dart';
-import '../models/tmdb/list_category.dart';
-import '../models/movie_detail.dart';
+import 'dto/tmdb/list_category.dart';
+import '../../movie_detail/models/movie_detail.dart';
 import '../models/paginated_movies.dart';
 import '../models/movie_discovery_query.dart';
-import '../models/paginated_movie_search_results.dart';
+import '../../search/models/paginated_movie_search_results.dart';
 
 /// Implementation of the movies repository using TMDB as the remote data source.
 ///

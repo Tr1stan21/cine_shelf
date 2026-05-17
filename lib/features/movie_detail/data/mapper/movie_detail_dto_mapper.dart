@@ -1,6 +1,6 @@
 import 'package:cine_shelf/shared/config/constants.dart';
-import '../models/movie_detail.dart';
-import '../models/tmdb/movie_detail_dto.dart';
+import '../../models/movie_detail.dart';
+import '../dto/movie_detail_dto.dart';
 
 /// Extension that maps TMDB detail response to domain model.
 ///

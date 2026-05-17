@@ -1,4 +1,4 @@
-import 'movie_genre.dart';
+import '../../movie_detail/models/movie_genre.dart';
 
 /// Hardcoded TMDB movie genres from the official genre list reference.
 ///

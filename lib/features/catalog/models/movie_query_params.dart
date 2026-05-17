@@ -1,4 +1,4 @@
-import 'tmdb/list_category.dart';
+import '../data/dto/tmdb/list_category.dart';
 import 'movie_discovery_query.dart';
 
 /// Immutable key for movie list queries.
