@@ -1,5 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cine_shelf/shared/data/movies/models/movie_query_params.dart';
+import 'package:cine_shelf/shared/movies/models/movie_query_params.dart';
 import 'package:cine_shelf/features/movie_detail/nav/movie_detail_args.dart';
 import 'package:cine_shelf/features/movie_list/nav/movie_scroll_args.dart';
 import 'package:cine_shelf/router/route_paths.dart';

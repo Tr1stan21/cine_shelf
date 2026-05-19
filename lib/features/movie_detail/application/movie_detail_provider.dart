@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/movie_detail.dart';
-import '../../../shared/data/movies/data/movies_providers.dart';
+import 'movie_detail_repository_provider.dart';
 
 /// Parametrized FutureProvider for fetching movie details by TMDB ID.
 ///
@@ -30,6 +30,6 @@ import '../../../shared/data/movies/data/movies_providers.dart';
 /// ```
 final movieDetailProvider = FutureProvider.autoDispose.family<MovieDetail, int>(
   (ref, movieId) {
-    return ref.watch(moviesRepositoryProvider).getMovieDetail(movieId);
+    return ref.watch(movieDetailRepositoryProvider).getMovieDetail(movieId);
   },
 );

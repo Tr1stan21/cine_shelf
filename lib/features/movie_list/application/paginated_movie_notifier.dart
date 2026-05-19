@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cine_shelf/shared/data/movies/data/movies_providers.dart';
-import 'package:cine_shelf/shared/data/movies/data/repositories/movies_repository.dart';
-import 'package:cine_shelf/shared/data/movies/models/movie_query_params.dart';
+import 'package:cine_shelf/shared/movies/application/movies_repository_provider.dart';
+import 'package:cine_shelf/shared/movies/data/repositories/movies_repository.dart';
+import 'package:cine_shelf/shared/movies/models/movie_query_params.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
 
 /// Immutable state for paginated movie list.

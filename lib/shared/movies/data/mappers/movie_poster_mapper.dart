@@ -1,4 +1,4 @@
-import 'package:cine_shelf/shared/data/movies/data/dto/tmdb/movie_poster_dto.dart';
+import 'package:cine_shelf/shared/movies/data/dto/movie_poster_dto.dart';
 
 import '../../../models/movie_poster.dart';
 

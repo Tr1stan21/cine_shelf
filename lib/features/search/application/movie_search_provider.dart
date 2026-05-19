@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:cine_shelf/shared/data/movies/data/movies_providers.dart';
+import 'package:cine_shelf/features/search/application/movie_search_repository_provider.dart';
 import 'package:cine_shelf/features/search/models/paginated_movie_search_results.dart';
 
 class MovieSearchQuery {
@@ -38,7 +38,7 @@ final movieSearchProvider = FutureProvider.autoDispose
     .family<PaginatedMovieSearchResults, MovieSearchQuery>((ref, params) {
       final query = params.normalized();
       return ref
-          .watch(moviesRepositoryProvider)
+          .watch(movieSearchRepositoryProvider)
           .searchMovies(
             query: query.query,
             page: query.page,

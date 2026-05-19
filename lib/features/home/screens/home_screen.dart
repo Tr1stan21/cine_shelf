@@ -1,5 +1,5 @@
 import 'package:cine_shelf/features/home/widgets/movies_section.dart';
-import 'package:cine_shelf/shared/data/movies/data/dto/tmdb/list_category.dart';
+import 'package:cine_shelf/shared/movies/models/list_category.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

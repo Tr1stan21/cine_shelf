@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/paginated_movies.dart';
+import '../../models/paginated_movies.dart';
 import '../models/movie_query_params.dart';
-import '../data/movies_providers.dart';
+import 'movies_repository_provider.dart';
 
 /// Parametrized FutureProvider for fetching paginated movies by discovery query.
 ///

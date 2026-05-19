@@ -1,4 +1,4 @@
-import '../../../models/movie_poster.dart';
+import 'movie_poster.dart';
 
 class PaginatedMoviesPage {
   const PaginatedMoviesPage({

@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'tmdb_providers.dart';
-import 'repositories/tmdb_movies_repository_impl.dart';
-import 'repositories/movies_repository.dart';
+import 'tmdb_data_source_provider.dart';
+import '../data/repositories/tmdb_movies_repository_impl.dart';
+import '../data/repositories/movies_repository.dart';
 
 /// Provider for the movies repository.
 ///

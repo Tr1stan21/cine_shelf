@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cine_shelf/shared/data/movies/models/movie_query_params.dart';
-import 'package:cine_shelf/shared/widgets/movie_poster_card.dart';
+import 'package:cine_shelf/shared/movies/models/movie_query_params.dart';
+import 'package:cine_shelf/features/movie_list/widgets/movie_poster_card.dart';
 import 'package:cine_shelf/features/movie_list/application/paginated_movie_notifier.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';

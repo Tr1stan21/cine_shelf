@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/network/dio_provider.dart';
-import 'sources/tmdb_remote_data_source.dart';
+import '../../../core/network/dio_provider.dart';
+import '../data/sources/tmdb_movies_source.dart';
 
 /// Provider for the TMDB remote data source.
 ///
@@ -9,7 +9,6 @@ import 'sources/tmdb_remote_data_source.dart';
 /// - Reads from [dioProvider] to get a configured Dio HTTP client
 ///
 /// **How it works:**
-/// - Wraps Dio with TMDB-specific API methods
 /// - Single instance per app (Provider, not FutureProvider)
 /// - Lazily created on first use
 ///

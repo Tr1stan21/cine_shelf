@@ -1,13 +1,9 @@
 import 'movies_repository.dart';
-import '../../mappers/movie_poster_mapper.dart';
-import '../../../../../features/search/mappers/movie_search_mapper.dart';
-import '../../../../../features/movie_detail/mappers/movie_detail_mapper.dart';
-import '../sources/tmdb_remote_data_source.dart';
-import '../dto/tmdb/list_category.dart';
-import '../../../../../features/movie_detail/models/movie_detail.dart';
-import '../../models/paginated_movies.dart';
+import '../mappers/movie_poster_mapper.dart';
+import '../sources/tmdb_movies_source.dart';
+import '../../models/list_category.dart';
+import '../../../models/paginated_movies.dart';
 import '../../models/movie_discovery_query.dart';
-import '../../../../../features/search/models/paginated_movie_search_results.dart';
 
 /// Implementation of the movies repository using TMDB as the remote data source.
 ///
@@ -63,26 +59,4 @@ class MoviesRepositoryImpl implements MoviesRepository {
     );
   }
 
-  @override
-  Future<PaginatedMovieSearchResults> searchMovies({
-    required String query,
-    int page = 1,
-    String region = 'US',
-  }) async {
-    final dto = await _remote.searchMovies(
-      query: query,
-      page: page,
-      region: region,
-    );
-    return dto.toAppModel();
-  }
-
-  /// Fetches detailed information for a specific movie.
-  ///
-  /// Maps the TMDB detail DTO to the app-layer domain model.
-  @override
-  Future<MovieDetail> getMovieDetail(int movieId) async {
-    final dto = await _remote.getMovieDetail(movieId);
-    return dto.toMovieDetail();
-  }
 }

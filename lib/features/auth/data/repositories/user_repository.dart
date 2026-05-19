@@ -1,4 +1,4 @@
-import 'package:cine_shelf/features/account/models/profile_update.dart';
+import 'package:cine_shelf/features/auth/models/profile_update.dart';
 import 'package:cine_shelf/features/auth/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

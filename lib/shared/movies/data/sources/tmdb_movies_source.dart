@@ -1,8 +1,6 @@
 import 'package:dio/dio.dart';
-import '../dto/tmdb/category_movies_dto.dart';
-import '../dto/tmdb/list_category.dart';
-import '../../../../../features/movie_detail/data/dto/movie_detail_dto.dart';
-import '../../../../../features/search/data/dto/search_movies_dto.dart';
+import '../dto/category_movies_dto.dart';
+import '../../models/list_category.dart';
 import '../../models/movie_discovery_query.dart';
 
 /// Remote data source for TMDB API integration.
@@ -91,45 +89,5 @@ class TmdbRemoteDataSource {
     return getMoviesByGenre(query.genreId!, page: page, region: region);
   }
 
-  /// Searches movies by title using TMDB `/search/movie`.
-  Future<SearchMoviesDto> searchMovies({
-    required String query,
-    int page = 1,
-    String region = 'US',
-  }) async {
-    final response = await _dio.get(
-      '/search/movie',
-      queryParameters: {
-        'query': query,
-        'page': page,
-        'include_adult': false,
-        'region': region.toUpperCase(),
-        'language': _fixedLanguage,
-      },
-    );
-    return SearchMoviesDto.fromJson(response.data as Map<String, dynamic>);
-  }
-
-  /// Fetches detailed information for a specific movie.
-  ///
-  /// Calls GET `/movie/{movie_id}` which returns the complete movie detail with:
-  /// - Full metadata (title, overview, release date)
-  /// - Pre-resolved genre objects (not just IDs; TMDB enriches this endpoint)
-  /// - Additional fields like runtime, budget, revenue (if available)
-  ///
-  /// Parameters:
-  /// - [movieId]: The TMDB movie ID
-  ///
-  /// Returns:
-  /// - [MovieDetailDto] with complete movie information
-  ///
-  /// Throws:
-  /// - [DioException] if the movie is not found (404) or on network errors
-  Future<MovieDetailDto> getMovieDetail(int movieId) async {
-    final response = await _dio.get(
-      '/movie/$movieId',
-      queryParameters: {'language': _fixedLanguage},
-    );
-    return MovieDetailDto.fromJson(response.data as Map<String, dynamic>);
-  }
 }
+

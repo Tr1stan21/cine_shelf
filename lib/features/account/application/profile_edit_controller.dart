@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cine_shelf/features/account/models/profile_update.dart';
+import 'package:cine_shelf/features/auth/models/profile_update.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/auth/application/validators.dart';
 import 'package:flutter/material.dart';

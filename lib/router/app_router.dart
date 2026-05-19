@@ -19,7 +19,7 @@ import 'package:cine_shelf/features/movie_list/screens/movie_list_screen.dart';
 import 'package:cine_shelf/features/search/screens/movie_search_screen.dart';
 import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
-import 'package:cine_shelf/features/credits/screens/credits.dart';
+import 'package:cine_shelf/features/credits/screens/credits_screen.dart';
 import 'package:cine_shelf/router/shell.dart';
 
 /// Central routing configuration for the CineShelf application.
