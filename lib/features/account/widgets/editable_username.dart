@@ -1,4 +1,4 @@
-import 'package:cine_shelf/features/auth/utils/validators.dart';
+import 'package:cine_shelf/features/auth/application/validators.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:flutter/material.dart';
 

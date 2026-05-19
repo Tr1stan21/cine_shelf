@@ -1,8 +1,8 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
-import 'package:cine_shelf/features/lists/domain/list_ids.dart';
+import 'package:cine_shelf/features/lists/models/list_ids.dart';
 import 'package:cine_shelf/features/lists/widgets/list_row.dart';
-import 'package:cine_shelf/features/movie_scroll/models/movie_scroll_args.dart';
+import 'package:cine_shelf/features/movie_list/nav/movie_scroll_args.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';

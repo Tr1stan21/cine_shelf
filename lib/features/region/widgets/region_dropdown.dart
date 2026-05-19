@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/region/application/region_providers.dart';
-import 'package:cine_shelf/features/region/data/static_regions_catalog_repository.dart';
+import 'package:cine_shelf/features/region/models/region_catalog.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 
 /// Region selector used in the account screen.

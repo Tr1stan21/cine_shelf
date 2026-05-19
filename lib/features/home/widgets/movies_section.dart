@@ -1,6 +1,6 @@
 import 'package:cine_shelf/features/home/widgets/movie_list_section.dart';
-import 'package:cine_shelf/features/catalog/application/movies_provider.dart';
-import 'package:cine_shelf/features/catalog/data/dto/tmdb/list_category.dart';
+import 'package:cine_shelf/shared/data/movies/application/movies_provider.dart';
+import 'package:cine_shelf/shared/data/movies/data/dto/tmdb/list_category.dart';
 import 'package:cine_shelf/features/home/application/genre_session_provider.dart';
 import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:cine_shelf/shared/config/theme.dart';

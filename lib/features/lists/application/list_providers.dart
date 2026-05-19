@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/lists/data/list_repository.dart';
+import 'package:cine_shelf/features/lists/data/repositories/list_repository.dart';
 
 /// Provides ListRepository instance with Firestore dependency.
 final listRepositoryProvider = Provider<ListRepository>((ref) {

@@ -7,7 +7,7 @@ import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/shared/widgets/bottom_nav.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
-import 'package:cine_shelf/features/lists/domain/list_ids.dart';
+import 'package:cine_shelf/features/lists/models/list_ids.dart';
 
 /// Navigation shell wrapper for tab-based navigation.
 ///

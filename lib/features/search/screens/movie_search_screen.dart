@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cine_shelf/features/movie_detail/models/movie_detail_args.dart';
+import 'package:cine_shelf/features/movie_detail/nav/movie_detail_args.dart';
 import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:cine_shelf/features/search/application/movie_search_provider.dart';
 import 'package:cine_shelf/features/search/models/movie_search_result.dart';

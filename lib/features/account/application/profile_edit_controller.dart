@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cine_shelf/features/account/models/profile_update.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
-import 'package:cine_shelf/features/auth/utils/validators.dart';
+import 'package:cine_shelf/features/auth/application/validators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

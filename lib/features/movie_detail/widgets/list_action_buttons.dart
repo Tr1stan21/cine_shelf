@@ -1,6 +1,6 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
-import 'package:cine_shelf/features/lists/domain/list_ids.dart';
+import 'package:cine_shelf/features/lists/models/list_ids.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
 import 'package:cine_shelf/features/movie_detail/widgets/movie_button.dart';
 import 'package:cine_shelf/shared/config/theme.dart';

@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
-import 'package:cine_shelf/features/lists/domain/list_ids.dart';
+import 'package:cine_shelf/features/lists/models/list_ids.dart';
 
 /// Preloads all user-related data and waits for completion.
 ///

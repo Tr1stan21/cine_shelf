@@ -11,11 +11,11 @@ import 'package:cine_shelf/features/account/widgets/editable_username.dart';
 import 'package:cine_shelf/features/account/widgets/stat_pill.dart';
 import 'package:cine_shelf/features/region/widgets/region_dropdown.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
-import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
+import 'package:cine_shelf/features/auth/mappers/auth_error_mapper.dart';
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/router/route_paths.dart';
-import 'package:cine_shelf/features/lists/domain/list_ids.dart';
+import 'package:cine_shelf/features/lists/models/list_ids.dart';
 
 /// User profile and account management screen.
 ///

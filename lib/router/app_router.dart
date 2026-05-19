@@ -1,5 +1,5 @@
-import 'package:cine_shelf/features/movie_scroll/models/movie_scroll_args.dart';
-import 'package:cine_shelf/features/movie_detail/models/movie_detail_args.dart';
+import 'package:cine_shelf/features/movie_list/nav/movie_scroll_args.dart';
+import 'package:cine_shelf/features/movie_detail/nav/movie_detail_args.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,7 +15,7 @@ import 'package:cine_shelf/features/auth/screens/login_screen.dart';
 import 'package:cine_shelf/features/auth/screens/sign_up_screen.dart';
 import 'package:cine_shelf/features/home/screens/home_screen.dart';
 import 'package:cine_shelf/features/movie_detail/screens/movie_detail_screen.dart';
-import 'package:cine_shelf/features/movie_scroll/screens/movie_scroll_screen.dart';
+import 'package:cine_shelf/features/movie_list/screens/movie_list_screen.dart';
 import 'package:cine_shelf/features/search/screens/movie_search_screen.dart';
 import 'package:cine_shelf/features/splash/screens/splash_screen.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';

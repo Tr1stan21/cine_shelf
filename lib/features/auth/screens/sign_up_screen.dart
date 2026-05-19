@@ -9,8 +9,8 @@ import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_button.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_text_field.dart';
 import 'package:cine_shelf/features/auth/application/auth_controller.dart';
-import 'package:cine_shelf/features/auth/application/auth_error_mapper.dart';
-import 'package:cine_shelf/features/auth/utils/validators.dart';
+import 'package:cine_shelf/features/auth/mappers/auth_error_mapper.dart';
+import 'package:cine_shelf/features/auth/application/validators.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 
 /// Registration screen for new users.

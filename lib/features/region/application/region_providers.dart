@@ -1,11 +1,11 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../catalog/data/dto/tmdb/list_category.dart';
-import '../../catalog/models/movie_discovery_query.dart';
-import '../../catalog/models/movie_query_params.dart';
-import '../data/drift_region_preferences_repository.dart';
-import '../data/local/region_preferences_database.dart';
-import '../data/region_preferences_repository.dart';
+import '../../../shared/data/movies/data/dto/tmdb/list_category.dart';
+import '../../../shared/data/movies/models/movie_discovery_query.dart';
+import '../../../shared/data/movies/models/movie_query_params.dart';
+import '../data/repositories/drift_region_preferences_repository.dart';
+import '../data/sources/region_preferences_database.dart';
+import '../data/repositories/region_preferences_repository.dart';
 
 /// Provides a singleton Drift database for local region preferences.
 final regionPreferencesDatabaseProvider = Provider<RegionPreferencesDatabase>((

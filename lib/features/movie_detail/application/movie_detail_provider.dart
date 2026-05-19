@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/movie_detail.dart';
-import '../../catalog/data/movies_providers.dart';
+import '../../../shared/data/movies/data/movies_providers.dart';
 
 /// Parametrized FutureProvider for fetching movie details by TMDB ID.
 ///
