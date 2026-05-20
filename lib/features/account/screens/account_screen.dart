@@ -67,7 +67,10 @@ class AccountScreen extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
       child: Column(
         children: [
-          const RegionDropdown(),
+          const Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(width: 96, child: RegionDropdown()),
+          ),
           const SizedBox(height: CineSpacing.xxxl),
 
           EditableAvatar(

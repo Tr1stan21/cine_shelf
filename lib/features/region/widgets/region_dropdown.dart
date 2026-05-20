@@ -49,6 +49,10 @@ class RegionDropdown extends ConsumerWidget {
     return DropdownButtonFormField<String>(
       key: ValueKey<String?>(selectedValue),
       initialValue: selectedValue,
+      decoration: const InputDecoration(
+        isDense: true,
+        contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      ),
       dropdownColor: CineColors.bgDark,
       iconEnabledColor: CineColors.amber,
       style: CineTypography.bodyMedium,
