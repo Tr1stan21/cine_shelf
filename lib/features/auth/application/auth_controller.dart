@@ -86,8 +86,9 @@ class AuthController {
     signOutFlag.setInProgress(true);
     try {
       await ref.read(authRepositoryProvider).signOut();
-    } finally {
+    } catch (_) {
       signOutFlag.setInProgress(false);
+      rethrow;
     }
   }
 }

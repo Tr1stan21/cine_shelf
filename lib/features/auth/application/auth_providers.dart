@@ -48,8 +48,8 @@ final signOutInProgressProvider = NotifierProvider<SignOutFlagNotifier, bool>(
 /// GoRouter's redirect logic still sees the user as authenticated while
 /// sign-out is underway.
 ///
-/// Reset to `false` in the `finally` block of [AuthController.signOut],
-/// regardless of success or failure.
+/// Reset to `false` only after Firebase emits `null` through the auth stream.
+/// If sign-out fails, [AuthController.signOut] resets it before rethrowing.
 ///
 /// **Usage:**
 /// ```dart

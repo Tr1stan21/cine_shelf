@@ -23,8 +23,8 @@ class MovieSearchScreen extends ConsumerStatefulWidget {
 }
 
 class _MovieSearchScreenState extends ConsumerState<MovieSearchScreen> {
-  static const int _minQueryLength = 3;
-  static const Duration _debounceDuration = Duration(milliseconds: 400);
+  static const int _minQueryLength = 1;
+  static const Duration _debounceDuration = Duration(milliseconds: 600);
 
   final _controller = TextEditingController();
 

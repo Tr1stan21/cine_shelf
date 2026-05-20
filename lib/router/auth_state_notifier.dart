@@ -34,6 +34,10 @@ class AuthStateNotifier extends ChangeNotifier {
     _subscription = _getAuthRepository().authStateChanges().listen((user) {
       _currentUser = user;
       _isInitialized = true;
+      if (user == null && _isSigningOut) {
+        _ref.read(signOutInProgressProvider.notifier).setInProgress(false);
+        return;
+      }
       notifyListeners();
     });
   }
