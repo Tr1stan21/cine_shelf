@@ -8,6 +8,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
+
 import 'profile_edit_providers.dart';
 
 class ProfileEditController extends AsyncNotifier<void> {
@@ -20,7 +22,7 @@ class ProfileEditController extends AsyncNotifier<void> {
   }) async {
     final trimmedUsername = username.trim();
     if (!isValidUsername(trimmedUsername)) {
-      _showSnackBar(context, 'Username must be at least 2 characters.');
+      showCineSnackBar(context, 'Username must be at least 2 characters.');
       return;
     }
 
@@ -44,7 +46,10 @@ class ProfileEditController extends AsyncNotifier<void> {
       debugPrint('PROFILE USERNAME UPDATE ERROR: $error\n$stackTrace');
       state = AsyncError(error, stackTrace);
       if (context.mounted) {
-        _showSnackBar(context, 'Could not update username. Please try again.');
+        showCineSnackBar(
+          context,
+          'Could not update username. Please try again.',
+        );
       }
     }
   }
@@ -61,7 +66,7 @@ class ProfileEditController extends AsyncNotifier<void> {
     } on PlatformException catch (error, stackTrace) {
       debugPrint('AVATAR PICKER ERROR: $error\n$stackTrace');
       if (context.mounted) {
-        _showSnackBar(context, 'Could not open the photo library.');
+        showCineSnackBar(context, 'Could not open the photo library.');
       }
       return;
     }
@@ -98,7 +103,7 @@ class ProfileEditController extends AsyncNotifier<void> {
       }
       state = AsyncError(error, stackTrace);
       if (context.mounted) {
-        _showSnackBar(context, 'Could not update avatar. Please try again.');
+        showCineSnackBar(context, 'Could not update avatar. Please try again.');
       }
     }
   }
@@ -123,12 +128,5 @@ class ProfileEditController extends AsyncNotifier<void> {
     if (name.endsWith('.heic')) return 'image/heic';
     if (name.endsWith('.heif')) return 'image/heif';
     return 'image/jpeg';
-  }
-
-  void _showSnackBar(BuildContext context, String message) {
-    if (!context.mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }

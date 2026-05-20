@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
 import 'package:cine_shelf/shared/widgets/wordmark.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_button.dart';
@@ -77,9 +78,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final password = _password;
 
     if (!_isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields correctly.')),
-      );
+      showCineSnackBar(context, 'Please fill all fields correctly.');
       return;
     }
 
@@ -95,9 +94,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       debugPrint('STACK: $st');
 
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+        showCineSnackBar(context, mapAuthError(e));
       }
     } finally {
       if (mounted) setState(() => _isLoading = false);

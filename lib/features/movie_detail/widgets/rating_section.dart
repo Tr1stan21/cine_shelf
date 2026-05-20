@@ -4,6 +4,7 @@ import 'package:cine_shelf/features/rating/application/rating_providers.dart';
 import 'package:cine_shelf/features/rating/widgets/star_rating_widget.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -46,10 +47,9 @@ class RatingSection extends ConsumerWidget {
         },
         onDisabledTap: isWatched
             ? null // loading state — no message needed
-            : () => ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Add the movie to Watched before rating it.'),
-                ),
+            : () => showCineSnackBar(
+                context,
+                'Add the movie to Watched before rating it.',
               ),
       ),
     );

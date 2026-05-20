@@ -7,6 +7,7 @@ import 'package:cine_shelf/features/movie_list/nav/movie_scroll_args.dart';
 import 'package:cine_shelf/router/route_paths.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,11 +38,7 @@ Future<void> _navigateToList(
 
     if (!context.mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Could not open this list. Please try again.'),
-      ),
-    );
+    showCineSnackBar(context, 'Could not open this list. Please try again.');
   }
 }
 

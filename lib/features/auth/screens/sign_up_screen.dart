@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
 import 'package:cine_shelf/shared/widgets/wordmark.dart';
 import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:cine_shelf/features/auth/widgets/auth_button.dart';
@@ -82,15 +83,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final String password = _password;
 
     if (!_isFormValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields correctly.')),
-      );
+      showCineSnackBar(context, 'Please fill all fields correctly.');
       return;
     }
 
     setState(() => _isLoading = true);
-    // Capture scaffoldMessenger and router before async operations
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    // Capture router before async operations.
     final router = GoRouter.of(context);
 
     try {
@@ -106,8 +104,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
       debugPrint('SIGNUP ERROR: $e');
       debugPrint('STACK: $st');
 
-      if (!mounted) return;
-      scaffoldMessenger.showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+      if (!context.mounted) return;
+      showCineSnackBar(context, mapAuthError(e));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

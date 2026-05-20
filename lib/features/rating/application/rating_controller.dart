@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
+
 import 'rating_providers.dart';
 
 /// Provides the singleton [RatingController] instance.
@@ -37,10 +39,9 @@ class RatingController {
       debugPrint('RATING WRITE ERROR: $error\n$stackTrace');
 
       if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not update the rating. Please try again.'),
-        ),
+      showCineSnackBar(
+        context,
+        'Could not update the rating. Please try again.',
       );
     }
   }

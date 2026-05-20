@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cine_shelf/features/region/application/region_providers.dart';
 import 'package:cine_shelf/features/region/models/region_catalog.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
 
 /// Region selector used in the account screen.
 ///
@@ -40,9 +41,7 @@ class RegionDropdown extends ConsumerWidget {
         // Surfaces persistence failures to the user while keeping the previous
         // region value managed by the notifier rollback logic.
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not update region: $e')),
-          );
+          showCineSnackBar(context, 'Could not update region: $e');
         }
       }
     }

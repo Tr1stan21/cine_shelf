@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/widgets/cine_snack_bar.dart';
 import 'package:cine_shelf/shared/widgets/separators.dart';
 import 'package:cine_shelf/features/account/application/profile_edit_providers.dart';
 import 'package:cine_shelf/features/account/widgets/editable_avatar.dart';
@@ -44,9 +45,7 @@ class AccountScreen extends ConsumerWidget {
     } catch (e) {
       debugPrint('SIGNOUT ERROR: $e');
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(mapAuthError(e))));
+        showCineSnackBar(context, mapAuthError(e));
       }
     }
   }
