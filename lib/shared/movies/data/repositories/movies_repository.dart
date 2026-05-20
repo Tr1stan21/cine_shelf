@@ -15,5 +15,4 @@ abstract class MoviesRepository {
     int page = 1,
     String region = 'US',
   });
-
 }

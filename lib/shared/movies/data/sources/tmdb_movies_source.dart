@@ -88,6 +88,4 @@ class TmdbRemoteDataSource {
     }
     return getMoviesByGenre(query.genreId!, page: page, region: region);
   }
-
 }
-

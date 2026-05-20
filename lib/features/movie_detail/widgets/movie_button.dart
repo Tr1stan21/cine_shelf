@@ -117,7 +117,9 @@ class WatchedMovieButton extends StatelessWidget {
 }
 
 class MovieListButton extends StatelessWidget {
-  const MovieListButton({super.key});
+  const MovieListButton({this.onTap, super.key});
+
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +129,7 @@ class MovieListButton extends StatelessWidget {
       foregroundColor: CineColors.amber,
       outlined: true,
       trailingIcon: Icons.chevron_right_rounded,
+      onTap: onTap,
     );
   }
 }

@@ -58,5 +58,4 @@ class MoviesRepositoryImpl implements MoviesRepository {
       movies: dto.results.map((e) => e.toAppModel()).toList(),
     );
   }
-
 }

@@ -1,6 +1,7 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/features/lists/models/list_ids.dart';
+import 'package:cine_shelf/features/lists/widgets/movie_list_selector_sheet.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
 import 'package:cine_shelf/features/movie_detail/widgets/movie_button.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
@@ -21,6 +22,11 @@ import 'package:cine_shelf/features/movie_detail/widgets/rating_section.dart';
 ///   holding a stale repository reference across rebuilds.
 class ListActionButtons extends ConsumerWidget {
   const ListActionButtons({required this.movie, super.key});
+
+  static const String _mustBeWatchedMessage =
+      'Mark the movie as watched first.';
+  static const String _watchedRemovalBlockedMessage =
+      'Movie couldn\'t be removed from "Watched" because there is activity on it';
 
   final MoviePoster movie;
 
@@ -61,14 +67,56 @@ class ListActionButtons extends ConsumerWidget {
     }
   }
 
-  void _showMustBeWatchedSnackBar(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Mark the movie as watched first.')),
+  void _showSnackBar(BuildContext context, String message) {
+    final theme = Theme.of(context);
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(
+            message,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: CineColors.white,
+            ),
+          ),
+          duration: const Duration(milliseconds: 1200),
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.fromLTRB(
+            CineSpacing.md,
+            0,
+            CineSpacing.md,
+            120,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(CineRadius.md),
+          ),
+          backgroundColor: CineColors.black.withValues(alpha: 0.92),
+        ),
+      );
+  }
+
+  void _openListSelector(BuildContext context, WidgetRef ref) {
+    final uid = ref.read(authStateProvider).asData?.value?.uid;
+    if (uid == null) return;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: CineColors.surfaceRaised,
+      clipBehavior: Clip.antiAlias,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(CineRadius.lg),
+        ),
+      ),
+      builder: (_) => MovieListSelectorSheet(movie: movie),
     );
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final uid = ref.watch(authStateProvider).asData?.value?.uid;
     final isFavAsync = ref.watch(
       movieInListProvider((listId: favoritesListId, movieId: movie.id)),
     );
@@ -82,6 +130,19 @@ class ListActionButtons extends ConsumerWidget {
     final isFav = isFavAsync.asData?.value ?? false;
     final isWatchlist = isWatchlistAsync.asData?.value ?? false;
     final isWatched = isWatchedAsync.asData?.value ?? false;
+    final customLists = uid == null
+        ? const []
+        : ref.watch(customListsProvider(uid)).asData?.value ?? const [];
+    final hasCustomListActivity = customLists.any((customList) {
+      return ref
+              .watch(
+                movieInListProvider((listId: customList.id, movieId: movie.id)),
+              )
+              .asData
+              ?.value ??
+          false;
+    });
+    final hasWatchedRemovalActivity = isFav || hasCustomListActivity;
 
     return Column(
       children: [
@@ -96,7 +157,7 @@ class ListActionButtons extends ConsumerWidget {
                     ? null
                     : isWatched
                     ? () => _toggle(context, ref, favoritesListId, isFav)
-                    : () => _showMustBeWatchedSnackBar(context),
+                    : () => _showSnackBar(context, _mustBeWatchedMessage),
               ),
             ),
             const SizedBox(width: CineSpacing.md),
@@ -118,11 +179,22 @@ class ListActionButtons extends ConsumerWidget {
                 isWatched: isWatched,
                 onTap: isWatchedAsync.isLoading
                     ? null
+                    : isWatched && hasWatchedRemovalActivity
+                    ? () =>
+                          _showSnackBar(context, _watchedRemovalBlockedMessage)
                     : () => _toggle(context, ref, watchedListId, isWatched),
               ),
             ),
             const SizedBox(width: CineSpacing.md),
-            const Expanded(child: MovieListButton()),
+            Expanded(
+              child: MovieListButton(
+                onTap: isWatchedAsync.isLoading
+                    ? null
+                    : isWatched
+                    ? () => _openListSelector(context, ref)
+                    : () => _showSnackBar(context, _mustBeWatchedMessage),
+              ),
+            ),
           ],
         ),
       ],

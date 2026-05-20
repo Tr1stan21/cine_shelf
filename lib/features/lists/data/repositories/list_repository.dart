@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cine_shelf/features/lists/models/user_custom_list.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
 
 /// Repository for managing user's movie lists in Firestore.
@@ -80,5 +81,65 @@ class ListRepository {
           ),
         )
         .toList();
+  }
+
+  /// Returns a reactive stream of all custom lists for a user, ordered by createdAt ascending.
+  ///
+  /// Filters for documents where `type == 'custom'`. Returns an empty list if no custom
+  /// lists exist or on error.
+  Stream<List<UserCustomList>> watchCustomLists({required String uid}) {
+    return _firestore
+        .collection('user')
+        .doc(uid)
+        .collection('list')
+        .where('type', isEqualTo: 'custom')
+        .snapshots()
+        .map((snapshot) {
+          final lists = snapshot.docs
+              .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
+              .toList();
+          lists.sort((a, b) {
+            final aCreatedAt = a.createdAt;
+            final bCreatedAt = b.createdAt;
+            if (aCreatedAt == null && bCreatedAt == null) return 0;
+            if (aCreatedAt == null) return 1;
+            if (bCreatedAt == null) return -1;
+            return aCreatedAt.compareTo(bCreatedAt);
+          });
+
+          return lists;
+        });
+  }
+
+  /// Creates a new custom list document. Returns the generated listId.
+  ///
+  /// Sets up the list document with:
+  /// - name: trimmed user input (1–30 chars, must contain ≥1 letter)
+  /// - type: 'custom'
+  /// - iconName: key in listIconCatalog
+  /// - createdAt, updatedAt: serverTimestamp
+  ///
+  /// Firestore security rules validate the input shape and content.
+  /// Throws if Firestore write fails (auth, validation, network).
+  Future<String> createCustomList({
+    required String uid,
+    required String name,
+    required String iconName,
+  }) async {
+    final listRef = _firestore
+        .collection('user')
+        .doc(uid)
+        .collection('list')
+        .doc(); // Auto-generate ID
+
+    await listRef.set({
+      'name': name.trim(),
+      'type': 'custom',
+      'iconName': iconName,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+
+    return listRef.id;
   }
 }

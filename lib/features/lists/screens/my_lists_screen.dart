@@ -1,5 +1,6 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
+import 'package:cine_shelf/features/lists/models/list_icon_catalog.dart';
 import 'package:cine_shelf/features/lists/models/list_ids.dart';
 import 'package:cine_shelf/features/lists/widgets/list_row.dart';
 import 'package:cine_shelf/features/movie_list/nav/movie_scroll_args.dart';
@@ -52,7 +53,7 @@ Future<void> _navigateToList(
 ///    - Watchlist: Movies saved to watch later
 ///    - Favorites: Movies marked as favorites
 ///
-/// 2. My Lists - User-created custom lists (currently placeholder)
+/// 2. My Lists - User-created custom lists
 ///
 /// Counts and movie content are observed from Firestore in real time via
 /// Riverpod stream providers. Tapping a list navigates to [MovieListScreen]
@@ -62,6 +63,11 @@ class MyListsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final uid = ref.watch(authStateProvider).asData?.value?.uid;
+    final customListsAsync = uid == null
+        ? null
+        : ref.watch(customListsProvider(uid));
+
     final watchedCount =
         ref.watch(listCountProvider(watchedListId)).asData?.value ?? 0;
 
@@ -123,6 +129,60 @@ class MyListsScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: CineSpacing.md),
+            if (customListsAsync != null)
+              customListsAsync.when(
+                data: (customLists) {
+                  return Column(
+                    children: [
+                      for (var index = 0; index < customLists.length; index++)
+                        Padding(
+                          padding: EdgeInsets.only(
+                            bottom: index == customLists.length - 1
+                                ? 0
+                                : CineSpacing.md,
+                          ),
+                          child: ListRow(
+                            icon:
+                                listIconCatalog[customLists[index].iconName] ??
+                                Icons.bookmark_outline,
+                            label: customLists[index].name,
+                            numMovies:
+                                ref
+                                    .watch(
+                                      listCountProvider(customLists[index].id),
+                                    )
+                                    .asData
+                                    ?.value ??
+                                0,
+                            onTap: () => _navigateToList(
+                              context,
+                              ref,
+                              customLists[index].id,
+                              customLists[index].name,
+                            ),
+                          ),
+                        ),
+                    ],
+                  );
+                },
+                loading: () => const Padding(
+                  padding: EdgeInsets.only(top: CineSpacing.md),
+                  child: Center(
+                    child: SizedBox(
+                      width: CineSizes.loaderSmall,
+                      height: CineSizes.loaderSmall,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
+                ),
+                error: (error, stackTrace) => const Padding(
+                  padding: EdgeInsets.only(top: CineSpacing.md),
+                  child: Text(
+                    'Could not load custom lists.',
+                    style: TextStyle(color: CineColors.textMuted),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

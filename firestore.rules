@@ -39,8 +39,34 @@ service cloud.firestore {
 
     /// Allow authenticated users to read/write their own lists
     match /user/{uid}/list/{listId} {
-      allow read: if request.auth.uid == uid;
-      allow write: if false; // Only Cloud Functions can write
+      allow read: if isOwner(uid);
+      allow create: if isOwner(uid)
+          && request.resource.data.keys().hasAll([
+            'name',
+            'type',
+            'iconName',
+            'createdAt',
+            'updatedAt'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'name',
+            'type',
+            'iconName',
+            'createdAt',
+            'updatedAt'
+          ])
+          && request.resource.data.type == 'custom'
+          && request.resource.data.name is string
+          && request.resource.data.name.size() >= 1
+          && request.resource.data.name.size() <= 30
+          && request.resource.data.name.matches('.*[A-Za-zÁÉÍÓÚáéíóúÜüÑñ].*')
+          && request.resource.data.iconName is string
+          && request.resource.data.iconName.size() >= 1
+          && request.resource.data.iconName.size() <= 64
+          && request.resource.data.iconName.matches('[a-z0-9_]+')
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+      allow write: if false; // Only Cloud Functions can write (updates/deletes)
     }
 
     /// Allow authenticated users to read/write movies inside their own lists.
