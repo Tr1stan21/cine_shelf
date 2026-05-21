@@ -10,7 +10,6 @@ import 'package:cine_shelf/router/route_paths.dart';
 import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
-import 'package:cine_shelf/shared/widgets/background.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +67,7 @@ class _MovieSearchScreenState extends ConsumerState<MovieSearchScreen> {
         ? null
         : ref.watch(movieSearchProvider(searchQuery));
 
-    return Background(
+    return Padding(
       padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
       child: Column(
         children: [
@@ -88,12 +87,10 @@ class _MovieSearchScreenState extends ConsumerState<MovieSearchScreen> {
   Widget _buildHeader(BuildContext context) {
     return const Padding(
       padding: EdgeInsets.only(top: CineSpacing.sm, bottom: CineSpacing.md),
-      child: Expanded(
-        child: Text(
-          'Search',
-          textAlign: TextAlign.center,
-          style: CineTypography.headline2,
-        ),
+      child: Text(
+        'Search',
+        textAlign: TextAlign.center,
+        style: CineTypography.headline1,
       ),
     );
   }

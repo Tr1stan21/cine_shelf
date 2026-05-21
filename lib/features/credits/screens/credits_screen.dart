@@ -55,27 +55,42 @@ class CreditsScreen extends StatelessWidget {
                   TechItem(
                     name: 'Flutter',
                     subtitle: 'Framework',
-                    version: '3.29.0',
+                    version: '3.44.0',
                   ),
                   TechItem(
                     name: 'Dart',
                     subtitle: 'Language',
-                    version: '3.10.1',
+                    version: '3.12.0',
                   ),
                   TechItem(
                     name: 'Go Router',
                     subtitle: 'Navigation',
-                    version: '17.1.0',
+                    version: '17.2.3',
                   ),
                   TechItem(
-                    name: 'Riverpod',
+                    name: 'Flutter Riverpod',
                     subtitle: 'State Management',
-                    version: '3.2.1',
+                    version: '3.3.1',
                   ),
                   TechItem(
-                    name: 'Firebase',
-                    subtitle: 'Backend Services',
-                    version: '4.4.0',
+                    name: 'Dio',
+                    subtitle: 'HTTP client',
+                    version: '5.9.2',
+                  ),
+                  TechItem(
+                    name: 'Drift',
+                    subtitle: 'Local persistence',
+                    version: '2.33.0',
+                  ),
+                  TechItem(
+                    name: 'Cached Network Image',
+                    subtitle: 'Image caching',
+                    version: '3.4.1',
+                  ),
+                  TechItem(
+                    name: 'Image Picker',
+                    subtitle: 'Media selection',
+                    version: '1.2.2',
                   ),
 
                   SizedBox(height: CineSpacing.xxxl),
@@ -83,6 +98,26 @@ class CreditsScreen extends StatelessWidget {
                   // APIs & Services Section
                   SectionHeader(icon: Icons.api, title: 'APIs and services'),
                   SizedBox(height: CineSpacing.lg),
+                  TechItem(
+                    name: 'Firebase Core',
+                    subtitle: 'Backend platform',
+                    version: '4.9.0',
+                  ),
+                  TechItem(
+                    name: 'Firebase Auth',
+                    subtitle: 'Authentication',
+                    version: '6.5.1',
+                  ),
+                  TechItem(
+                    name: 'Cloud Firestore',
+                    subtitle: 'Database',
+                    version: '6.4.1',
+                  ),
+                  TechItem(
+                    name: 'Firebase Storage',
+                    subtitle: 'Media storage',
+                    version: '13.4.1',
+                  ),
                   TechItem(
                     name: 'The Movie Database (TMDB)',
                     subtitle: 'Movie database',
