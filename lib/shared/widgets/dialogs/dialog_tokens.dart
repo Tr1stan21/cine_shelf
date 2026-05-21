@@ -21,7 +21,7 @@ class CineShelfDialogTokens {
   static const double glowBlurRadius = 24;
   static const double maxDialogWidth = 430;
   static const double minButtonHeight = 52;
-  static const double actionsTopSpacing = 28;
+  static const double actionsTopSpacing = CineSpacing.lg;
   static const double transitionScaleBegin = 0.98;
 
   static const EdgeInsets viewportPadding = EdgeInsets.symmetric(

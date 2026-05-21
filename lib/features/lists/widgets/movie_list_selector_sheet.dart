@@ -5,6 +5,7 @@ import 'package:cine_shelf/features/lists/widgets/create_list_dialog.dart';
 import 'package:cine_shelf/features/lists/widgets/custom_list_row.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/show_cine_shelf_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -17,7 +18,7 @@ class MovieListSelectorSheet extends ConsumerWidget {
     BuildContext context,
     List<String> existingListNames,
   ) {
-    return showDialog<void>(
+    return showCineShelfDialog<void>(
       context: context,
       builder: (context) {
         return CreateListDialog(

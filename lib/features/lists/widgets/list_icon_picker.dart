@@ -5,7 +5,7 @@ import 'package:cine_shelf/shared/config/theme.dart';
 
 /// Grid selector for predefined list icons.
 ///
-/// Displays all icons from [listIconCatalog] in a 3-column grid.
+/// Displays all icons from [listIconCatalog] in a 6-column grid.
 /// Selected icon is highlighted with an amber circle background.
 ///
 /// Callback notifies parent of selected iconName key.
@@ -28,21 +28,24 @@ class ListIconPicker extends StatelessWidget {
     final iconEntries = listIconCatalog.entries.toList();
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: CineSpacing.md),
-      child: Center(
-        child: Wrap(
-          spacing: CineSpacing.lg,
-          runSpacing: CineSpacing.lg,
-          children: [
-            for (final entry in iconEntries)
-              _IconOption(
-                iconName: entry.key,
-                iconData: entry.value,
-                isSelected: entry.key == selectedIconName,
-                onSelected: onIconSelected,
-              ),
-          ],
-        ),
+      padding: const EdgeInsets.only(top: CineSpacing.xs),
+      child: GridView.count(
+        crossAxisCount: 6,
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        mainAxisSpacing: CineSpacing.xs,
+        crossAxisSpacing: CineSpacing.xs,
+        childAspectRatio: 1.3,
+        children: [
+          for (final entry in iconEntries)
+            _IconOption(
+              iconName: entry.key,
+              iconData: entry.value,
+              isSelected: entry.key == selectedIconName,
+              onSelected: onIconSelected,
+            ),
+        ],
       ),
     );
   }
@@ -63,23 +66,27 @@ class _IconOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkResponse(
-      onTap: () => onSelected(iconName),
-      radius: 30,
-      child: Container(
-        width: 56,
-        height: 56,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: isSelected
-              ? CineColors.amber.withValues(alpha: 0.2)
-              : Colors.transparent,
-          border: Border.all(
-            color: isSelected ? CineColors.amber : Colors.transparent,
-            width: 2,
+    return Center(
+      child: InkResponse(
+        onTap: () => onSelected(iconName),
+        radius: 25,
+        child: Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isSelected
+                ? CineColors.amber.withValues(alpha: 0.18)
+                : Colors.transparent,
+            // border: Border.all(
+            //   color: isSelected ? CineColors.amber : Colors.transparent,
+            //   width: 1.4,
+            // ),
+          ),
+          child: Center(
+            child: Icon(iconData, color: CineColors.amber, size: 24),
           ),
         ),
-        child: Center(child: Icon(iconData, color: CineColors.amber, size: 30)),
       ),
     );
   }

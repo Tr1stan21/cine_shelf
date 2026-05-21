@@ -2,7 +2,9 @@ import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/features/lists/models/list_icon_catalog.dart';
 import 'package:cine_shelf/features/lists/widgets/list_icon_picker.dart';
-import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog_button.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -108,61 +110,51 @@ class _CreateListDialogState extends ConsumerState<CreateListDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: CineColors.surfaceRaised,
-      title: const Text('New list'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              autofocus: true,
-              enabled: !_isCreating,
-              maxLength: 30,
-              textInputAction: TextInputAction.done,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                errorText: _errorText,
-                counterStyle: const TextStyle(color: CineColors.textSecondary),
-              ),
-              onChanged: (_) {
-                if (_errorText != null) {
-                  setState(() => _errorText = null);
-                }
-              },
-              onSubmitted: (_) {
-                if (!_isCreating) {
-                  _createList();
-                }
-              },
-            ),
-            ListIconPicker(
-              selectedIconName: _selectedIconName,
-              onIconSelected: _isCreating
-                  ? (_) {}
-                  : (iconName) {
-                      setState(() => _selectedIconName = iconName);
-                    },
-            ),
-          ],
-        ),
+    return CineShelfDialog(
+      title: 'New list',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          CineShelfDialogTextField(
+            controller: _nameController,
+            labelText: 'Name',
+            autofocus: true,
+            enabled: !_isCreating,
+            maxLength: 30,
+            textInputAction: TextInputAction.done,
+            errorText: _errorText,
+            onChanged: (_) {
+              if (_errorText != null) {
+                setState(() => _errorText = null);
+              }
+            },
+            onSubmitted: (_) {
+              if (!_isCreating) {
+                _createList();
+              }
+            },
+          ),
+          ListIconPicker(
+            selectedIconName: _selectedIconName,
+            onIconSelected: _isCreating
+                ? (_) {}
+                : (iconName) {
+                    setState(() => _selectedIconName = iconName);
+                  },
+          ),
+        ],
       ),
       actions: [
-        TextButton(
+        CineShelfDialogButton(
+          label: 'Cancel',
+          variant: CineShelfDialogButtonVariant.secondary,
           onPressed: _isCreating ? null : () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
         ),
-        FilledButton.icon(
+        CineShelfDialogButton(
+          label: 'Create',
+          icon: Icons.check,
+          isLoading: _isCreating,
           onPressed: _isCreating ? null : _createList,
-          icon: _isCreating
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.check),
-          label: const Text('Create'),
         ),
       ],
     );

@@ -16,10 +16,22 @@ const Map<String, IconData> listIconCatalog = {
   'local_movies_outlined': Icons.local_movies_outlined,
   'emoji_events_outlined': Icons.emoji_events_outlined,
   'thumb_up_outlined': Icons.thumb_up_outlined,
+  'sports_outlined': Icons.sports_outlined,
+  'family_restroom_outlined': Icons.family_restroom_outlined,
+  'child_care_outlined': Icons.child_care_outlined,
   'nightlife_outlined': Icons.nightlife_outlined,
   'local_fire_department_outlined': Icons.local_fire_department_outlined,
+  'psychology_outlined': Icons.psychology_outlined,
+  'public_outlined': Icons.public_outlined,
+  'music_note_outlined': Icons.music_note_outlined,
   'science_outlined': Icons.science_outlined,
+  'history_edu_outlined': Icons.history_edu_outlined,
+  'sentiment_very_satisfied_outlined': Icons.sentiment_very_satisfied_outlined,
   'auto_awesome_outlined': Icons.auto_awesome_outlined,
+  'bolt_outlined': Icons.bolt_outlined,
+  'celebration_outlined': Icons.celebration_outlined,
+  'work_outline': Icons.work_outline,
+  'coffee_outlined': Icons.coffee_outlined,
 };
 
 /// Default icon when a custom list is created without explicit icon selection.
