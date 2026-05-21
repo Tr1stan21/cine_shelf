@@ -15,6 +15,7 @@ class ListRow extends StatelessWidget {
     required this.label,
     required this.numMovies,
     this.onTap,
+    this.onLongPress,
     super.key,
   });
 
@@ -22,12 +23,14 @@ class ListRow extends StatelessWidget {
   final String label;
   final int numMovies;
   final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: CineSpacing.lg,

@@ -1,7 +1,7 @@
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
-import 'package:cine_shelf/features/lists/models/list_icon_catalog.dart';
 import 'package:cine_shelf/features/lists/models/list_ids.dart';
+import 'package:cine_shelf/features/lists/widgets/custom_list_row_tile.dart';
 import 'package:cine_shelf/features/lists/widgets/list_row.dart';
 import 'package:cine_shelf/features/movie_list/nav/movie_scroll_args.dart';
 import 'package:cine_shelf/router/route_paths.dart';
@@ -138,25 +138,8 @@ class MyListsScreen extends ConsumerWidget {
                                 ? 0
                                 : CineSpacing.md,
                           ),
-                          child: ListRow(
-                            icon:
-                                listIconCatalog[customLists[index].iconName] ??
-                                Icons.bookmark_outline,
-                            label: customLists[index].name,
-                            numMovies:
-                                ref
-                                    .watch(
-                                      listCountProvider(customLists[index].id),
-                                    )
-                                    .asData
-                                    ?.value ??
-                                0,
-                            onTap: () => _navigateToList(
-                              context,
-                              ref,
-                              customLists[index].id,
-                              customLists[index].name,
-                            ),
+                          child: CustomListRowTile(
+                            customList: customLists[index],
                           ),
                         ),
                     ],

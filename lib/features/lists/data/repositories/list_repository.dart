@@ -168,4 +168,48 @@ class ListRepository {
 
     return listRef.id;
   }
+
+  /// Deletes a custom list and its movies subcollection.
+  ///
+  /// Verifies the list document exists and that its type is 'custom'
+  /// before removing any documents.
+  Future<void> deleteCustomList({
+    required String uid,
+    required String listId,
+  }) async {
+    final listRef = _firestore
+        .collection('user')
+        .doc(uid)
+        .collection('list')
+        .doc(listId);
+
+    final listSnapshot = await listRef.get();
+    if (!listSnapshot.exists) {
+      throw StateError('Custom list does not exist.');
+    }
+
+    final listData = listSnapshot.data();
+    if (listData == null || listData['type'] != 'custom') {
+      throw StateError('Only custom lists can be deleted.');
+    }
+
+    while (true) {
+      final moviesSnapshot = await listRef
+          .collection('movies')
+          .limit(500)
+          .get();
+
+      if (moviesSnapshot.docs.isEmpty) {
+        break;
+      }
+
+      final batch = _firestore.batch();
+      for (final doc in moviesSnapshot.docs) {
+        batch.delete(doc.reference);
+      }
+      await batch.commit();
+    }
+
+    await listRef.delete();
+  }
 }

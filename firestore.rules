@@ -66,7 +66,8 @@ service cloud.firestore {
           && request.resource.data.iconName.matches('[a-z0-9_]+')
           && request.resource.data.createdAt == request.time
           && request.resource.data.updatedAt == request.time;
-      allow write: if false; // Only Cloud Functions can write (updates/deletes)
+      allow delete: if isOwner(uid) && resource.data.type == 'custom';
+      allow write: if false; // Only Cloud Functions can write updates
     }
 
     /// Allow authenticated users to read/write movies inside their own lists.
