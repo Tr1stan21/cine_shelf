@@ -139,175 +139,179 @@ class _MovieListScreenState extends ConsumerState<MovieListScreen> {
     final showScrollToTop =
         _queryParams != null && currentPage >= 2 && !_isAtTop;
 
-    return Stack(
-      children: [
-        Background(
-          padding: const EdgeInsets.symmetric(horizontal: CineSpacing.sm),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  // +1 for the sticky header row at index 0.
-                  itemCount: totalRows + 1,
-                  addRepaintBoundaries: true,
-                  itemBuilder: (context, rowIndex) {
-                    // Row 0 is the screen header (back button + title).
-                    if (rowIndex == 0) {
-                      return Padding(
-                        padding: const EdgeInsets.only(
-                          top: CineSpacing.sm,
-                          bottom: CineSpacing.md,
-                        ),
-                        child: Row(
-                          children: [
-                            IconButton(
-                              onPressed: () => context.pop(),
-                              icon: const Icon(
-                                Icons.arrow_back_ios_new,
-                                color: CineColors.amber,
-                                size: 18,
+    return Scaffold(
+      body: Stack(
+        children: [
+          Background(
+            padding: const EdgeInsets.symmetric(horizontal: CineSpacing.sm),
+            child: Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    // +1 for the sticky header row at index 0.
+                    itemCount: totalRows + 1,
+                    addRepaintBoundaries: true,
+                    itemBuilder: (context, rowIndex) {
+                      // Row 0 is the screen header (back button + title).
+                      if (rowIndex == 0) {
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                            top: CineSpacing.sm,
+                            bottom: CineSpacing.md,
+                          ),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                onPressed: () => context.pop(),
+                                icon: const Icon(
+                                  Icons.arrow_back_ios_new,
+                                  color: CineColors.amber,
+                                  size: 18,
+                                ),
+                                splashRadius: 18,
                               ),
-                              splashRadius: 18,
-                            ),
-                            Expanded(
-                              child: Center(
-                                child: Text(
-                                  widget.title,
-                                  style: CineTypography.headline2,
+                              Expanded(
+                                child: Center(
+                                  child: Text(
+                                    widget.title,
+                                    style: CineTypography.headline2,
+                                  ),
                                 ),
                               ),
-                            ),
-                            // Spacer balances the back button so the title
-                            // appears visually centered.
-                            const SizedBox(width: 44),
-                          ],
-                        ),
-                      );
-                    }
+                              // Spacer balances the back button so the title
+                              // appears visually centered.
+                              const SizedBox(width: 44),
+                            ],
+                          ),
+                        );
+                      }
 
-                    final gridRowIndex = rowIndex - 1;
+                      final gridRowIndex = rowIndex - 1;
 
-                    // Loading indicator row — shown while fetching the next page.
-                    if (gridRowIndex == gridRows && isLoadingMore) {
-                      return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 24),
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              CineColors.amber,
+                      // Loading indicator row — shown while fetching the next page.
+                      if (gridRowIndex == gridRows && isLoadingMore) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                CineColors.amber,
+                              ),
                             ),
                           ),
-                        ),
-                      );
-                    }
+                        );
+                      }
 
-                    // Error row — shown after a failed page fetch with a retry button.
-                    final isErrorRow =
-                        error != null &&
-                        gridRowIndex == gridRows + (isLoadingMore ? 1 : 0);
-                    if (isErrorRow) {
+                      // Error row — shown after a failed page fetch with a retry button.
+                      final isErrorRow =
+                          error != null &&
+                          gridRowIndex == gridRows + (isLoadingMore ? 1 : 0);
+                      if (isErrorRow) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          child: Column(
+                            children: [
+                              const Text(
+                                'Failed to load more movies.',
+                                style: TextStyle(
+                                  color: CineColors.error,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              TextButton(
+                                onPressed: () => ref
+                                    .read(
+                                      paginatedMoviesProvider(
+                                        _queryParams!,
+                                      ).notifier,
+                                    )
+                                    .loadMore(),
+                                child: const Text(
+                                  'Retry',
+                                  style: TextStyle(color: CineColors.amber),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      // Movie grid row — renders up to [AppConstants.moviesPerRow]
+                      // posters side by side. The last row may have fewer items;
+                      // empty slots are filled with invisible [SizedBox] widgets
+                      // to maintain consistent column widths.
+                      final start = gridRowIndex * AppConstants.moviesPerRow;
+                      final end = (start + AppConstants.moviesPerRow).clamp(
+                        0,
+                        items.length,
+                      );
+                      final rowItems = items.sublist(start, end);
+
                       return Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        child: Column(
-                          children: [
-                            const Text(
-                              'Failed to load more movies.',
-                              style: TextStyle(
-                                color: CineColors.error,
-                                fontSize: 14,
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Row(
+                          children: List.generate(AppConstants.moviesPerRow, (
+                            i,
+                          ) {
+                            if (i >= rowItems.length) {
+                              return const Expanded(child: SizedBox());
+                            }
+                            return Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                ),
+                                child: MoviePosterCard(item: rowItems[i]),
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            TextButton(
-                              onPressed: () => ref
-                                  .read(
-                                    paginatedMoviesProvider(
-                                      _queryParams!,
-                                    ).notifier,
-                                  )
-                                  .loadMore(),
-                              child: const Text(
-                                'Retry',
-                                style: TextStyle(color: CineColors.amber),
-                              ),
-                            ),
-                          ],
+                            );
+                          }),
                         ),
                       );
-                    }
-
-                    // Movie grid row — renders up to [AppConstants.moviesPerRow]
-                    // posters side by side. The last row may have fewer items;
-                    // empty slots are filled with invisible [SizedBox] widgets
-                    // to maintain consistent column widths.
-                    final start = gridRowIndex * AppConstants.moviesPerRow;
-                    final end = (start + AppConstants.moviesPerRow).clamp(
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (showScrollToTop)
+            Positioned(
+              right: 16,
+              bottom: 24,
+              child: SafeArea(
+                top: false,
+                left: false,
+                right: false,
+                child: GestureDetector(
+                  onTap: () {
+                    if (!_scrollController.hasClients) return;
+                    _scrollController.animateTo(
                       0,
-                      items.length,
-                    );
-                    final rowItems = items.sublist(start, end);
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Row(
-                        children: List.generate(AppConstants.moviesPerRow, (i) {
-                          if (i >= rowItems.length) {
-                            return const Expanded(child: SizedBox());
-                          }
-                          return Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                              ),
-                              child: MoviePosterCard(item: rowItems[i]),
-                            ),
-                          );
-                        }),
-                      ),
+                      duration: const Duration(milliseconds: 350),
+                      curve: Curves.easeOutCubic,
                     );
                   },
-                ),
-              ),
-            ],
-          ),
-        ),
-        if (showScrollToTop)
-          Positioned(
-            right: 16,
-            bottom: 24,
-            child: SafeArea(
-              top: false,
-              left: false,
-              right: false,
-              child: GestureDetector(
-                onTap: () {
-                  if (!_scrollController.hasClients) return;
-                  _scrollController.animateTo(
-                    0,
-                    duration: const Duration(milliseconds: 350),
-                    curve: Curves.easeOutCubic,
-                  );
-                },
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                    color: CineColors.surfaceRaised,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.keyboard_arrow_up,
-                      size: 18,
-                      color: CineColors.amber,
+                  child: Container(
+                    width: 34,
+                    height: 34,
+                    decoration: const BoxDecoration(
+                      color: CineColors.surfaceRaised,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.keyboard_arrow_up,
+                        size: 18,
+                        color: CineColors.amber,
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-      ],
+        ],
+      ),
     );
   }
 }
