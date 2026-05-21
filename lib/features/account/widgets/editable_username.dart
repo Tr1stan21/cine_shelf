@@ -1,5 +1,9 @@
 import 'package:cine_shelf/features/auth/application/validators.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog_button.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog_text_field.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/show_cine_shelf_dialog.dart';
 import 'package:flutter/material.dart';
 
 class EditableUsername extends StatelessWidget {
@@ -40,7 +44,7 @@ class EditableUsername extends StatelessWidget {
   }
 
   Future<void> _openDialog(BuildContext context) async {
-    final nextUsername = await showDialog<String>(
+    final nextUsername = await showCineShelfDialog<String>(
       context: context,
       builder: (_) => _EditUsernameDialog(initialUsername: username),
     );
@@ -89,29 +93,32 @@ class _EditUsernameDialogState extends State<_EditUsernameDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: CineColors.surfaceRaised,
-      title: const Text('Edit username'),
-      content: TextField(
+    return CineShelfDialog(
+      title: 'Edit username',
+      content: CineShelfDialogTextField(
         controller: _controller,
+        labelText: 'Username',
         autofocus: true,
         maxLength: 40,
         textInputAction: TextInputAction.done,
-        decoration: InputDecoration(
-          errorText: _errorText,
-          counterStyle: const TextStyle(color: CineColors.textSecondary),
-        ),
+        errorText: _errorText,
+        onChanged: (_) {
+          if (_errorText != null) {
+            setState(() => _errorText = null);
+          }
+        },
         onSubmitted: (_) => _validateAndClose(),
       ),
       actions: [
-        TextButton(
+        CineShelfDialogButton(
+          label: 'Cancel',
+          variant: CineShelfDialogButtonVariant.secondary,
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
         ),
-        FilledButton.icon(
+        CineShelfDialogButton(
+          label: 'Save',
+          icon: Icons.check,
           onPressed: _validateAndClose,
-          icon: const Icon(Icons.check),
-          label: const Text('Save'),
         ),
       ],
     );

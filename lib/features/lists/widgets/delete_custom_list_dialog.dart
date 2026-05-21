@@ -1,27 +1,32 @@
-import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/cine_shelf_dialog_button.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/dialog_tokens.dart';
+import 'package:cine_shelf/shared/widgets/dialogs/show_cine_shelf_dialog.dart';
 import 'package:flutter/material.dart';
 
 Future<bool> showDeleteCustomListDialog(
   BuildContext context,
   String listName,
 ) async {
-  final result = await showDialog<bool>(
+  final result = await showCineShelfDialog<bool>(
     context: context,
     builder: (context) {
-      return AlertDialog(
-        backgroundColor: CineColors.surfaceRaised,
-        title: const Text('Delete list?'),
+      return CineShelfDialog(
+        title: 'Delete list?',
         content: Text(
           'Delete "$listName" and all its saved movies? This action cannot be undone.',
+          style: CineShelfDialogTokens.bodyStyle(context),
         ),
         actions: [
-          TextButton(
+          CineShelfDialogButton(
+            label: 'Cancel',
+            variant: CineShelfDialogButtonVariant.secondary,
             onPressed: () => Navigator.of(context).pop(false),
-            child: const Text('Cancel'),
           ),
-          FilledButton(
+          CineShelfDialogButton(
+            label: 'Delete',
+            variant: CineShelfDialogButtonVariant.danger,
             onPressed: () => Navigator.of(context).pop(true),
-            child: const Text('Delete'),
           ),
         ],
       );
