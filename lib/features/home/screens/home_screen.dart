@@ -26,8 +26,9 @@ class HomeScreen extends ConsumerWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
+          const SizedBox(height: 15),
           Image.asset(AppConstants.logoPath, height: 100),
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
           const MovieSection(category: ListCategory.popular, title: 'Popular'),
           const GlowSeparator(),
           const MovieSection(

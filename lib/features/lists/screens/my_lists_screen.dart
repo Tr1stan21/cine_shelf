@@ -79,9 +79,9 @@ class MyListsScreen extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
         child: Column(
           children: [
+            const SizedBox(height: 15),
             Image.asset(AppConstants.logoPath, height: 100),
-
-            const SizedBox(height: CineSpacing.xxxl),
+            const SizedBox(height: 18),
             const Text(
               'Base Lists',
               style: TextStyle(
@@ -114,9 +114,9 @@ class MyListsScreen extends ConsumerWidget {
               onTap: () =>
                   _navigateToList(context, ref, favoritesListId, 'Favorites'),
             ),
-            const SizedBox(height: CineSpacing.xl),
+            const SizedBox(height: CineSpacing.xxxl),
             const GlowSeparator(),
-            const SizedBox(height: CineSpacing.xl),
+            const SizedBox(height: CineSpacing.xxxl),
             const Text(
               'My Lists',
               style: TextStyle(
@@ -163,6 +163,7 @@ class MyListsScreen extends ConsumerWidget {
                   ),
                 ),
               ),
+            const SizedBox(height: CineSpacing.xxxl),
           ],
         ),
       ),

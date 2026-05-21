@@ -72,13 +72,8 @@ class ListActionButtons extends ConsumerWidget {
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      backgroundColor: CineColors.surfaceRaised,
-      clipBehavior: Clip.antiAlias,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(CineRadius.lg),
-        ),
-      ),
+      backgroundColor: Colors.transparent,
+      barrierColor: CineColors.black.withValues(alpha: 0.55),
       builder: (_) => MovieListSelectorSheet(movie: movie),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:cine_shelf/shared/config/theme.dart';
+import 'package:cine_shelf/shared/config/constants.dart';
 import 'package:flutter/material.dart';
 
 /// App information card with icon, name, version, and description.
@@ -34,7 +35,7 @@ class AppInfoCard extends StatelessWidget {
             ),
             child: Center(
               child: Image.asset(
-                'assets/logo/logo.png',
+                AppConstants.logoPath,
                 width: 34,
                 height: 34,
                 fit: BoxFit.contain,

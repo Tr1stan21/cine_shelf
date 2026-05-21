@@ -42,77 +42,47 @@ class MovieListSelectorSheet extends ConsumerWidget {
 
     return SafeArea(
       top: false,
-      child: SizedBox(
-        height: MediaQuery.sizeOf(context).height * 0.62,
-        child: DecoratedBox(
-          decoration: const BoxDecoration(color: CineColors.surfaceRaised),
-          child: Column(
-            children: [
-              const SizedBox(height: CineSpacing.sm),
-              Container(
-                width: 42,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: CineColors.textMuted,
-                  borderRadius: BorderRadius.circular(CineRadius.sm),
-                ),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.68,
+          ),
+          child: Container(
+            decoration: BoxDecoration(
+              color: CineColors.bgDark,
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(CineRadius.xl),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(
-                  CineSpacing.xxl,
-                  CineSpacing.xl,
-                  CineSpacing.xxl,
-                  CineSpacing.md,
+              boxShadow: [
+                BoxShadow(
+                  color: CineColors.black.withValues(alpha: 0.35),
+                  blurRadius: 30,
+                  offset: const Offset(0, -14),
                 ),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Save to list',
-                    style: TextStyle(
-                      color: CineColors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w700,
-                    ),
+              ],
+            ),
+            child: Column(
+              children: [
+                const SizedBox(height: CineSpacing.xl),
+                const _SheetHandle(),
+                const SizedBox(height: CineSpacing.lg),
+                const _SheetHeader(),
+                Expanded(
+                  child: _CustomListsContent(
+                    customListsAsync: customListsAsync,
+                    movie: movie,
                   ),
                 ),
-              ),
-              Expanded(
-                child: customListsAsync.when(
-                  data: (customLists) {
-                    if (customLists.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-
-                    return ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: customLists.length,
-                      itemBuilder: (context, index) {
-                        return CustomListRow(
-                          customList: customLists[index],
-                          movieId: movie.id,
-                          posterPath: movie.posterPath,
-                        );
-                      },
-                    );
-                  },
-                  loading: () => const Center(
-                    child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        CineColors.amber,
-                      ),
-                    ),
-                  ),
-                  error: (_, _) => const SizedBox.shrink(),
+                _NewListButton(
+                  enabled: uid != null,
+                  onTap: uid == null
+                      ? null
+                      : () => _openCreateDialog(context, existingListNames),
                 ),
-              ),
-              const Divider(height: 1, color: Color(0x33FFFFFF)),
-              _NewListRow(
-                enabled: uid != null,
-                onTap: uid == null
-                    ? null
-                    : () => _openCreateDialog(context, existingListNames),
-              ),
-            ],
+                const SizedBox(height: CineSpacing.lg),
+              ],
+            ),
           ),
         ),
       ),
@@ -120,34 +90,158 @@ class MovieListSelectorSheet extends ConsumerWidget {
   }
 }
 
-class _NewListRow extends StatelessWidget {
-  const _NewListRow({required this.enabled, required this.onTap});
+class _SheetHandle extends StatelessWidget {
+  const _SheetHandle();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 48,
+      height: 4,
+      decoration: BoxDecoration(
+        color: CineColors.textMuted,
+        borderRadius: BorderRadius.circular(CineRadius.sm),
+      ),
+    );
+  }
+}
+
+class _SheetHeader extends StatelessWidget {
+  const _SheetHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: CineSpacing.xxl),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          'Save to list',
+          style: TextStyle(
+            color: CineColors.amber,
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomListsContent extends StatelessWidget {
+  const _CustomListsContent({
+    required this.customListsAsync,
+    required this.movie,
+  });
+
+  final AsyncValue<List<UserCustomList>> customListsAsync;
+  final MoviePoster movie;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: CineSpacing.xxl,
+        vertical: CineSpacing.sm,
+      ),
+      child: customListsAsync.when(
+        data: (customLists) {
+          if (customLists.isEmpty) {
+            return const Center(
+              child: Text(
+                'No custom lists yet',
+                style: TextStyle(color: CineColors.textSecondary, fontSize: 16),
+              ),
+            );
+          }
+
+          return ListView.separated(
+            padding: EdgeInsets.zero,
+            itemCount: customLists.length,
+            separatorBuilder: (_, _) => const SizedBox(height: CineSpacing.sm),
+            itemBuilder: (context, index) {
+              return CustomListRow(
+                customList: customLists[index],
+                movieId: movie.id,
+                posterPath: movie.posterPath,
+              );
+            },
+          );
+        },
+        loading: () => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(CineColors.amber),
+          ),
+        ),
+        error: (_, _) => const Center(
+          child: Text(
+            'Unable to load lists',
+            style: TextStyle(color: CineColors.textSecondary, fontSize: 16),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NewListButton extends StatelessWidget {
+  const _NewListButton({required this.enabled, required this.onTap});
 
   final bool enabled;
   final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: enabled ? onTap : null,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: CineSpacing.lg,
-          vertical: CineSpacing.md,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: CineSpacing.xxl),
+      child: Material(
+        color: CineColors.surfaceRaised,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(CineRadius.lg),
         ),
-        child: Row(
-          children: [
-            const Icon(Icons.add, color: CineColors.amber, size: 24),
-            const SizedBox(width: CineSpacing.lg),
-            Text(
-              'New list',
-              style: TextStyle(
-                color: enabled ? CineColors.textLight : CineColors.textMuted,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(CineRadius.lg),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: CineSpacing.lg,
+              vertical: CineSpacing.md,
             ),
-          ],
+            child: Row(
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: enabled
+                        ? CineColors.black.withValues(alpha: 0.12)
+                        : CineColors.black.withValues(alpha: 0.08),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: CineColors.amber,
+                    size: 24,
+                  ),
+                ),
+                const SizedBox(width: CineSpacing.lg),
+                Expanded(
+                  child: Text(
+                    'New list',
+                    style: TextStyle(
+                      color: enabled ? CineColors.amber : CineColors.textMuted,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.chevron_right,
+                  color: enabled ? CineColors.amber : CineColors.textMuted,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

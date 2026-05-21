@@ -88,14 +88,28 @@ class CustomListRow extends ConsumerWidget {
                 debugPrint('Error toggling movie in list: $e');
               }
             },
-      child: Padding(
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: CineSpacing.xs),
         padding: const EdgeInsets.symmetric(
           horizontal: CineSpacing.lg,
           vertical: CineSpacing.md,
         ),
+        decoration: BoxDecoration(
+          color: CineColors.surfaceRaised,
+          borderRadius: BorderRadius.circular(CineRadius.lg),
+          border: Border.all(color: CineColors.white.withValues(alpha: 0.06)),
+        ),
         child: Row(
           children: [
-            Icon(iconData, color: CineColors.amber, size: 24),
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: CineColors.black.withValues(alpha: 0.14),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(iconData, color: CineColors.amber, size: 24),
+            ),
             const SizedBox(width: CineSpacing.lg),
             Expanded(
               child: Text(
@@ -103,22 +117,24 @@ class CustomListRow extends ConsumerWidget {
                 style: const TextStyle(
                   fontSize: 16,
                   color: CineColors.textLight,
+                  fontWeight: FontWeight.w500,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: CineSpacing.lg),
             Container(
-              width: 36,
-              height: 36,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
+                color: CineColors.black.withValues(alpha: 0.14),
                 shape: BoxShape.circle,
-                border: Border.all(color: CineColors.amber, width: 1.5),
               ),
               child: Center(
                 child: isLoading
                     ? const SizedBox(
-                        width: 18,
-                        height: 18,
+                        width: 20,
+                        height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
                           valueColor: AlwaysStoppedAnimation<Color>(
@@ -129,7 +145,7 @@ class CustomListRow extends ConsumerWidget {
                     : Icon(
                         isInList ? Icons.check : Icons.add,
                         color: CineColors.amber,
-                        size: 20,
+                        size: 24,
                       ),
               ),
             ),
