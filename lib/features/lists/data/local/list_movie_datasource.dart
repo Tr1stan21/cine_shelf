@@ -47,15 +47,17 @@ class ListMovieLocalDataSource {
     required int movieId,
   }) async {
     try {
-      await _db.into(_db.listMovieRelationsTable).insertOnConflictUpdate(
-        ListMovieRelationsTableCompanion(
-          uid: Value(uid),
-          listId: Value(listId),
-          movieId: Value(movieId),
-          addedAt: Value(DateTime.now()),
-          cachedAt: Value(DateTime.now()),
-        ),
-      );
+      await _db
+          .into(_db.listMovieRelationsTable)
+          .insertOnConflictUpdate(
+            ListMovieRelationsTableCompanion(
+              uid: Value(uid),
+              listId: Value(listId),
+              movieId: Value(movieId),
+              addedAt: Value(DateTime.now()),
+              cachedAt: Value(DateTime.now()),
+            ),
+          );
     } catch (e, st) {
       debugPrint('ERROR adding movie to list: $e\n$st');
     }
@@ -67,31 +69,35 @@ class ListMovieLocalDataSource {
     required String? posterPath,
   }) async {
     try {
-      final existing = await (_db.select(_db.cachedMoviesTable)
-            ..where((m) => m.movieId.equals(movieId)))
-          .getSingleOrNull();
+      final existing = await (_db.select(
+        _db.cachedMoviesTable,
+      )..where((m) => m.movieId.equals(movieId))).getSingleOrNull();
 
       if (existing != null) {
-        await (_db.update(_db.cachedMoviesTable)
-              ..where((m) => m.movieId.equals(movieId)))
-            .write(CachedMoviesTableCompanion(
-              posterPath: Value(posterPath),
-              cachedAt: Value(DateTime.now()),
-            ));
+        await (_db.update(
+          _db.cachedMoviesTable,
+        )..where((m) => m.movieId.equals(movieId))).write(
+          CachedMoviesTableCompanion(
+            posterPath: Value(posterPath),
+            cachedAt: Value(DateTime.now()),
+          ),
+        );
         return;
       }
 
-      await _db.into(_db.cachedMoviesTable).insert(
-        CachedMoviesData(
-          movieId: movieId,
-          title: '',
-          posterPath: posterPath,
-          overview: null,
-          releaseDate: null,
-          genresJson: null,
-          cachedAt: DateTime.now(),
-        ),
-      );
+      await _db
+          .into(_db.cachedMoviesTable)
+          .insert(
+            CachedMoviesData(
+              movieId: movieId,
+              title: '',
+              posterPath: posterPath,
+              overview: null,
+              releaseDate: null,
+              genresJson: null,
+              cachedAt: DateTime.now(),
+            ),
+          );
     } catch (e, st) {
       debugPrint('ERROR caching movie poster: $e\n$st');
     }
@@ -103,22 +109,24 @@ class ListMovieLocalDataSource {
       if (movies.isEmpty) return;
 
       final movieIds = movies.map((movie) => movie.id).toList();
-      final existingRows = await (_db.select(_db.cachedMoviesTable)
-            ..where((m) => m.movieId.isIn(movieIds)))
-          .get();
+      final existingRows = await (_db.select(
+        _db.cachedMoviesTable,
+      )..where((m) => m.movieId.isIn(movieIds))).get();
       final existingIds = existingRows.map((row) => row.movieId).toSet();
 
       final inserts = movies
           .where((movie) => !existingIds.contains(movie.id))
-          .map((movie) => CachedMoviesData(
-                movieId: movie.id,
-                title: '',
-                posterPath: movie.posterPath,
-                overview: null,
-                releaseDate: null,
-                genresJson: null,
-                cachedAt: DateTime.now(),
-              ))
+          .map(
+            (movie) => CachedMoviesData(
+              movieId: movie.id,
+              title: '',
+              posterPath: movie.posterPath,
+              overview: null,
+              releaseDate: null,
+              genresJson: null,
+              cachedAt: DateTime.now(),
+            ),
+          )
           .toList();
 
       if (inserts.isNotEmpty) {
@@ -127,13 +135,17 @@ class ListMovieLocalDataSource {
         });
       }
 
-      for (final movie in movies.where((movie) => existingIds.contains(movie.id))) {
-        await (_db.update(_db.cachedMoviesTable)
-              ..where((m) => m.movieId.equals(movie.id)))
-            .write(CachedMoviesTableCompanion(
-              posterPath: Value(movie.posterPath),
-              cachedAt: Value(DateTime.now()),
-            ));
+      for (final movie in movies.where(
+        (movie) => existingIds.contains(movie.id),
+      )) {
+        await (_db.update(
+          _db.cachedMoviesTable,
+        )..where((m) => m.movieId.equals(movie.id))).write(
+          CachedMoviesTableCompanion(
+            posterPath: Value(movie.posterPath),
+            cachedAt: Value(DateTime.now()),
+          ),
+        );
       }
     } catch (e, st) {
       debugPrint('ERROR caching movies: $e\n$st');
@@ -170,9 +182,9 @@ class ListMovieLocalDataSource {
         return [];
       }
 
-      final movies = await (_db.select(_db.cachedMoviesTable)
-            ..where((m) => m.movieId.isIn(movieIds)))
-          .get();
+      final movies = await (_db.select(
+        _db.cachedMoviesTable,
+      )..where((m) => m.movieId.isIn(movieIds))).get();
 
       return movies
           .map((m) => MoviePoster(id: m.movieId, posterPath: m.posterPath))
@@ -197,9 +209,9 @@ class ListMovieLocalDataSource {
   /// - [listId]: List ID
   Future<List<int>> getMovieIds(String uid, String listId) async {
     try {
-      final relations = await (_db.select(_db.listMovieRelationsTable)
-            ..where((r) => r.uid.equals(uid) & r.listId.equals(listId)))
-          .get();
+      final relations = await (_db.select(
+        _db.listMovieRelationsTable,
+      )..where((r) => r.uid.equals(uid) & r.listId.equals(listId))).get();
 
       return relations.map((r) => r.movieId).toList();
     } catch (e, st) {
@@ -220,9 +232,9 @@ class ListMovieLocalDataSource {
   /// - [listId]: List ID
   Future<void> clearListMovies(String uid, String listId) async {
     try {
-      await (_db.delete(_db.listMovieRelationsTable)
-            ..where((r) => r.uid.equals(uid) & r.listId.equals(listId)))
-          .go();
+      await (_db.delete(
+        _db.listMovieRelationsTable,
+      )..where((r) => r.uid.equals(uid) & r.listId.equals(listId))).go();
     } catch (e, st) {
       debugPrint('ERROR clearing list movies: $e\n$st');
     }
@@ -234,9 +246,9 @@ class ListMovieLocalDataSource {
   /// - [uid]: User ID
   Future<void> clearByUid(String uid) async {
     try {
-      await (_db.delete(_db.listMovieRelationsTable)
-            ..where((r) => r.uid.equals(uid)))
-          .go();
+      await (_db.delete(
+        _db.listMovieRelationsTable,
+      )..where((r) => r.uid.equals(uid))).go();
     } catch (e, st) {
       debugPrint('ERROR clearing user movie relations: $e\n$st');
     }

@@ -8,8 +8,5 @@ import 'package:cine_shelf/features/movie_detail/data/sources/tmdb_movie_detail_
 final movieDetailRepositoryProvider = Provider<MovieDetailRepository>((ref) {
   final dio = ref.watch(dioProvider);
   final movieCache = ref.watch(movieCacheLocalDataSourceProvider);
-  return TmdbMovieDetailRepositoryImpl(
-    TmdbMovieDetailSource(dio),
-    movieCache,
-  );
+  return TmdbMovieDetailRepositoryImpl(TmdbMovieDetailSource(dio), movieCache);
 });

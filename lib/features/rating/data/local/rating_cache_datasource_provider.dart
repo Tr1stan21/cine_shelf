@@ -18,8 +18,9 @@ import 'rating_cache_datasource.dart';
 /// await ratingCache.cacheRating(uid: uid, movieId: movieId, stars: 4.5);
 /// final cached = await ratingCache.getRating(uid: uid, movieId: movieId);
 /// ```
-final ratingCacheLocalDataSourceProvider =
-    Provider<RatingCacheLocalDataSource>((ref) {
-  final db = ref.watch(appDatabaseProvider);
-  return RatingCacheLocalDataSource(db);
-});
+final ratingCacheLocalDataSourceProvider = Provider<RatingCacheLocalDataSource>(
+  (ref) {
+    final db = ref.watch(appDatabaseProvider);
+    return RatingCacheLocalDataSource(db);
+  },
+);

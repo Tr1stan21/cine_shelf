@@ -63,15 +63,17 @@ class RatingCacheLocalDataSource {
   }) async {
     try {
       final now = DateTime.now();
-      await _db.into(_db.cachedRatingsTable).insertOnConflictUpdate(
-        CachedRatingsTableCompanion(
-          uid: Value(uid),
-          movieId: Value(movieId),
-          stars: Value(stars),
-          updatedAt: Value(updatedAt ?? now),
-          cachedAt: Value(now),
-        ),
-      );
+      await _db
+          .into(_db.cachedRatingsTable)
+          .insertOnConflictUpdate(
+            CachedRatingsTableCompanion(
+              uid: Value(uid),
+              movieId: Value(movieId),
+              stars: Value(stars),
+              updatedAt: Value(updatedAt ?? now),
+              cachedAt: Value(now),
+            ),
+          );
     } catch (e, st) {
       debugPrint('ERROR caching rating ($uid, $movieId): $e\n$st');
     }
@@ -96,7 +98,7 @@ class RatingCacheLocalDataSource {
   }) async {
     try {
       return await (_db.select(_db.cachedRatingsTable)
-        ..where((r) => r.uid.equals(uid) & r.movieId.equals(movieId)))
+            ..where((r) => r.uid.equals(uid) & r.movieId.equals(movieId)))
           .getSingleOrNull();
     } catch (e, st) {
       debugPrint('ERROR reading rating ($uid, $movieId) from cache: $e\n$st');
@@ -117,9 +119,9 @@ class RatingCacheLocalDataSource {
   /// - Returns empty list on error
   Future<List<CachedRatingData>> getRatings(String uid) async {
     try {
-      return await (_db.select(_db.cachedRatingsTable)
-        ..where((r) => r.uid.equals(uid)))
-          .get();
+      return await (_db.select(
+        _db.cachedRatingsTable,
+      )..where((r) => r.uid.equals(uid))).get();
     } catch (e, st) {
       debugPrint('ERROR reading ratings for user $uid from cache: $e\n$st');
       return [];
@@ -137,10 +139,7 @@ class RatingCacheLocalDataSource {
   /// **Error Handling:**
   /// - Catches and logs exceptions silently
   /// - Never rethrows
-  Future<void> deleteRating({
-    required String uid,
-    required int movieId,
-  }) async {
+  Future<void> deleteRating({required String uid, required int movieId}) async {
     try {
       await (_db.cachedRatingsTable.delete()
             ..where((r) => r.uid.equals(uid) & r.movieId.equals(movieId)))

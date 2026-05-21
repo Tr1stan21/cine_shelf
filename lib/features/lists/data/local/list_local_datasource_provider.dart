@@ -37,8 +37,9 @@ final listLocalDataSourceProvider = Provider<ListLocalDataSource>((ref) {
 /// final movieCache = ref.watch(listMovieLocalDataSourceProvider);
 /// final posters = await movieCache.getMoviePostersByList(uid, listId);
 /// ```
-final listMovieLocalDataSourceProvider =
-    Provider<ListMovieLocalDataSource>((ref) {
+final listMovieLocalDataSourceProvider = Provider<ListMovieLocalDataSource>((
+  ref,
+) {
   final db = ref.watch(appDatabaseProvider);
   return ListMovieLocalDataSource(db);
 });

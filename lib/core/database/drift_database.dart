@@ -1,4 +1,3 @@
-
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 
@@ -59,8 +58,8 @@ class UserListsTable extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {uid, listId}
-      ];
+    {uid, listId},
+  ];
 }
 
 /// Represents cached movie data for movies stored in user lists.
@@ -115,8 +114,8 @@ class ListMovieRelationsTable extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {uid, listId, movieId}
-      ];
+    {uid, listId, movieId},
+  ];
 }
 
 /// Represents cached user ratings for movies.
@@ -139,8 +138,8 @@ class CachedRatingsTable extends Table {
 
   @override
   List<Set<Column>> get uniqueKeys => [
-        {uid, movieId}
-      ];
+    {uid, movieId},
+  ];
 }
 
 // ============================================================================

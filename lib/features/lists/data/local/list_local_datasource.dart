@@ -39,20 +39,24 @@ class ListLocalDataSource {
   /// - [uid]: User ID that owns the list
   Future<void> cacheList(UserCustomList list, String uid) async {
     try {
-      await _db.into(_db.userListsTable).insertOnConflictUpdate(
-        UserListsTableCompanion(
-          listId: Value(list.id),
-          uid: Value(uid),
-          name: Value(list.name),
-          type: const Value('custom'),
-          iconName: Value(list.iconName),
-          createdAt:
-              list.createdAt != null ? Value(list.createdAt) : const Value(null),
-          updatedAt:
-              list.updatedAt != null ? Value(list.updatedAt) : const Value(null),
-          cachedAt: Value(DateTime.now()),
-        ),
-      );
+      await _db
+          .into(_db.userListsTable)
+          .insertOnConflictUpdate(
+            UserListsTableCompanion(
+              listId: Value(list.id),
+              uid: Value(uid),
+              name: Value(list.name),
+              type: const Value('custom'),
+              iconName: Value(list.iconName),
+              createdAt: list.createdAt != null
+                  ? Value(list.createdAt)
+                  : const Value(null),
+              updatedAt: list.updatedAt != null
+                  ? Value(list.updatedAt)
+                  : const Value(null),
+              cachedAt: Value(DateTime.now()),
+            ),
+          );
     } catch (e, st) {
       debugPrint('ERROR caching list: $e\n$st');
     }
@@ -79,20 +83,22 @@ class ListLocalDataSource {
       if (lists.isEmpty) return;
 
       final companions = lists
-          .map((list) => UserListsTableCompanion(
-                listId: Value(list.id),
-                uid: Value(uid),
-                name: Value(list.name),
-                type: const Value('custom'),
-                iconName: Value(list.iconName),
-                createdAt: list.createdAt != null
-                    ? Value(list.createdAt)
-                    : const Value(null),
-                updatedAt: list.updatedAt != null
-                    ? Value(list.updatedAt)
-                    : const Value(null),
-                cachedAt: Value(DateTime.now()),
-              ))
+          .map(
+            (list) => UserListsTableCompanion(
+              listId: Value(list.id),
+              uid: Value(uid),
+              name: Value(list.name),
+              type: const Value('custom'),
+              iconName: Value(list.iconName),
+              createdAt: list.createdAt != null
+                  ? Value(list.createdAt)
+                  : const Value(null),
+              updatedAt: list.updatedAt != null
+                  ? Value(list.updatedAt)
+                  : const Value(null),
+              cachedAt: Value(DateTime.now()),
+            ),
+          )
           .toList();
 
       await _db.batch((batch) {
@@ -115,9 +121,9 @@ class ListLocalDataSource {
   /// - [uid]: User ID to retrieve lists for
   Future<List<UserListLocalEntity>> getLists(String uid) async {
     try {
-      return await (_db.select(_db.userListsTable)
-            ..where((list) => list.uid.equals(uid)))
-          .get();
+      return await (_db.select(
+        _db.userListsTable,
+      )..where((list) => list.uid.equals(uid))).get();
     } catch (e, st) {
       debugPrint('ERROR retrieving cached lists: $e\n$st');
       return [];
@@ -138,9 +144,9 @@ class ListLocalDataSource {
   /// - [uid]: User ID to delete lists for
   Future<void> clearLists(String uid) async {
     try {
-      await (_db.delete(_db.userListsTable)
-            ..where((list) => list.uid.equals(uid)))
-          .go();
+      await (_db.delete(
+        _db.userListsTable,
+      )..where((list) => list.uid.equals(uid))).go();
     } catch (e, st) {
       debugPrint('ERROR clearing cached lists: $e\n$st');
     }

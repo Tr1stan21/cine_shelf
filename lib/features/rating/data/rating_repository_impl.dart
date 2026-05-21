@@ -13,10 +13,7 @@ class FirestoreRatingRepository implements RatingRepository {
   /// **Parameters:**
   /// - [_firestore]: Firebase Firestore instance for remote operations
   /// - [_ratingCacheDataSource]: Local Drift datasource for offline caching
-  FirestoreRatingRepository(
-    this._firestore,
-    this._ratingCacheDataSource,
-  );
+  FirestoreRatingRepository(this._firestore, this._ratingCacheDataSource);
 
   final FirebaseFirestore _firestore;
   final RatingCacheLocalDataSource _ratingCacheDataSource;
@@ -29,7 +26,9 @@ class FirestoreRatingRepository implements RatingRepository {
     // ATTEMPT REMOTE stream with proper fallback to cache on error
     return (() async* {
       try {
-        await for (final snap in _ratingsCol(uid).doc(movieId.toString()).snapshots()) {
+        await for (final snap in _ratingsCol(
+          uid,
+        ).doc(movieId.toString()).snapshots()) {
           if (!snap.exists) {
             yield null;
             continue;
@@ -66,7 +65,9 @@ class FirestoreRatingRepository implements RatingRepository {
           yield result;
         }
       } catch (e) {
-        debugPrint('RATING STREAM REMOTE ERROR for ($uid, $movieId): $e\nFalling back to cache');
+        debugPrint(
+          'RATING STREAM REMOTE ERROR for ($uid, $movieId): $e\nFalling back to cache',
+        );
         yield* _watchRatingFromCache(uid, movieId);
       }
     })();
@@ -88,15 +89,11 @@ class FirestoreRatingRepository implements RatingRepository {
         );
         yield cached.toAppModel();
       } else {
-        debugPrint(
-          'RATING CACHE MISS: no cached value for ($uid, $movieId)',
-        );
+        debugPrint('RATING CACHE MISS: no cached value for ($uid, $movieId)');
         yield null;
       }
     } catch (e, st) {
-      debugPrint(
-        'ERROR reading rating from cache ($uid, $movieId): $e\n$st',
-      );
+      debugPrint('ERROR reading rating from cache ($uid, $movieId): $e\n$st');
       yield null;
     }
   }
@@ -115,9 +112,7 @@ class FirestoreRatingRepository implements RatingRepository {
     );
 
     // BACKGROUND SYNC: Persist to Firestore (async, fire & forget)
-    unawaited(
-      _syncRatingToFirebase(uid, movieId, stars),
-    );
+    unawaited(_syncRatingToFirebase(uid, movieId, stars));
   }
 
   /// Background task to sync rating to Firestore.
@@ -154,9 +149,7 @@ class FirestoreRatingRepository implements RatingRepository {
     await _ratingCacheDataSource.deleteRating(uid: uid, movieId: movieId);
 
     // BACKGROUND SYNC: Delete from Firestore (async, fire & forget)
-    unawaited(
-      _deleteRatingFromFirebase(uid, movieId),
-    );
+    unawaited(_deleteRatingFromFirebase(uid, movieId));
   }
 
   /// Background task to delete rating from Firestore.

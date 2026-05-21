@@ -15,10 +15,7 @@ class TmdbMovieDetailRepositoryImpl implements MovieDetailRepository {
   /// **Parameters:**
   /// - [_remote]: TMDB remote data source
   /// - [_movieCacheDataSource]: Local Drift data source for offline caching
-  TmdbMovieDetailRepositoryImpl(
-    this._remote,
-    this._movieCacheDataSource,
-  );
+  TmdbMovieDetailRepositoryImpl(this._remote, this._movieCacheDataSource);
 
   final TmdbMovieDetailSource _remote;
   final MovieCacheLocalDataSource _movieCacheDataSource;
@@ -40,7 +37,9 @@ class TmdbMovieDetailRepositoryImpl implements MovieDetailRepository {
 
       final cached = await _movieCacheDataSource.getMovieDetail(movieId);
       if (cached != null) {
-        debugPrint('MOVIE DETAIL CACHE HIT: returning cached data for movie $movieId');
+        debugPrint(
+          'MOVIE DETAIL CACHE HIT: returning cached data for movie $movieId',
+        );
         return cached.toMovieDetail();
       }
 

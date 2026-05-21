@@ -53,17 +53,19 @@ class MovieCacheLocalDataSource {
         genresList.map((name) => {'name': name}).toList(),
       );
 
-      await _db.into(_db.cachedMoviesTable).insertOnConflictUpdate(
-        CachedMoviesData(
-          movieId: movieDetail.id,
-          title: movieDetail.title,
-          posterPath: posterPath,
-          overview: movieDetail.overview,
-          releaseDate: releaseDate,
-          genresJson: genresJson,
-          cachedAt: DateTime.now(),
-        ),
-      );
+      await _db
+          .into(_db.cachedMoviesTable)
+          .insertOnConflictUpdate(
+            CachedMoviesData(
+              movieId: movieDetail.id,
+              title: movieDetail.title,
+              posterPath: posterPath,
+              overview: movieDetail.overview,
+              releaseDate: releaseDate,
+              genresJson: genresJson,
+              cachedAt: DateTime.now(),
+            ),
+          );
     } catch (e, st) {
       debugPrint('ERROR caching movie detail: $e\n$st');
     }
@@ -81,9 +83,9 @@ class MovieCacheLocalDataSource {
   /// - [movieId]: TMDB movie ID
   Future<CachedMoviesData?> getMovieDetail(int movieId) async {
     try {
-      return await (_db.select(_db.cachedMoviesTable)
-            ..where((m) => m.movieId.equals(movieId)))
-          .getSingleOrNull();
+      return await (_db.select(
+        _db.cachedMoviesTable,
+      )..where((m) => m.movieId.equals(movieId))).getSingleOrNull();
     } catch (e, st) {
       debugPrint('ERROR retrieving cached movie detail: $e\n$st');
       return null;

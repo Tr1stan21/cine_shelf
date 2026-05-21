@@ -60,10 +60,7 @@ abstract class ListRepository {
     required String iconName,
   });
 
-  Future<void> deleteCustomList({
-    required String uid,
-    required String listId,
-  });
+  Future<void> deleteCustomList({required String uid, required String listId});
 }
 
 class FirestoreListRepository implements ListRepository {
@@ -130,7 +127,9 @@ class FirestoreListRepository implements ListRepository {
     );
 
     // THEN: sync to Firestore (async, fire & forget)
-    unawaited(_syncMovieToFirebaseInBackground(uid, listId, movieId, posterPath));
+    unawaited(
+      _syncMovieToFirebaseInBackground(uid, listId, movieId, posterPath),
+    );
   }
 
   /// Background task to sync movie to Firestore.
@@ -231,10 +230,14 @@ class FirestoreListRepository implements ListRepository {
       // REMOTE FAILED: try local cache
       debugPrint('LIST MOVIES REMOTE ERROR: $e, attempting cache fallback');
 
-      final cachedPosters =
-          await _listMovieDataSource.getMoviePostersByList(uid: uid, listId: listId);
+      final cachedPosters = await _listMovieDataSource.getMoviePostersByList(
+        uid: uid,
+        listId: listId,
+      );
       if (cachedPosters.isNotEmpty) {
-        debugPrint('LIST MOVIES CACHE HIT: returning ${cachedPosters.length} movies');
+        debugPrint(
+          'LIST MOVIES CACHE HIT: returning ${cachedPosters.length} movies',
+        );
         return cachedPosters;
       }
 
@@ -334,14 +337,14 @@ class FirestoreListRepository implements ListRepository {
       try {
         final cachedLists = await _listLocalDataSource.getLists(uid);
         if (cachedLists.isNotEmpty) {
-          debugPrint('CUSTOM LISTS CACHE HIT: returning ${cachedLists.length} lists');
+          debugPrint(
+            'CUSTOM LISTS CACHE HIT: returning ${cachedLists.length} lists',
+          );
           yield cachedLists.map((e) => e.toAppModel()).toList();
           return;
         }
       } catch (cacheError, cacheStackTrace) {
-        debugPrint(
-          'CUSTOM LISTS CACHE ERROR: $cacheError\n$cacheStackTrace',
-        );
+        debugPrint('CUSTOM LISTS CACHE ERROR: $cacheError\n$cacheStackTrace');
       }
 
       debugPrint('CUSTOM LISTS CACHE MISS: trying unordered remote query');

@@ -56,10 +56,7 @@ class FirestoreUserRepository implements UserRepository {
   /// **Parameters:**
   /// - [_firestore]: Firestore instance for remote operations
   /// - [_userLocalDataSource]: Local Drift data source for offline fallback
-  FirestoreUserRepository(
-    this._firestore,
-    this._userLocalDataSource,
-  );
+  FirestoreUserRepository(this._firestore, this._userLocalDataSource);
 
   final FirebaseFirestore _firestore;
   final UserLocalDataSource _userLocalDataSource;

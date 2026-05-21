@@ -44,17 +44,20 @@ class UserLocalDataSource {
   /// - [user]: [UserModel] to cache
   Future<void> cacheUser(UserModel user) async {
     try {
-      await _db.into(_db.usersTable).insertOnConflictUpdate(
-        UsersTableCompanion(
-          uid: Value(user.uid),
-          email: Value(user.email),
-          username: Value(user.username),
-          avatarUrl:
-              user.avatarUrl != null ? Value(user.avatarUrl) : const Value(null),
-          updatedAt: Value(user.createdAt ?? DateTime.now()),
-          cachedAt: Value(DateTime.now()),
-        ),
-      );
+      await _db
+          .into(_db.usersTable)
+          .insertOnConflictUpdate(
+            UsersTableCompanion(
+              uid: Value(user.uid),
+              email: Value(user.email),
+              username: Value(user.username),
+              avatarUrl: user.avatarUrl != null
+                  ? Value(user.avatarUrl)
+                  : const Value(null),
+              updatedAt: Value(user.createdAt ?? DateTime.now()),
+              cachedAt: Value(DateTime.now()),
+            ),
+          );
     } catch (e, st) {
       debugPrint('ERROR caching user: $e\n$st');
     }
@@ -72,9 +75,9 @@ class UserLocalDataSource {
   /// - [uid]: User ID to retrieve
   Future<UserLocalEntity?> getUser(String uid) async {
     try {
-      return await (_db.select(_db.usersTable)
-            ..where((u) => u.uid.equals(uid)))
-          .getSingleOrNull();
+      return await (_db.select(
+        _db.usersTable,
+      )..where((u) => u.uid.equals(uid))).getSingleOrNull();
     } catch (e, st) {
       debugPrint('ERROR retrieving cached user: $e\n$st');
       return null;
@@ -95,9 +98,7 @@ class UserLocalDataSource {
   /// - [uid]: User ID to delete
   Future<void> clearUser(String uid) async {
     try {
-      await (_db.delete(_db.usersTable)
-            ..where((u) => u.uid.equals(uid)))
-          .go();
+      await (_db.delete(_db.usersTable)..where((u) => u.uid.equals(uid))).go();
     } catch (e, st) {
       debugPrint('ERROR clearing cached user: $e\n$st');
     }

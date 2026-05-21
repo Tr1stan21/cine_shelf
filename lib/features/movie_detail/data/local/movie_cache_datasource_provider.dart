@@ -17,8 +17,9 @@ import 'movie_cache_datasource.dart';
 /// final movieCache = ref.watch(movieCacheLocalDataSourceProvider);
 /// final cached = await movieCache.getMovieDetail(movieId);
 /// ```
-final movieCacheLocalDataSourceProvider =
-    Provider<MovieCacheLocalDataSource>((ref) {
+final movieCacheLocalDataSourceProvider = Provider<MovieCacheLocalDataSource>((
+  ref,
+) {
   final db = ref.watch(appDatabaseProvider);
   return MovieCacheLocalDataSource(db);
 });
