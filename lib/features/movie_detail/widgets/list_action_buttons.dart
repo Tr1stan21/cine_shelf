@@ -98,18 +98,11 @@ class ListActionButtons extends ConsumerWidget {
     final isFav = isFavAsync.asData?.value ?? false;
     final isWatchlist = isWatchlistAsync.asData?.value ?? false;
     final isWatched = isWatchedAsync.asData?.value ?? false;
-    final customLists = uid == null
-        ? const []
-        : ref.watch(customListsProvider(uid)).asData?.value ?? const [];
-    final hasCustomListActivity = customLists.any((customList) {
-      return ref
-              .watch(
-                movieInListProvider((listId: customList.id, movieId: movie.id)),
-              )
-              .asData
-              ?.value ??
-          false;
-    });
+    final hasCustomListActivity = uid == null
+        ? false
+        : ref.watch(
+            hasMovieInAnyCustomListProvider((uid: uid, movieId: movie.id)),
+          );
     final hasWatchedRemovalActivity = isFav || hasCustomListActivity;
 
     return Column(

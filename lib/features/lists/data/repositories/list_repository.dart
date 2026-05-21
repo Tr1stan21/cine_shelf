@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:cine_shelf/features/lists/models/user_custom_list.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
 
@@ -88,27 +89,52 @@ class ListRepository {
   /// Filters for documents where `type == 'custom'`. Returns an empty list if no custom
   /// lists exist or on error.
   Stream<List<UserCustomList>> watchCustomLists({required String uid}) {
-    return _firestore
+    // Try to delegate ordering to Firestore. If the remote query fails
+    // (e.g., missing index or server-side error), fall back to the
+    // unordered query and sort on the client to avoid returning no data.
+    final baseQuery = _firestore
         .collection('user')
         .doc(uid)
         .collection('list')
-        .where('type', isEqualTo: 'custom')
-        .snapshots()
-        .map((snapshot) {
-          final lists = snapshot.docs
-              .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
-              .toList();
-          lists.sort((a, b) {
-            final aCreatedAt = a.createdAt;
-            final bCreatedAt = b.createdAt;
-            if (aCreatedAt == null && bCreatedAt == null) return 0;
-            if (aCreatedAt == null) return 1;
-            if (bCreatedAt == null) return -1;
-            return aCreatedAt.compareTo(bCreatedAt);
-          });
+        .where('type', isEqualTo: 'custom');
 
-          return lists;
-        });
+    Stream<List<UserCustomList>> mapSnapshot(
+      QuerySnapshot<Map<String, dynamic>> snap,
+    ) {
+      final lists = snap.docs
+          .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
+          .toList();
+      lists.sort((a, b) {
+        final aCreatedAt = a.createdAt;
+        final bCreatedAt = b.createdAt;
+        if (aCreatedAt == null && bCreatedAt == null) return 0;
+        if (aCreatedAt == null) return 1;
+        if (bCreatedAt == null) return -1;
+        return aCreatedAt.compareTo(bCreatedAt);
+      });
+      return Stream<List<UserCustomList>>.value(lists);
+    }
+
+    // First attempt: ask Firestore to order by createdAt.
+    final orderedQuery = baseQuery.orderBy('createdAt');
+
+    // Use an async* stream to catch synchronous stream errors and provide a
+    // fallback to the unordered query when needed.
+    return (() async* {
+      try {
+        await for (final snap in orderedQuery.snapshots()) {
+          yield* mapSnapshot(snap);
+        }
+      } catch (error, stackTrace) {
+        debugPrint(
+          'watchCustomLists ordered query failed: $error\n$stackTrace',
+        );
+        // Fallback: subscribe to base query without ordering and sort client-side.
+        await for (final snap in baseQuery.snapshots()) {
+          yield* mapSnapshot(snap);
+        }
+      }
+    })();
   }
 
   /// Creates a new custom list document. Returns the generated listId.

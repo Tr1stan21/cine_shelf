@@ -101,6 +101,39 @@ final customListsProvider = StreamProvider.autoDispose
       );
     });
 
+/// Emits true when the current movie exists in any custom list for [uid].
+///
+/// This provider centralizes membership evaluation and avoids dynamic
+/// `ref.watch()` calls inside collection iteration in UI widgets.
+final hasMovieInAnyCustomListProvider = Provider.autoDispose
+    .family<bool, ({String uid, int movieId})>((ref, params) {
+      final customListsAsync = ref.watch(customListsProvider(params.uid));
+
+      return customListsAsync.when(
+        data: (customLists) {
+          if (customLists.isEmpty) return false;
+
+          return customLists
+              .map(
+                (customList) => ref.watch(
+                  movieInListProvider((
+                    listId: customList.id,
+                    movieId: params.movieId,
+                  )),
+                ),
+              )
+              .any((state) => state.asData?.value ?? false);
+        },
+        loading: () => false,
+        error: (error, stackTrace) {
+          debugPrint(
+            'HAS CUSTOM LIST ACTIVITY PROVIDER ERROR: $error\n$stackTrace',
+          );
+          return false;
+        },
+      );
+    });
+
 Stream<List<UserCustomList>> _emptyOnCustomListsError(
   Stream<List<UserCustomList>> source,
 ) async* {
