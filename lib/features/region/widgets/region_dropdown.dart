@@ -52,6 +52,10 @@ class RegionDropdown extends ConsumerWidget {
       decoration: const InputDecoration(
         isDense: true,
         contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        border: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
       ),
       dropdownColor: CineColors.bgDark,
       iconEnabledColor: CineColors.amber,
