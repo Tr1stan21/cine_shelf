@@ -63,104 +63,108 @@ class AccountScreen extends ConsumerWidget {
     final watchlistCount = ref.watch(listCountProvider(watchlistListId));
     final favoritesCount = ref.watch(listCountProvider(favoritesListId));
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
-      child: Column(
-        children: [
-          const Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(width: 96, child: RegionDropdown()),
-          ),
-          const SizedBox(height: CineSpacing.xxxl),
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: CineSpacing.lg),
+        child: Column(
+          children: [
+            const Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(width: 96, child: RegionDropdown()),
+            ),
+            const SizedBox(height: CineSpacing.xxxl),
 
-          EditableAvatar(
-            avatarUrl: loadedUser?.avatarUrl,
-            isLoading: userDocument.isLoading || isProfileEditing,
-            onTap: loadedUser == null || isProfileEditing
-                ? null
-                : () => ref
-                      .read(profileEditControllerProvider.notifier)
-                      .pickAndUploadAvatar(context),
-          ),
+            EditableAvatar(
+              avatarUrl: loadedUser?.avatarUrl,
+              isLoading: userDocument.isLoading || isProfileEditing,
+              onTap: loadedUser == null || isProfileEditing
+                  ? null
+                  : () => ref
+                        .read(profileEditControllerProvider.notifier)
+                        .pickAndUploadAvatar(context),
+            ),
 
-          const SizedBox(height: CineSpacing.lg),
+            const SizedBox(height: CineSpacing.lg),
 
-          // Username and email from Firestore
-          userDocument.when(
-            data: (user) {
-              if (user == null) {
-                return const Column(
+            // Username and email from Firestore
+            userDocument.when(
+              data: (user) {
+                if (user == null) {
+                  return const Column(
+                    children: [
+                      Text('User', style: CineTypography.profileName),
+                      SizedBox(height: CineSpacing.xs),
+                      Text('No email', style: CineTypography.profileEmail),
+                    ],
+                  );
+                }
+
+                return Column(
                   children: [
-                    Text('User', style: CineTypography.profileName),
-                    SizedBox(height: CineSpacing.xs),
-                    Text('No email', style: CineTypography.profileEmail),
+                    EditableUsername(
+                      username: user.username,
+                      isLoading: isProfileEditing,
+                      onSave: (username) => ref
+                          .read(profileEditControllerProvider.notifier)
+                          .updateUsername(context: context, username: username),
+                    ),
+                    const SizedBox(height: CineSpacing.xs),
+                    Text(user.email, style: CineTypography.profileEmail),
                   ],
                 );
-              }
-
-              return Column(
+              },
+              loading: () => const Column(
                 children: [
-                  EditableUsername(
-                    username: user.username,
-                    isLoading: isProfileEditing,
-                    onSave: (username) => ref
-                        .read(profileEditControllerProvider.notifier)
-                        .updateUsername(context: context, username: username),
+                  SizedBox(
+                    width: CineSizes.loaderSmall,
+                    height: CineSizes.loaderSmall,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        CineColors.amber,
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: CineSpacing.xs),
-                  Text(user.email, style: CineTypography.profileEmail),
                 ],
-              );
-            },
-            loading: () => const Column(
-              children: [
-                SizedBox(
-                  width: CineSizes.loaderSmall,
-                  height: CineSizes.loaderSmall,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(CineColors.amber),
+              ),
+              error: (error, stackTrace) => const Column(
+                children: [
+                  Text('User', style: CineTypography.profileName),
+                  SizedBox(height: CineSpacing.xs),
+                  Text(
+                    'Error loading profile',
+                    style: CineTypography.profileEmail,
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-            error: (error, stackTrace) => const Column(
-              children: [
-                Text('User', style: CineTypography.profileName),
-                SizedBox(height: CineSpacing.xs),
-                Text(
-                  'Error loading profile',
-                  style: CineTypography.profileEmail,
-                ),
-              ],
+
+            const SizedBox(height: CineSpacing.xxl),
+
+            // Stats (1 pill, 4 items)
+            StatsPill(
+              watchedValue: watchedCount.value ?? 0,
+              favoriteValue: favoritesCount.value ?? 0,
+              watchlistValue: watchlistCount.value ?? 0,
             ),
-          ),
+            const SizedBox(height: CineSpacing.xl),
+            const SizedBox(height: CineSpacing.xxl),
+            const GlowSeparator(),
+            const SizedBox(height: CineSpacing.xxl),
 
-          const SizedBox(height: CineSpacing.xxl),
-
-          // Stats (1 pill, 4 items)
-          StatsPill(
-            watchedValue: watchedCount.value ?? 0,
-            favoriteValue: favoritesCount.value ?? 0,
-            watchlistValue: watchlistCount.value ?? 0,
-          ),
-          const SizedBox(height: CineSpacing.xl),
-          const SizedBox(height: CineSpacing.xxl),
-          const GlowSeparator(),
-          const SizedBox(height: CineSpacing.xxl),
-
-          AccountRow(
-            icon: Icons.format_list_bulleted,
-            label: 'Credits',
-            onTap: () => context.push(RoutePaths.credits),
-          ),
-          const ThinDivider(),
-          AccountRow(
-            icon: Icons.power_settings_new,
-            label: 'Sign Out',
-            onTap: () => _onSignOut(context, ref),
-          ),
-        ],
+            AccountRow(
+              icon: Icons.format_list_bulleted,
+              label: 'Credits',
+              onTap: () => context.push(RoutePaths.credits),
+            ),
+            const ThinDivider(),
+            AccountRow(
+              icon: Icons.power_settings_new,
+              label: 'Sign Out',
+              onTap: () => _onSignOut(context, ref),
+            ),
+          ],
+        ),
       ),
     );
   }

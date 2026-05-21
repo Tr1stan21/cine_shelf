@@ -40,64 +40,80 @@ class EditableUsername extends StatelessWidget {
   }
 
   Future<void> _openDialog(BuildContext context) async {
-    final controller = TextEditingController(text: username);
-    String? errorText;
+    final nextUsername = await showDialog<String>(
+      context: context,
+      builder: (_) => _EditUsernameDialog(initialUsername: username),
+    );
 
-    void validateAndClose(BuildContext context, StateSetter setDialogState) {
-      final value = controller.text.trim();
-      if (!isValidUsername(value)) {
-        setDialogState(() {
-          errorText = 'Use at least 2 characters.';
-        });
-        return;
-      }
+    if (nextUsername == null || nextUsername == username.trim()) return;
+    await onSave(nextUsername);
+  }
+}
 
-      Navigator.of(context).pop(value);
+class _EditUsernameDialog extends StatefulWidget {
+  const _EditUsernameDialog({required this.initialUsername});
+
+  final String initialUsername;
+
+  @override
+  State<_EditUsernameDialog> createState() => _EditUsernameDialogState();
+}
+
+class _EditUsernameDialogState extends State<_EditUsernameDialog> {
+  late final TextEditingController _controller;
+  String? _errorText;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(text: widget.initialUsername);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _validateAndClose() {
+    final value = _controller.text.trim();
+    if (!isValidUsername(value)) {
+      setState(() {
+        _errorText = 'Use at least 2 characters.';
+      });
+      return;
     }
 
-    try {
-      final nextUsername = await showDialog<String>(
-        context: context,
-        builder: (context) {
-          return StatefulBuilder(
-            builder: (context, setDialogState) {
-              return AlertDialog(
-                backgroundColor: CineColors.surfaceRaised,
-                title: const Text('Edit username'),
-                content: TextField(
-                  controller: controller,
-                  autofocus: true,
-                  maxLength: 40,
-                  textInputAction: TextInputAction.done,
-                  decoration: InputDecoration(
-                    errorText: errorText,
-                    counterStyle: const TextStyle(
-                      color: CineColors.textSecondary,
-                    ),
-                  ),
-                  onSubmitted: (_) => validateAndClose(context, setDialogState),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: const Text('Cancel'),
-                  ),
-                  FilledButton.icon(
-                    onPressed: () => validateAndClose(context, setDialogState),
-                    icon: const Icon(Icons.check),
-                    label: const Text('Save'),
-                  ),
-                ],
-              );
-            },
-          );
-        },
-      );
+    Navigator.of(context).pop(value);
+  }
 
-      if (nextUsername == null || nextUsername == username.trim()) return;
-      await onSave(nextUsername);
-    } finally {
-      controller.dispose();
-    }
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: CineColors.surfaceRaised,
+      title: const Text('Edit username'),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        maxLength: 40,
+        textInputAction: TextInputAction.done,
+        decoration: InputDecoration(
+          errorText: _errorText,
+          counterStyle: const TextStyle(color: CineColors.textSecondary),
+        ),
+        onSubmitted: (_) => _validateAndClose(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('Cancel'),
+        ),
+        FilledButton.icon(
+          onPressed: _validateAndClose,
+          icon: const Icon(Icons.check),
+          label: const Text('Save'),
+        ),
+      ],
+    );
   }
 }

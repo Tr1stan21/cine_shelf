@@ -2,6 +2,7 @@ import 'package:cine_shelf/features/auth/application/auth_providers.dart';
 import 'package:cine_shelf/features/lists/application/list_providers.dart';
 import 'package:cine_shelf/features/lists/models/list_ids.dart';
 import 'package:cine_shelf/features/lists/widgets/movie_list_selector_sheet.dart';
+import 'package:cine_shelf/features/rating/application/rating_providers.dart';
 import 'package:cine_shelf/shared/models/movie_poster.dart';
 import 'package:cine_shelf/features/movie_detail/widgets/movie_button.dart';
 import 'package:cine_shelf/shared/config/theme.dart';
@@ -94,16 +95,19 @@ class ListActionButtons extends ConsumerWidget {
     final isWatchedAsync = ref.watch(
       movieInListProvider((listId: watchedListId, movieId: movie.id)),
     );
+    final ratingAsync = ref.watch(movieRatingProvider(movie.id));
 
     final isFav = isFavAsync.asData?.value ?? false;
     final isWatchlist = isWatchlistAsync.asData?.value ?? false;
     final isWatched = isWatchedAsync.asData?.value ?? false;
+    final hasRating = ratingAsync.asData?.value != null;
     final hasCustomListActivity = uid == null
         ? false
         : ref.watch(
             hasMovieInAnyCustomListProvider((uid: uid, movieId: movie.id)),
           );
-    final hasWatchedRemovalActivity = isFav || hasCustomListActivity;
+    final hasWatchedRemovalActivity =
+        isFav || hasCustomListActivity || hasRating;
 
     return Column(
       children: [

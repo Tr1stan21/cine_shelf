@@ -45,4 +45,28 @@ class RatingController {
       );
     }
   }
+
+  /// Deletes the rating for [movieId] belonging to [uid].
+  ///
+  /// Shows a [SnackBar] on failure. [context] is used only for that error
+  /// message and is guarded with [BuildContext.mounted] before use.
+  Future<void> deleteRating({
+    required BuildContext context,
+    required String uid,
+    required int movieId,
+  }) async {
+    try {
+      await _ref
+          .read(ratingRepositoryProvider)
+          .deleteRating(uid: uid, movieId: movieId);
+    } catch (error, stackTrace) {
+      debugPrint('RATING DELETE ERROR: $error\n$stackTrace');
+
+      if (!context.mounted) return;
+      showCineSnackBar(
+        context,
+        'Could not update the rating. Please try again.',
+      );
+    }
+  }
 }

@@ -45,6 +45,13 @@ class RatingSection extends ConsumerWidget {
                 stars: stars,
               );
         },
+        onRatingClear: () {
+          final uid = ref.read(authStateProvider).asData?.value?.uid;
+          if (uid == null) return;
+          ref
+              .read(ratingControllerProvider)
+              .deleteRating(context: context, uid: uid, movieId: movie.id);
+        },
         onDisabledTap: isWatched
             ? null // loading state — no message needed
             : () => showCineSnackBar(

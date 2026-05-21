@@ -7,6 +7,7 @@ class StarRatingWidget extends StatelessWidget {
     required this.rating,
     this.editable = false,
     this.onRatingUpdate,
+    this.onRatingClear,
     this.onDisabledTap,
     super.key,
   });
@@ -14,6 +15,7 @@ class StarRatingWidget extends StatelessWidget {
   final double? rating;
   final bool editable;
   final ValueChanged<double>? onRatingUpdate;
+  final VoidCallback? onRatingClear;
   final VoidCallback? onDisabledTap;
 
   static const int _maxStars = 5;
@@ -41,6 +43,15 @@ class StarRatingWidget extends StatelessWidget {
     return 0;
   }
 
+  void _handleStarTap(int starNumber) {
+    if (_value == 0.5 && starNumber == 1) {
+      onRatingClear?.call();
+      return;
+    }
+
+    onRatingUpdate?.call(_nextRating(starNumber));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -53,9 +64,7 @@ class StarRatingWidget extends StatelessWidget {
           padding: const EdgeInsets.only(right: 6),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTap: editable
-                ? () => onRatingUpdate?.call(_nextRating(starNumber))
-                : onDisabledTap,
+            onTap: editable ? () => _handleStarTap(starNumber) : onDisabledTap,
             child: SizedBox.square(
               dimension: 30,
               child: Stack(
