@@ -2,12 +2,17 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/lists/data/local/list_local_datasource_provider.dart';
 import 'package:cine_shelf/features/lists/data/repositories/list_repository.dart';
 import 'package:cine_shelf/features/lists/models/user_custom_list.dart';
 
-/// Provides ListRepository instance with Firestore dependency.
+/// Provides ListRepository instance with Firestore and local cache dependencies.
 final listRepositoryProvider = Provider<ListRepository>((ref) {
-  return ListRepository(ref.watch(firebaseFirestoreProvider));
+  return FirestoreListRepository(
+    ref.watch(firebaseFirestoreProvider),
+    ref.watch(listLocalDataSourceProvider),
+    ref.watch(listMovieLocalDataSourceProvider),
+  );
 });
 
 /// Stream provider for count of movies in lists.

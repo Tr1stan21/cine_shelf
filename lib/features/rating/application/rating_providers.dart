@@ -2,12 +2,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cine_shelf/features/auth/application/auth_providers.dart';
+import 'package:cine_shelf/features/rating/data/local/rating_cache_datasource_provider.dart';
 import 'package:cine_shelf/features/rating/data/rating_repository.dart';
 import 'package:cine_shelf/features/rating/data/rating_repository_impl.dart';
 
-/// Provides the [RatingRepository] implementation backed by Firestore.
+/// Provides the [RatingRepository] implementation with Firestore and cache support.
 final ratingRepositoryProvider = Provider<RatingRepository>((ref) {
-  return FirestoreRatingRepository(ref.watch(firebaseFirestoreProvider));
+  final firestore = ref.watch(firebaseFirestoreProvider);
+  final ratingCache = ref.watch(ratingCacheLocalDataSourceProvider);
+  return FirestoreRatingRepository(firestore, ratingCache);
 });
 
 /// Reactive stream of the current user's rating for a given movie.

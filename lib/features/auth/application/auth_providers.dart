@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cine_shelf/features/auth/data/local/user_local_datasource_provider.dart';
 import 'package:cine_shelf/features/auth/data/repositories/auth_repository.dart';
 import 'package:cine_shelf/features/auth/data/repositories/user_repository.dart';
 import 'package:cine_shelf/features/auth/models/user_model.dart';
@@ -20,9 +21,13 @@ final firebaseFirestoreProvider = Provider<FirebaseFirestore>(
   (ref) => FirebaseFirestore.instance,
 );
 
-/// Provides [UserRepository] instance with [FirebaseFirestore] dependency.
+/// Provides [UserRepository] instance with [FirebaseFirestore] and
+/// [UserLocalDataSource] dependencies.
 final userRepositoryProvider = Provider<UserRepository>((ref) {
-  return UserRepository(ref.watch(firebaseFirestoreProvider));
+  return FirestoreUserRepository(
+    ref.watch(firebaseFirestoreProvider),
+    ref.watch(userLocalDataSourceProvider),
+  );
 });
 
 /// Stream provider that emits current authentication state.

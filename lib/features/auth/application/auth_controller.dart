@@ -3,6 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth_providers.dart';
+import 'package:cine_shelf/features/auth/data/local/user_local_datasource_provider.dart';
+import 'package:cine_shelf/features/lists/data/local/list_local_datasource_provider.dart';
+import 'package:cine_shelf/features/rating/data/local/rating_cache_datasource_provider.dart';
 
 /// Provider for AuthController instances.
 final authControllerProvider = Provider<AuthController>((ref) {
@@ -80,15 +83,34 @@ class AuthController {
     }
   }
 
-  /// Signs out current user.
+  /// Signs out current user and clears all cached user data.
   Future<void> signOut() async {
     final signOutFlag = ref.read(signOutInProgressProvider.notifier);
     signOutFlag.setInProgress(true);
+
+    final uid = ref.read(authStateProvider).asData?.value?.uid;
+
     try {
+      if (uid != null) {
+        await _clearUserCache(uid);
+      }
+
       await ref.read(authRepositoryProvider).signOut();
     } catch (_) {
       signOutFlag.setInProgress(false);
       rethrow;
     }
+  }
+
+  Future<void> _clearUserCache(String uid) async {
+    final userCache = ref.read(userLocalDataSourceProvider);
+    final listCache = ref.read(listLocalDataSourceProvider);
+    final listMovieCache = ref.read(listMovieLocalDataSourceProvider);
+    final ratingCache = ref.read(ratingCacheLocalDataSourceProvider);
+
+    await listMovieCache.clearByUid(uid);
+    await listCache.clearLists(uid);
+    await ratingCache.clearByUid(uid);
+    await userCache.clearUser(uid);
   }
 }

@@ -1,15 +1,41 @@
+import 'package:cine_shelf/features/auth/data/local/user_cache_mapper.dart';
+import 'package:cine_shelf/features/auth/data/local/user_local_datasource.dart';
 import 'package:cine_shelf/features/auth/models/profile_update.dart';
 import 'package:cine_shelf/features/auth/models/user_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:async';
 
-/// Repository for managing user profile documents in Firestore.
+/// Repository contract for user profile operations (remote + cache).
+abstract class UserRepository {
+  Future<void> createUserDocument({
+    required String uid,
+    required String username,
+    required String email,
+  });
+
+  Future<UserModel?> getUserDocument(String uid);
+
+  Future<void> updateEditableProfile({
+    required String uid,
+    required ProfileUpdate update,
+  });
+}
+
+/// Repository for managing user profile documents in Firestore with local cache.
 ///
 /// Handles:
 /// - User profile creation (cooperates with Cloud Functions)
-/// - Fetching user profile data
+/// - Fetching user profile data (with offline fallback to local cache)
 ///
 /// User documents are stored in the `/user/{uid}` collection.
+///
+/// **Offline Caching Strategy:**
+/// [getUserDocument] implements a try-remote-catch-local pattern:
+/// 1. Attempts to fetch from Firestore (remote)
+/// 2. On success: returns data and caches it locally (fire & forget)
+/// 3. On failure: falls back to local Drift cache
+/// 4. Returns null only if no remote data and no cache available
 ///
 /// **Error handling strategy:**
 /// The two methods in this repository intentionally differ in error behavior:
@@ -17,19 +43,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 ///   trigger a rollback (delete the Firebase Auth account) when profile
 ///   creation fails. Swallowing the error here would leave an orphaned auth
 ///   account with no Firestore document.
-/// - [getUserDocument] **swallows** exceptions and returns `null` because a
-///   missing profile on read is a recoverable situation — the UI can show a
-///   fallback state without breaking the session.
+/// - [getUserDocument] **swallows** exceptions and falls back to cache
+///   because a missing profile on read is a recoverable situation — the UI
+///   can show fallback or cached state without breaking the session.
 ///
 /// **Dependency Injection for Testability:**
-/// The [FirebaseFirestore] instance is injected via constructor, allowing:
-/// - Easy mocking in unit tests without Firebase initialization.
-/// - Decoupling from Firebase SDK specifics.
-class UserRepository {
-  /// Creates a [UserRepository] with the provided [FirebaseFirestore] instance.
-  UserRepository(this._firestore);
+/// Both [FirebaseFirestore] and [UserLocalDataSource] are injected via
+/// constructor, allowing easy mocking in tests.
+class FirestoreUserRepository implements UserRepository {
+  /// Creates a [FirestoreUserRepository] with the provided dependencies.
+  ///
+  /// **Parameters:**
+  /// - [_firestore]: Firestore instance for remote operations
+  /// - [_userLocalDataSource]: Local Drift data source for offline fallback
+  FirestoreUserRepository(
+    this._firestore,
+    this._userLocalDataSource,
+  );
 
   final FirebaseFirestore _firestore;
+  final UserLocalDataSource _userLocalDataSource;
 
   /// Creates a user profile document in Firestore with Cloud Function enrichment.
   ///
@@ -53,6 +86,7 @@ class UserRepository {
   /// - [uid]: User ID from Firebase Authentication.
   /// - [username]: Display name for the user.
   /// - [email]: User's email address (trimmed and lowercased before writing).
+  @override
   Future<void> createUserDocument({
     required String uid,
     required String username,
@@ -73,27 +107,52 @@ class UserRepository {
     }
   }
 
-  /// Fetches the user profile document from Firestore.
+  /// Fetches the user profile document with fallback to local cache.
   ///
-  /// Returns:
-  /// - [UserModel] if the document exists (`createdAt` may be null initially).
-  /// - `null` if the document does not exist or any error occurs.
+  /// **Behavior:**
+  /// 1. Attempts to fetch from Firestore (remote source)
+  /// 2. On success: Returns [UserModel] and caches it locally (fire & forget)
+  /// 3. On failure: Falls back to local cache (Drift)
+  /// 4. If no cache available: Returns `null`
   ///
-  /// **Error behavior:** Errors are logged but not rethrown. A missing profile
-  /// on read is a recoverable condition — the UI shows fallback values
-  /// ("User" / "No email") without breaking the authenticated session.
+  /// **Returns:**
+  /// - [UserModel] from Firestore (remote) if online
+  /// - [UserModel] from cache (Drift) if offline
+  /// - `null` if no remote data and no cache available
+  ///
+  /// **Offline behavior:**
+  /// When offline, returns cached data if previously loaded. Users can view
+  /// their profile without internet as long as it was cached during a
+  /// previous online session.
   ///
   /// Parameters:
-  /// - [uid]: User ID to fetch the profile for.
+  /// - [uid]: User ID to fetch the profile for
+  @override
   Future<UserModel?> getUserDocument(String uid) async {
     try {
+      // ATTEMPT REMOTE
       final doc = await _firestore.collection('user').doc(uid).get();
       if (doc.exists) {
-        return UserModel.fromFirestore(doc, uid);
+        final user = UserModel.fromFirestore(doc, uid);
+
+        // CACHE LOCALLY (fire & forget, non-blocking)
+        unawaited(_userLocalDataSource.cacheUser(user));
+
+        return user;
       }
       return null;
-    } catch (e) {
-      debugPrint('Error fetching user document: $e');
+    } on FirebaseException catch (e) {
+      // REMOTE FAILED: try local cache
+      debugPrint('USER REMOTE ERROR: $e, attempting cache fallback');
+
+      final cachedEntity = await _userLocalDataSource.getUser(uid);
+      if (cachedEntity != null) {
+        debugPrint('USER CACHE HIT: returning cached data');
+        return cachedEntity.toAppModel();
+      }
+
+      // No cache available
+      debugPrint('USER CACHE MISS: no cached user found');
       return null;
     }
   }
@@ -103,6 +162,7 @@ class UserRepository {
   /// Ownership of the user aggregate stays in this repository. Binary avatar
   /// upload remains outside of Firestore and is handled by the account Storage
   /// repository before its final URL is persisted here.
+  @override
   Future<void> updateEditableProfile({
     required String uid,
     required ProfileUpdate update,

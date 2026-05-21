@@ -98,7 +98,12 @@ class MovieDetailsScreen extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           const SizedBox(height: 2),
-                          Text(detail.title, style: CineTypography.headline1),
+                          Text(
+                            detail.title.isNotEmpty
+                                ? detail.title
+                                : 'Unknown title',
+                            style: CineTypography.headline1,
+                          ),
                           const SizedBox(height: CineSpacing.sm),
                           Text.rich(
                             TextSpan(
