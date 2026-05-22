@@ -127,7 +127,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: CineSpacing.md),
-                AuthTextField(isPassword: false, onChanged: _onEmailChanged),
+                AuthTextField(
+                  hintText: 'Email',
+                  icon: Icons.email_outlined,
+                  onChanged: _onEmailChanged,
+                ),
                 if (_emailError != null)
                   Padding(
                     padding: const EdgeInsets.only(top: CineSpacing.sm),
@@ -153,6 +157,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 ),
                 const SizedBox(height: CineSpacing.md),
                 AuthTextField(
+                  hintText: 'Password',
+                  icon: Icons.lock_outlined,
                   isPassword: true,
                   onChanged: (v) => setState(() => _password = v),
                 ),

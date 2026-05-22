@@ -13,11 +13,23 @@ import 'package:cine_shelf/shared/config/theme.dart';
 /// The optional [onChanged] callback allows parent widgets to react to input
 /// changes in real time, enabling form validation as the user types.
 class AuthTextField extends StatefulWidget {
-  const AuthTextField({required this.isPassword, this.onChanged, super.key});
+  const AuthTextField({
+    this.isPassword = false,
+    this.icon,
+    this.hintText,
+    this.onChanged,
+    super.key,
+  });
 
   /// When `true`, the field operates in password mode: text is obscured
   /// and a visibility toggle button is shown.
   final bool isPassword;
+
+  /// Optional icon displayed at the start of the field.
+  final IconData? icon;
+
+  /// Optional hint text for the field.
+  final String? hintText;
 
   /// Called with the current field value on every keystroke.
   ///
@@ -68,20 +80,24 @@ class _AuthTextFieldState extends State<AuthTextField> {
           ),
           cursorColor: const Color(0xFFFFA84B),
           decoration: InputDecoration(
-            hintText: isPassword
-                ? AuthTextField._passwordHint
-                : AuthTextField._emailHint,
+            hintText:
+                widget.hintText ??
+                (widget.isPassword
+                    ? AuthTextField._passwordHint
+                    : AuthTextField._emailHint),
             hintStyle: const TextStyle(
               color: CineColors.textMuted,
               fontSize: 17,
               fontWeight: FontWeight.w500,
             ),
-            prefixIcon: Icon(
-              isPassword ? Icons.lock_outlined : Icons.email_outlined,
-              color: CineColors.amber,
-              size: CineSizes.iconSize,
-            ),
-            suffixIcon: isPassword
+            prefixIcon: widget.icon != null
+                ? Icon(
+                    widget.icon,
+                    color: CineColors.amber,
+                    size: CineSizes.iconSize,
+                  )
+                : null,
+            suffixIcon: widget.isPassword
                 ? IconButton(
                     icon: Icon(
                       _obscureText ? Icons.visibility_off : Icons.visibility,

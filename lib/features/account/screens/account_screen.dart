@@ -70,7 +70,7 @@ class AccountScreen extends ConsumerWidget {
           children: [
             const Align(
               alignment: Alignment.centerRight,
-              child: SizedBox(width: 96, child: RegionDropdown()),
+              child: SizedBox(width: 180, child: RegionDropdown()),
             ),
             const SizedBox(height: CineSpacing.xxxl),
 
