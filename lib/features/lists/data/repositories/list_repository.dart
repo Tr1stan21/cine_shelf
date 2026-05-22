@@ -79,6 +79,8 @@ class FirestoreListRepository implements ListRepository {
   final FirebaseFirestore _firestore;
   final ListLocalDataSource _listLocalDataSource;
   final ListMovieLocalDataSource _listMovieDataSource;
+  StreamSubscription<QuerySnapshot>? _syncSubscription;
+  String? _syncUid;
 
   CollectionReference<Map<String, dynamic>> _moviesCol(
     String uid,
@@ -299,66 +301,44 @@ class FirestoreListRepository implements ListRepository {
   /// **Parameters:**
   /// - [uid]: User ID to fetch custom lists for
   @override
-  Stream<List<UserCustomList>> watchCustomLists({required String uid}) async* {
-    final baseQuery = _firestore
+  Stream<List<UserCustomList>> watchCustomLists({required String uid}) {
+    // 1) Source of truth: reactive stream from Drift
+    final localStream = _listLocalDataSource
+        .watchLists(uid)
+        .map(
+          (rows) => rows
+              .where((r) => r.type == 'custom')
+              .map((r) => r.toAppModel())
+              .toList(),
+        );
+
+    // 2) Start Firestore -> Drift sync in background (fire-and-forget)
+    _startFirestoreSync(uid);
+
+    // 3) Emit only from local Drift stream
+    return localStream;
+  }
+
+  void _startFirestoreSync(String uid) {
+    // No-op if already syncing for same uid
+    if (_syncUid == uid && _syncSubscription != null) return;
+
+    _syncSubscription?.cancel();
+    _syncUid = uid;
+
+    final query = _firestore
         .collection('user')
         .doc(uid)
         .collection('list')
-        .where('type', isEqualTo: 'custom');
+        .where('type', isEqualTo: 'custom')
+        .orderBy('createdAt');
 
-    final orderedQuery = baseQuery.orderBy('createdAt');
-
-    List<UserCustomList> mapSnapshot(QuerySnapshot<Map<String, dynamic>> snap) {
+    _syncSubscription = query.snapshots().listen((snap) {
       final lists = snap.docs
           .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
           .toList();
-      lists.sort((a, b) {
-        final aCreatedAt = a.createdAt;
-        final bCreatedAt = b.createdAt;
-        if (aCreatedAt == null && bCreatedAt == null) return 0;
-        if (aCreatedAt == null) return 1;
-        if (bCreatedAt == null) return -1;
-        return aCreatedAt.compareTo(bCreatedAt);
-      });
-
       unawaited(_listLocalDataSource.replaceAllLists(lists, uid));
-      return lists;
-    }
-
-    try {
-      await for (final snap in orderedQuery.snapshots()) {
-        yield mapSnapshot(snap);
-      }
-    } catch (error, stackTrace) {
-      debugPrint(
-        'CUSTOM LISTS REMOTE ERROR: $error, attempting cache fallback\n$stackTrace',
-      );
-
-      try {
-        final cachedLists = await _listLocalDataSource.getLists(uid);
-        if (cachedLists.isNotEmpty) {
-          debugPrint(
-            'CUSTOM LISTS CACHE HIT: returning ${cachedLists.length} lists',
-          );
-          yield cachedLists.map((e) => e.toAppModel()).toList();
-          return;
-        }
-      } catch (cacheError, cacheStackTrace) {
-        debugPrint('CUSTOM LISTS CACHE ERROR: $cacheError\n$cacheStackTrace');
-      }
-
-      debugPrint('CUSTOM LISTS CACHE MISS: trying unordered remote query');
-      try {
-        await for (final snap in baseQuery.snapshots()) {
-          yield mapSnapshot(snap);
-        }
-      } catch (fallbackError, fallbackStackTrace) {
-        debugPrint(
-          'CUSTOM LISTS FALLBACK QUERY FAILED: $fallbackError\n$fallbackStackTrace',
-        );
-        yield [];
-      }
-    }
+    }, onError: (e) => debugPrint('Firestore sync error (offline?): $e'));
   }
 
   /// Creates a new custom list document. Returns the generated listId.
@@ -381,15 +361,31 @@ class FirestoreListRepository implements ListRepository {
         .collection('user')
         .doc(uid)
         .collection('list')
-        .doc(); // Auto-generate ID
+        .doc();
 
-    await listRef.set({
-      'name': name.trim(),
-      'type': 'custom',
-      'iconName': iconName,
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+    final now = DateTime.now(); // local timestamp for immediate UI
+
+    final newList = UserCustomList(
+      id: listRef.id,
+      name: name.trim(),
+      iconName: iconName,
+      createdAt: now,
+      updatedAt: now,
+    );
+
+    // 1) Write to Drift first so UI updates immediately
+    await _listLocalDataSource.cacheList(newList, uid);
+
+    // 2) Write to Firestore in background; serverTimestamp will normalize
+    unawaited(
+      listRef.set({
+        'name': name.trim(),
+        'type': 'custom',
+        'iconName': iconName,
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
+      }),
+    );
 
     return listRef.id;
   }
@@ -404,30 +400,11 @@ class FirestoreListRepository implements ListRepository {
     required String uid,
     required String listId,
   }) async {
-    final listRef = _firestore
-        .collection('user')
-        .doc(uid)
-        .collection('list')
-        .doc(listId);
-
-    final listSnapshot = await listRef.get();
-    if (!listSnapshot.exists) {
-      // La lista no existe en remoto — limpiar el caché local si quedó huérfano
-      await _listLocalDataSource.deleteList(uid, listId);
-      return;
-    }
-
-    final listData = listSnapshot.data();
-    if (listData == null || listData['type'] != 'custom') {
-      throw StateError('Only custom lists can be deleted.');
-    }
-
-    // Borrar del caché local ANTES de Firestore para que el stream
-    // no pueda reescribirla si emite durante el borrado de películas
+    // 1) Delete from Drift first so UI updates immediately
     await _listLocalDataSource.deleteList(uid, listId);
 
-    await listRef.delete();
-    unawaited(_deleteListMoviesInBackground(uid, listId));
+    // 2) Delete from Firestore in background
+    unawaited(_deleteFromFirestoreInBackground(uid, listId));
   }
 
   Future<void> _deleteListMoviesInBackground(String uid, String listId) async {
@@ -457,5 +434,29 @@ class FirestoreListRepository implements ListRepository {
         'ERROR deleting movies in background for list $listId: $e\n$st',
       );
     }
+  }
+
+  Future<void> _deleteFromFirestoreInBackground(
+    String uid,
+    String listId,
+  ) async {
+    try {
+      final listRef = _firestore
+          .collection('user')
+          .doc(uid)
+          .collection('list')
+          .doc(listId);
+
+      await listRef.delete();
+      await _deleteListMoviesInBackground(uid, listId);
+    } catch (e, st) {
+      debugPrint('ERROR deleting list from Firestore: $e\n$st');
+    }
+  }
+
+  void dispose() {
+    _syncSubscription?.cancel();
+    _syncSubscription = null;
+    _syncUid = null;
   }
 }

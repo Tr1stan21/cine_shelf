@@ -8,11 +8,15 @@ import 'package:cine_shelf/features/lists/models/user_custom_list.dart';
 
 /// Provides ListRepository instance with Firestore and local cache dependencies.
 final listRepositoryProvider = Provider<ListRepository>((ref) {
-  return FirestoreListRepository(
+  final repo = FirestoreListRepository(
     ref.watch(firebaseFirestoreProvider),
     ref.watch(listLocalDataSourceProvider),
     ref.watch(listMovieLocalDataSourceProvider),
   );
+
+  ref.onDispose(() => repo.dispose());
+
+  return repo;
 });
 
 /// Stream provider for count of movies in lists.

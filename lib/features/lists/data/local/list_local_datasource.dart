@@ -128,6 +128,17 @@ class ListLocalDataSource {
     }
   }
 
+  /// Returns a reactive stream of cached lists for [uid].
+  ///
+  /// Emits a new value whenever the underlying `user_lists` table changes
+  /// for the given user. Consumers should map and filter as needed.
+  Stream<List<UserListLocalEntity>> watchLists(String uid) {
+    return (_db.select(_db.userListsTable)
+          ..where((t) => t.uid.equals(uid))
+          ..orderBy([(t) => OrderingTerm.asc(t.createdAt)]))
+        .watch();
+  }
+
   /// Deletes all cached lists for a user.
   ///
   /// **Behavior:**
@@ -178,9 +189,10 @@ class ListLocalDataSource {
   Future<void> replaceAllLists(List<UserCustomList> lists, String uid) async {
     try {
       await _db.transaction(() async {
+        // Delete only custom lists for the user, keep base/system lists intact.
         await (_db.delete(
           _db.userListsTable,
-        )..where((l) => l.uid.equals(uid))).go();
+        )..where((l) => l.uid.equals(uid) & l.type.equals('custom'))).go();
 
         if (lists.isEmpty) return;
 
