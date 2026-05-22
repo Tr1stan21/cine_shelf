@@ -333,16 +333,19 @@ class FirestoreListRepository implements ListRepository {
         .where('type', isEqualTo: 'custom')
         .orderBy('createdAt');
 
-    _syncSubscription = query.snapshots().listen((snap) {
-      final lists = snap.docs
-          .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
-          .toList();
-      unawaited(_listLocalDataSource.replaceAllLists(lists, uid));
-    }, onError: (e) {
-      debugPrint('Firestore sync error (offline?): $e');
-      _syncSubscription = null;
-      _syncUid = null;
-    });
+    _syncSubscription = query.snapshots().listen(
+      (snap) {
+        final lists = snap.docs
+            .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
+            .toList();
+        unawaited(_listLocalDataSource.replaceAllLists(lists, uid));
+      },
+      onError: (e) {
+        debugPrint('Firestore sync error (offline?): $e');
+        _syncSubscription = null;
+        _syncUid = null;
+      },
+    );
   }
 
   /// Creates a new custom list document. Returns the generated listId.
