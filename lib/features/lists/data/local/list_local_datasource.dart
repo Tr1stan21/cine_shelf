@@ -80,8 +80,6 @@ class ListLocalDataSource {
   /// - [uid]: User ID that owns the lists
   Future<void> cacheLists(List<UserCustomList> lists, String uid) async {
     try {
-      if (lists.isEmpty) return;
-
       final companions = lists
           .map(
             (list) => UserListsTableCompanion(
@@ -161,6 +159,56 @@ class ListLocalDataSource {
       await _db.delete(_db.userListsTable).go();
     } catch (e, st) {
       debugPrint('ERROR clearing all cached lists: $e\n$st');
+    }
+  }
+
+  Future<void> deleteList(String uid, String listId) async {
+    try {
+      await (_db.delete(
+        _db.userListsTable,
+      )..where((l) => l.uid.equals(uid) & l.listId.equals(listId))).go();
+    } catch (e, st) {
+      debugPrint('ERROR deleting cached list: $e\n$st');
+    }
+  }
+
+  /// Replaces all cached lists for a user atomically.
+  /// Deletes all existing rows for [uid] and inserts [lists].
+  /// Safe to call with an empty list — it will clear the cache.
+  Future<void> replaceAllLists(List<UserCustomList> lists, String uid) async {
+    try {
+      await _db.transaction(() async {
+        await (_db.delete(
+          _db.userListsTable,
+        )..where((l) => l.uid.equals(uid))).go();
+
+        if (lists.isEmpty) return;
+
+        final companions = lists
+            .map(
+              (list) => UserListsTableCompanion(
+                listId: Value(list.id),
+                uid: Value(uid),
+                name: Value(list.name),
+                type: const Value('custom'),
+                iconName: Value(list.iconName),
+                createdAt: list.createdAt != null
+                    ? Value(list.createdAt)
+                    : const Value(null),
+                updatedAt: list.updatedAt != null
+                    ? Value(list.updatedAt)
+                    : const Value(null),
+                cachedAt: Value(DateTime.now()),
+              ),
+            )
+            .toList();
+
+        await _db.batch((batch) {
+          batch.insertAllOnConflictUpdate(_db.userListsTable, companions);
+        });
+      });
+    } catch (e, st) {
+      debugPrint('ERROR replacing cached lists: $e\n$st');
     }
   }
 }

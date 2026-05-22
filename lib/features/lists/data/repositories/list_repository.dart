@@ -321,7 +321,7 @@ class FirestoreListRepository implements ListRepository {
         return aCreatedAt.compareTo(bCreatedAt);
       });
 
-      unawaited(_listLocalDataSource.cacheLists(lists, uid));
+      unawaited(_listLocalDataSource.replaceAllLists(lists, uid));
       return lists;
     }
 
@@ -383,12 +383,14 @@ class FirestoreListRepository implements ListRepository {
         .collection('list')
         .doc(); // Auto-generate ID
 
+    final now = Timestamp.now();
+
     await listRef.set({
       'name': name.trim(),
       'type': 'custom',
       'iconName': iconName,
-      'createdAt': FieldValue.serverTimestamp(),
-      'updatedAt': FieldValue.serverTimestamp(),
+      'createdAt': now,
+      'updatedAt': now,
     });
 
     return listRef.id;
@@ -419,23 +421,40 @@ class FirestoreListRepository implements ListRepository {
       throw StateError('Only custom lists can be deleted.');
     }
 
-    while (true) {
-      final moviesSnapshot = await listRef
-          .collection('movies')
-          .limit(500)
-          .get();
-
-      if (moviesSnapshot.docs.isEmpty) {
-        break;
-      }
-
-      final batch = _firestore.batch();
-      for (final doc in moviesSnapshot.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-    }
-
+    // Eliminar el documento de la lista primero — el stream emite
+    // inmediatamente y la UI la quita. Las películas se borran después
+    // en background sin afectar la pantalla.
     await listRef.delete();
+    unawaited(_deleteListMoviesInBackground(uid, listId));
+    await _listLocalDataSource.deleteList(uid, listId);
+  }
+
+  Future<void> _deleteListMoviesInBackground(String uid, String listId) async {
+    final listRef = _firestore
+        .collection('user')
+        .doc(uid)
+        .collection('list')
+        .doc(listId);
+
+    try {
+      while (true) {
+        final moviesSnapshot = await listRef
+            .collection('movies')
+            .limit(500)
+            .get();
+
+        if (moviesSnapshot.docs.isEmpty) break;
+
+        final batch = _firestore.batch();
+        for (final doc in moviesSnapshot.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      }
+    } catch (e, st) {
+      debugPrint(
+        'ERROR deleting movies in background for list $listId: $e\n$st',
+      );
+    }
   }
 }
