@@ -8,6 +8,8 @@ import 'package:cine_shelf/features/lists/models/user_custom_list.dart';
 
 /// Provides ListRepository instance with Firestore and local cache dependencies.
 final listRepositoryProvider = Provider<ListRepository>((ref) {
+  ref.watch(authStateProvider);
+
   final repo = FirestoreListRepository(
     ref.watch(firebaseFirestoreProvider),
     ref.watch(listLocalDataSourceProvider),

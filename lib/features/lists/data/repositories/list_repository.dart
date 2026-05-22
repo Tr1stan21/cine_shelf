@@ -338,7 +338,11 @@ class FirestoreListRepository implements ListRepository {
           .map((doc) => UserCustomList.fromFirestore(doc.id, doc.data()))
           .toList();
       unawaited(_listLocalDataSource.replaceAllLists(lists, uid));
-    }, onError: (e) => debugPrint('Firestore sync error (offline?): $e'));
+    }, onError: (e) {
+      debugPrint('Firestore sync error (offline?): $e');
+      _syncSubscription = null;
+      _syncUid = null;
+    });
   }
 
   /// Creates a new custom list document. Returns the generated listId.
