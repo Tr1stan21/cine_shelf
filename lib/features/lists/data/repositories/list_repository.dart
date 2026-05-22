@@ -383,14 +383,12 @@ class FirestoreListRepository implements ListRepository {
         .collection('list')
         .doc(); // Auto-generate ID
 
-    final now = Timestamp.now();
-
     await listRef.set({
       'name': name.trim(),
       'type': 'custom',
       'iconName': iconName,
-      'createdAt': now,
-      'updatedAt': now,
+      'createdAt': FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
     });
 
     return listRef.id;
@@ -400,6 +398,7 @@ class FirestoreListRepository implements ListRepository {
   ///
   /// Verifies the list document exists and that its type is 'custom'
   /// before removing any documents.
+  @override
   @override
   Future<void> deleteCustomList({
     required String uid,
@@ -413,7 +412,9 @@ class FirestoreListRepository implements ListRepository {
 
     final listSnapshot = await listRef.get();
     if (!listSnapshot.exists) {
-      throw StateError('Custom list does not exist.');
+      // La lista no existe en remoto — limpiar el caché local si quedó huérfano
+      await _listLocalDataSource.deleteList(uid, listId);
+      return;
     }
 
     final listData = listSnapshot.data();
@@ -421,12 +422,12 @@ class FirestoreListRepository implements ListRepository {
       throw StateError('Only custom lists can be deleted.');
     }
 
-    // Eliminar el documento de la lista primero — el stream emite
-    // inmediatamente y la UI la quita. Las películas se borran después
-    // en background sin afectar la pantalla.
+    // Borrar del caché local ANTES de Firestore para que el stream
+    // no pueda reescribirla si emite durante el borrado de películas
+    await _listLocalDataSource.deleteList(uid, listId);
+
     await listRef.delete();
     unawaited(_deleteListMoviesInBackground(uid, listId));
-    await _listLocalDataSource.deleteList(uid, listId);
   }
 
   Future<void> _deleteListMoviesInBackground(String uid, String listId) async {
